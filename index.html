@@ -11,8 +11,6 @@ body {
   background: linear-gradient(135deg,#0f172a,#1e293b);
   color: #111;
 }
-
-/* APP CONTAINER */
 .app-container {
   max-width: 950px;
   margin: 40px auto;
@@ -21,8 +19,6 @@ body {
   padding: 25px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.25);
 }
-
-/* HEADER TABS */
 header {
   display: flex;
   gap: 8px;
@@ -31,7 +27,6 @@ header {
   border-radius: 14px;
   margin-bottom: 20px;
 }
-
 header button {
   flex: 1;
   background: transparent;
@@ -43,14 +38,11 @@ header button {
   color: #9ca3af;
   transition: 0.25s ease;
 }
-
 header button.active {
   background: #22d3ee;
   color: #0f172a;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-
-/* SECTIONS */
 section {
   display: none;
   background: #ffffff;
@@ -58,24 +50,14 @@ section {
   padding: 25px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
-
-section.active {
-  display: block;
-}
-
-/* TOTAL DISPLAY */
+section.active { display: block; }
 .total-display {
   font-size: 28px;
   font-weight: 800;
   text-align: center;
   margin-bottom: 20px;
 }
-
-.total-display span {
-  color: #0ea5e9;
-}
-
-/* FORM ELEMENTS */
+.total-display span { color: #0ea5e9; }
 input, select {
   padding: 10px;
   border-radius: 10px;
@@ -85,7 +67,6 @@ input, select {
   width: 100%;
   box-sizing: border-box;
 }
-
 button.add-btn,
 button.pay-btn {
   background: #0f172a;
@@ -98,32 +79,22 @@ button.pay-btn {
   transition: 0.2s ease;
   margin-bottom: 10px;
 }
-
 button.add-btn:hover,
-button.pay-btn:hover {
-  background: #1e293b;
-  transform: translateY(-2px);
-}
-
-/* DELETE & EDIT BUTTONS */
-.delete-btn {
-  background: #ef4444;
-  color: white;
+button.pay-btn:hover { background: #1e293b; transform: translateY(-2px); }
+.delete-btn,
+.edit-btn {
   border: none;
   padding: 5px 10px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
-  margin-left:5px;
 }
-
-/* LIST DESIGN */
-ul {
-  list-style: none;
-  padding: 0;
-}
-
+.delete-btn { background: #ef4444; color: white; margin-left:5px; }
+.delete-btn:hover { background:#b91c1c; }
+.edit-btn { background: #facc15; color:#111; }
+.edit-btn:hover { background:#eab308; }
+ul { list-style: none; padding: 0; }
 ul li {
   background: #f1f5f9;
   padding: 14px;
@@ -135,24 +106,12 @@ ul li {
   border: 1px solid #e2e8f0;
   transition: 0.2s ease;
 }
-
-ul li:hover {
-  transform: translateY(-2px);
-  background: #e2e8f0;
-}
-
-/* ICONS */
+ul li:hover { transform: translateY(-2px); background: #e2e8f0; }
 .wallet-icon::before { content:'💰 '; }
 .expense-icon::before { content:'🛒 '; }
 .bill-icon::before { content:'🧾 '; }
 .debt-icon::before { content:'💳 '; }
-
-@media (max-width:480px){
-  ul li {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
+@media (max-width:480px){ ul li { flex-direction: column; align-items: flex-start; } }
 </style>
 </head>
 <body>
@@ -183,6 +142,7 @@ ul li:hover {
   <ul id="dailyList"></ul>
 
   <h2 class="total-display total-bills">Bills Total Savings: ₱<span id="billsTotal">0.00</span></h2>
+  <h2 class="total-display total-bills-all">Total Bills: ₱<span id="billsAll">0.00</span></h2>
   <input type="text" id="billName" placeholder="Bill Name" />
   <input type="number" id="billAmount" placeholder="Amount" />
   <select id="billWalletSelect"></select>
@@ -194,6 +154,7 @@ ul li:hover {
 <!-- Debt -->
 <section id="debtTab">
   <h2 class="total-display total-debt">Debt Total Savings: ₱<span id="debtTotal">0.00</span></h2>
+  <h2 class="total-display total-debt-all">Total Debt: ₱<span id="debtAll">0.00</span></h2>
   <input type="text" id="debtName" placeholder="Debt Name" />
   <input type="number" id="debtAmount" placeholder="Amount" />
   <select id="debtWalletSelect"></select>
@@ -204,18 +165,15 @@ ul li:hover {
 </div>
 
 <script>
-/* ===== HELPER ===== */
-function formatPeso(amount){
-  return amount.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-
-/* ===== DATA ===== */
 let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let bills = JSON.parse(localStorage.getItem('bills')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || [];
 
-/* ===== TABS ===== */
+function formatPeso(value){
+  return value.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
 function showTab(tabId){
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
@@ -223,7 +181,6 @@ function showTab(tabId){
   document.querySelector(`header button[onclick*="${tabId}"]`).classList.add('active');
 }
 
-/* ===== WALLET DROPDOWN ===== */
 function updateWalletDropdown(){
   const selects = [document.getElementById('walletSelect'), document.getElementById('billWalletSelect'), document.getElementById('debtWalletSelect')];
   selects.forEach(sel=>sel.innerHTML='');
@@ -237,79 +194,65 @@ function updateWalletDropdown(){
   });
 }
 
-/* ===== WALLETS ===== */
 function updateWalletList(){
-  const list=document.getElementById('walletList'); list.innerHTML='';
+  const list = document.getElementById('walletList'); list.innerHTML='';
   wallets.forEach((w, idx)=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<span class="wallet-icon">${w.name}</span>: ₱${formatPeso(w.balance)}`;
-
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="wallet-icon">${w.name}</span>: ₱${formatPeso(w.balance)}`;
     const editBtn=document.createElement('button');
     editBtn.textContent='✏️ Edit';
-    editBtn.className='delete-btn';
-    editBtn.style.background='#3b82f6';
+    editBtn.className='edit-btn';
     editBtn.onclick=()=>editWallet(idx);
-
     const delBtn=document.createElement('button');
     delBtn.textContent='🗑 Delete';
     delBtn.className='delete-btn';
     delBtn.onclick=()=>deleteWallet(idx);
-
-    li.appendChild(editBtn);
-    li.appendChild(delBtn);
-    list.appendChild(li);
+    li.appendChild(editBtn); li.appendChild(delBtn); list.appendChild(li);
   });
   updateTotals();
-  localStorage.setItem('wallets',JSON.stringify(wallets));
+  localStorage.setItem('wallets', JSON.stringify(wallets));
 }
 
 function addWallet(){
-  const name=document.getElementById('walletName').value.trim();
+  const name=document.getElementById('walletName').value;
   const balance=parseFloat(document.getElementById('walletBalance').value)||0;
-  if(name){ wallets.push({name,balance}); updateWalletDropdown(); updateWalletList();
+  if(name){
+    wallets.push({name,balance});
     document.getElementById('walletName').value=''; document.getElementById('walletBalance').value='';
-    updateTotals();
+    updateWalletDropdown(); updateWalletList(); updateTotals();
   }
 }
+
 function editWallet(idx){
-  const w=wallets[idx];
-  const newName=prompt("Edit Wallet Name:", w.name);
-  if(newName!==null && newName.trim()!=='') w.name=newName.trim();
-  const newBalance=prompt("Edit Wallet Balance:", w.balance);
-  if(newBalance!==null && !isNaN(parseFloat(newBalance))) w.balance=parseFloat(newBalance);
-  updateWalletDropdown(); updateWalletList();
+  const newName=prompt('Edit wallet name:',wallets[idx].name);
+  if(newName) wallets[idx].name=newName;
+  const newBalance=parseFloat(prompt('Edit balance:',wallets[idx].balance));
+  if(!isNaN(newBalance)) wallets[idx].balance=newBalance;
+  updateWalletDropdown(); updateWalletList(); updateTotals();
 }
+
 function deleteWallet(idx){
   wallets.splice(idx,1);
   transactions=transactions.filter(t=>t.wallet!==idx).map(t=>{if(t.wallet>idx)t.wallet--; return t;});
   updateWalletDropdown(); updateWalletList(); updateDailyExpenses(); updateTotals();
 }
 
-/* ===== TRANSACTIONS ===== */
+// Transactions
 function updateDailyExpenses(){
   const list=document.getElementById('dailyList'); list.innerHTML='';
   transactions.forEach((t,idx)=>{
     const li=document.createElement('li');
     li.innerHTML=`<span class="expense-icon">${wallets[t.wallet].name}</span> - ₱${formatPeso(t.amount)} (${t.date})`;
-
-    const editBtn=document.createElement('button');
-    editBtn.textContent='✏️ Edit';
-    editBtn.className='delete-btn';
-    editBtn.style.background='#3b82f6';
+    const editBtn=document.createElement('button'); editBtn.textContent='✏️ Edit'; editBtn.className='edit-btn';
     editBtn.onclick=()=>editTransaction(idx);
-
-    const delBtn=document.createElement('button');
-    delBtn.textContent='🗑 Delete';
-    delBtn.className='delete-btn';
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑 Delete'; delBtn.className='delete-btn';
     delBtn.onclick=()=>deleteTransaction(idx);
-
-    li.appendChild(editBtn);
-    li.appendChild(delBtn);
-    list.appendChild(li);
+    li.appendChild(editBtn); li.appendChild(delBtn); list.appendChild(li);
   });
   updateTotals();
-  localStorage.setItem('transactions',JSON.stringify(transactions));
+  localStorage.setItem('transactions', JSON.stringify(transactions));
 }
+
 function addTransaction(){
   const idx=parseInt(document.getElementById('walletSelect').value);
   const amount=parseFloat(document.getElementById('txnAmount').value)||0;
@@ -319,113 +262,90 @@ function addTransaction(){
     if(amount>wallet.balance){ alert(`❌ Insufficient funds! Wallet "${wallet.name}" only has ₱${formatPeso(wallet.balance)}.`); return; }
     transactions.push({wallet:idx, amount, date});
     wallet.balance-=amount; updateWalletDropdown(); updateWalletList(); updateDailyExpenses();
-    document.getElementById('txnAmount').value='';
+    document.getElementById('txnAmount').value=''; document.getElementById('txnDate').value='';
   }
 }
+
 function editTransaction(idx){
   const t=transactions[idx];
-  const newAmount=prompt("Edit Expense Amount:", t.amount);
-  const newDate=prompt("Edit Date (YYYY-MM-DD):", t.date);
-  if(newAmount!==null && !isNaN(parseFloat(newAmount))) {
-    wallets[t.wallet].balance+=t.amount-parseFloat(newAmount);
-    t.amount=parseFloat(newAmount);
+  const newAmount=parseFloat(prompt('Edit expense amount:',t.amount));
+  const newDate=prompt('Edit expense date:',t.date);
+  if(!isNaN(newAmount)){
+    wallets[t.wallet].balance+=t.amount; // revert old
+    t.amount=newAmount; t.date=newDate;
+    wallets[t.wallet].balance-=newAmount; // deduct new
+    updateWalletDropdown(); updateWalletList(); updateDailyExpenses();
   }
-  if(newDate!==null && newDate.trim()!=='') t.date=newDate.trim();
-  updateWalletDropdown(); updateWalletList(); updateDailyExpenses();
 }
+
 function deleteTransaction(idx){
   const txn=transactions[idx];
   wallets[txn.wallet].balance+=txn.amount;
   transactions.splice(idx,1); updateWalletDropdown(); updateWalletList(); updateDailyExpenses();
 }
 
-/* ===== BILLS ===== */
+// Bills
 function updateBillList(){
   const list=document.getElementById('billList'); list.innerHTML='';
   bills.forEach((b,idx)=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<span class="bill-icon">${b.name}</span> - ₱${formatPeso(b.amount)}`;
-
-    const editBtn=document.createElement('button');
-    editBtn.textContent='✏️ Edit';
-    editBtn.className='delete-btn';
-    editBtn.style.background='#3b82f6';
+    const li=document.createElement('li'); li.innerHTML=`<span class="bill-icon">${b.name}</span> - ₱${formatPeso(b.amount)}`;
+    const editBtn=document.createElement('button'); editBtn.textContent='✏️ Edit'; editBtn.className='edit-btn';
     editBtn.onclick=()=>editBill(idx);
-
-    const delBtn=document.createElement('button');
-    delBtn.textContent='🗑 Delete';
-    delBtn.className='delete-btn';
-    delBtn.onclick=()=>deleteBill(idx);
-
-    li.appendChild(editBtn);
-    li.appendChild(delBtn);
-    list.appendChild(li);
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑 Delete'; delBtn.className='delete-btn';
+    delBtn.onclick=()=>deleteBill(idx); li.appendChild(editBtn); li.appendChild(delBtn); list.appendChild(li);
   });
-  updateTotals();
-  localStorage.setItem('bills',JSON.stringify(bills));
+  updateTotals(); localStorage.setItem('bills', JSON.stringify(bills));
 }
 function addBill(){
-  const name=document.getElementById('billName').value.trim();
+  const name=document.getElementById('billName').value;
   const amount=parseFloat(document.getElementById('billAmount').value)||0;
-  if(name&&amount>0){ bills.push({name,amount}); updateWalletDropdown(); updateWalletList(); updateBillList();
+  if(name&&amount>0){ bills.push({name,amount});
     document.getElementById('billName').value=''; document.getElementById('billAmount').value='';
+    updateWalletDropdown(); updateWalletList(); updateBillList();
   }
 }
 function editBill(idx){
   const b=bills[idx];
-  const newName=prompt("Edit Bill Name:", b.name);
-  const newAmount=prompt("Edit Bill Amount:", b.amount);
-  if(newName!==null && newName.trim()!=='') b.name=newName.trim();
-  if(newAmount!==null && !isNaN(parseFloat(newAmount))) b.amount=parseFloat(newAmount);
-  updateWalletDropdown(); updateWalletList(); updateBillList();
+  const newName=prompt('Edit bill name:',b.name);
+  const newAmount=parseFloat(prompt('Edit bill amount:',b.amount));
+  if(newName) b.name=newName;
+  if(!isNaN(newAmount)) b.amount=newAmount;
+  updateBillList();
 }
 function deleteBill(idx){ bills.splice(idx,1); updateBillList(); }
+function payBills(){ payAll(bills,'bill'); bills=[]; updateBillList(); }
 
-/* ===== DEBTS ===== */
+// Debts
 function updateDebtList(){
   const list=document.getElementById('debtList'); list.innerHTML='';
   debts.forEach((d,idx)=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<span class="debt-icon">${d.name}</span> - ₱${formatPeso(d.amount)}`;
-
-    const editBtn=document.createElement('button');
-    editBtn.textContent='✏️ Edit';
-    editBtn.className='delete-btn';
-    editBtn.style.background='#3b82f6';
+    const li=document.createElement('li'); li.innerHTML=`<span class="debt-icon">${d.name}</span> - ₱${formatPeso(d.amount)}`;
+    const editBtn=document.createElement('button'); editBtn.textContent='✏️ Edit'; editBtn.className='edit-btn';
     editBtn.onclick=()=>editDebt(idx);
-
-    const delBtn=document.createElement('button');
-    delBtn.textContent='🗑 Delete';
-    delBtn.className='delete-btn';
-    delBtn.onclick=()=>deleteDebt(idx);
-
-    li.appendChild(editBtn);
-    li.appendChild(delBtn);
-    list.appendChild(li);
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑 Delete'; delBtn.className='delete-btn';
+    delBtn.onclick=()=>deleteDebt(idx); li.appendChild(editBtn); li.appendChild(delBtn); list.appendChild(li);
   });
-  updateTotals();
-  localStorage.setItem('debts',JSON.stringify(debts));
+  updateTotals(); localStorage.setItem('debts', JSON.stringify(debts));
 }
 function addDebt(){
-  const name=document.getElementById('debtName').value.trim();
+  const name=document.getElementById('debtName').value;
   const amount=parseFloat(document.getElementById('debtAmount').value)||0;
-  if(name&&amount>0){ debts.push({name,amount}); updateWalletDropdown(); updateWalletList(); updateDebtList();
+  if(name&&amount>0){ debts.push({name,amount});
     document.getElementById('debtName').value=''; document.getElementById('debtAmount').value='';
+    updateWalletDropdown(); updateWalletList(); updateDebtList();
   }
 }
 function editDebt(idx){
   const d=debts[idx];
-  const newName=prompt("Edit Debt Name:", d.name);
-  const newAmount=prompt("Edit Debt Amount:", d.amount);
-  if(newName!==null && newName.trim()!=='') d.name=newName.trim();
-  if(newAmount!==null && !isNaN(parseFloat(newAmount))) d.amount=parseFloat(newAmount);
-  updateWalletDropdown(); updateWalletList(); updateDebtList();
+  const newName=prompt('Edit debt name:',d.name);
+  const newAmount=parseFloat(prompt('Edit debt amount:',d.amount));
+  if(newName) d.name=newName;
+  if(!isNaN(newAmount)) d.amount=newAmount;
+  updateDebtList();
 }
 function deleteDebt(idx){ debts.splice(idx,1); updateDebtList(); }
-
-/* ===== PAY ALL ===== */
-function payBills(){ payAll(bills,'bill'); bills=[]; updateBillList(); }
 function payDebt(){ payAll(debts,'debt'); debts=[]; updateDebtList(); }
+
 function payAll(array,type){
   if(array.length===0){ alert('No '+type+' to pay!'); return; }
   if(!confirm('Do you want to pay all '+type+'?')) return;
@@ -436,7 +356,6 @@ function payAll(array,type){
   updateWalletDropdown(); updateWalletList(); updateTotals();
 }
 
-/* ===== TOTALS ===== */
 function updateTotals(){
   const mainTotal = wallets.reduce((sum,w)=>sum+w.balance,0);
   document.getElementById('total').textContent=formatPeso(mainTotal);
@@ -446,17 +365,18 @@ function updateTotals(){
 
   let billsTotal = mainTotal;
   let debtTotal = mainTotal;
+  if(totalBills>0) billsTotal=mainTotal-totalBills; if(billsTotal<0) billsTotal=0;
+  if(totalDebt>0) debtTotal=mainTotal-totalDebt; if(debtTotal<0) debtTotal=0;
 
-  if(totalBills>0) billsTotal = mainTotal - totalBills;
-  if(totalDebt>0) debtTotal = mainTotal - totalDebt;
+  document.getElementById('billsTotal').textContent=formatPeso(billsTotal);
+  document.getElementById('debtTotal').textContent=formatPeso(debtTotal);
 
-  document.getElementById('billsTotal').textContent=formatPeso(billsTotal>=0?billsTotal:0);
-  document.getElementById('debtTotal').textContent=formatPeso(debtTotal>=0?debtTotal:0);
+  document.getElementById('billsAll').textContent=formatPeso(totalBills);
+  document.getElementById('debtAll').textContent=formatPeso(totalDebt);
 }
 
-/* ===== INIT ===== */
+// ===== Init =====
 updateWalletDropdown(); updateWalletList(); updateDailyExpenses(); updateBillList(); updateDebtList();
 </script>
 </body>
 </html>
-``
