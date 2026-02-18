@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Money Tracker</title>
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg,#0f172a,#1e293b);
+  color: #111;
+}
+
+/* APP CONTAINER */
+.app-container {
+  max-width: 950px;
+  margin: 40px auto;
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+/* HEADER TABS */
+header {
+  display: flex;
+  gap: 8px;
+  background: #111827;
+  padding: 6px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+header button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: 0.25s ease;
+}
+
+header button.active {
+  background: #22d3ee;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* SECTIONS */
+section {
+  display: none;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+section.active {
+  display: block;
+}
+
+/* TOTAL DISPLAY */
+.total-display {
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.total-display span {
+  color: #0ea5e9;
+}
+
+/* FORM ELEMENTS */
+input, select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button.add-btn,
+button.pay-btn {
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s ease;
+  margin-bottom: 10px;
+}
+
+button.add-btn:hover,
+button.pay-btn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* LIST DESIGN */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li {
+  background: #f1f5f9;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  transition: 0.2s ease;
+}
+
+ul li:hover {
+  transform: translateY(-2px);
+  background: #e2e8f0;
+}
+
+/* ICONS */
+.wallet-icon::before { content:'💰 '; }
+.expense-icon::before { content:'🛒 '; }
+.bill-icon::before { content:'🧾 '; }
+.debt-icon::before { content:'💳 '; }
+
+@media (max-width:480px){
+  ul li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <button class="tab-btn active" onclick="showTab('walletsTab')">Wallets</button>
+  <button class="tab-btn" onclick="showTab('expensesTab')">Expenses & Bills</button>
+  <button class="tab-btn" onclick="showTab('debtTab')">Debt</button>
+</header>
+
+<!-- Wallets -->
+<section id="walletsTab" class="active">
+  <h2 class="total-display">Main Total Savings: ₱<span id="total">0</span></h2>
+  <input type="text" id="walletName" placeholder="Wallet Name" />
+  <input type="number" id="walletBalance" placeholder="Initial Balance" />
+  <button class="add-btn" onclick="addWallet()">➕ Add Wallet</button>
+  <ul id="walletList"></ul>
+</section>
+
+<!-- Expenses & Bills -->
+<section id="expensesTab">
+  <h2 class="total-display">Daily Expenses</h2>
+  <select id="walletSelect"></select>
+  <input type="number" id="txnAmount" placeholder="Amount" />
+  <input type="date" id="txnDate" />
+  <button class="add-btn" onclick="addTransaction()">➕ Add Expense</button>
+  <ul id="dailyList"></ul>
+
+  <h2 class="total-display total-bills">Bills Total Savings: ₱<span id="billsTotal">0</span></h2>
+  <input type="text" id="billName" placeholder="Bill Name" />
+  <input type="number" id="billAmount" placeholder="Amount" />
+  <select id="billWalletSelect"></select>
+  <button class="add-btn" onclick="addBill()">➕ Add Bill</button>
+  <button class="pay-btn" onclick="payBills()">💸 Pay All Bills</button>
+  <ul id="billList"></ul>
+</section>
+
+<!-- Debt -->
+<section id="debtTab">
+  <h2 class="total-display total-debt">Debt Total Savings: ₱<span id="debtTotal">0</span></h2>
+  <input type="text" id="debtName" placeholder="Debt Name" />
+  <input type="number" id="debtAmount" placeholder="Amount" />
+  <select id="debtWalletSelect"></select>
+  <button class="add-btn" onclick="addDebt()">➕ Add Debt</button>
+  <button class="pay-btn" onclick="payDebt()">💳 Pay All Debt</button>
+  <ul id="debtList"></ul>
+</section>
+
+<script>
+let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+let bills = JSON.parse(localStorage.getItem('bills')) || [];
+let debts = JSON.parse(localStorage.getItem('debts')) || [];
+
+function showTab(tabId){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelectorAll('header button').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`header button[onclick*="${tabId}"]`).classList.add('active');
+}
+
+function updateWalletDropdown(){
+  const selects = [document.getElementById('walletSelect'), document.getElementById('billWalletSelect'), document.getElementById('debtWalletSelect')];
+  selects.forEach(sel=>sel.innerHTML='');
+  wallets.forEach((w, idx)=>{
+    selects.forEach(sel=>{
+      const opt = document.createElement('option');
+      opt.value = idx;
+      opt.textContent = `💰 ${w.name} (₱${w.balance})`;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function updateWalletList(){
+  const list = document.getElementById('walletList'); list.innerHTML='';
+  wallets.forEach((w, idx)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="wallet-icon">${w.name}</span>: ₱${w.balance}`;
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '🗑 Delete';
+    delBtn.className='delete-btn';
+    delBtn.onclick=()=>deleteWallet(idx);
+    li.appendChild(delBtn); list.appendChild(li);
+  });
+  updateTotals();
+  localStorage.setItem('wallets', JSON.stringify(wallets));
+}
+
+function addWallet(){
+  const name=document.getElementById('walletName').value;
+  const balance=parseFloat(document.getElementById('walletBalance').value)||0;
+  if(name){ wallets.push({name, balance}); updateWalletDropdown(); updateWalletList();
+    document.getElementById('walletName').value=''; document.getElementById('walletBalance').value='';
+    updateTotals();
+  }
+}
+function deleteWallet(idx){
+  wallets.splice(idx,1);
+  transactions=transactions.filter(t=>t.wallet!==idx).map(t=>{if(t.wallet>idx)t.wallet--; return t;});
+  updateWalletDropdown(); updateWalletList(); updateDailyExpenses(); updateTotals();
+}
+
+function updateDailyExpenses(){
+  const list=document.getElementById('dailyList'); list.innerHTML='';
+  transactions.forEach((t,idx)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="expense-icon">${wallets[t.wallet].name}</span> - ₱${t.amount} (${t.date})`;
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑 Delete'; delBtn.className='delete-btn';
+    delBtn.onclick=()=>deleteTransaction(idx);
+    li.appendChild(delBtn); list.appendChild(li);
+  });
+  updateTotals();
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+function addTransaction(){
+  const idx=parseInt(document.getElementById('walletSelect').value);
+  const amount=parseFloat(document.getElementById('txnAmount').value)||0;
+  const date=document.getElementById('txnDate').value;
+  const wallet=wallets[idx];
+  if(!isNaN(idx)&&amount>0&&date){
+    if(amount>wallet.balance){ alert(`❌ Error: Insufficient funds! Wallet "${wallet.name}" only has ₱${wallet.balance}.`); return; }
+    transactions.push({wallet:idx, amount, date});
+    wallet.balance-=amount; updateWalletDropdown(); updateWalletList(); updateDailyExpenses();
+    document.getElementById('txnAmount').value='';
+  }
+}
+function deleteTransaction(idx){
+  const txn=transactions[idx];
+  wallets[txn.wallet].balance+=txn.amount;
+  transactions.splice(idx,1); updateWalletDropdown(); updateWalletList(); updateDailyExpenses();
+}
+
+function updateBillList(){
+  const list=document.getElementById('billList'); list.innerHTML='';
+  bills.forEach((b,idx)=>{
+    const li=document.createElement('li'); li.innerHTML=`<span class="bill-icon">${b.name}</span> - ₱${b.amount}`;
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑 Delete'; delBtn.className='delete-btn';
+    delBtn.onclick=()=>deleteBill(idx); li.appendChild(delBtn); list.appendChild(li);
+  });
+  updateTotals();
+  localStorage.setItem('bills', JSON.stringify(bills));
+}
+function addBill(){
+  const name=document.getElementById('billName').value;
+  const amount=parseFloat(document.getElementById('billAmount').value)||0;
+  if(name&&amount>0){ bills.push({name,amount}); updateWalletDropdown(); updateWalletList(); updateBillList();
+    document.getElementById('billName').value=''; document.getElementById('billAmount').value='';
+  }
+}
+function deleteBill(idx){ bills.splice(idx,1); updateBillList(); }
+
+function updateDebtList(){
+  const list=document.getElementById('debtList'); list.innerHTML='';
+  debts.forEach((d,idx)=>{
+    const li=document.createElement('li'); li.innerHTML=`<span class="debt-icon">${d.name}</span> - ₱${d.amount}`;
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑 Delete'; delBtn.className='delete-btn';
+    delBtn.onclick=()=>deleteDebt(idx); li.appendChild(delBtn); list.appendChild(li);
+  });
+  updateTotals();
+  localStorage.setItem('debts', JSON.stringify(debts));
+}
+function addDebt(){
+  const name=document.getElementById('debtName').value;
+  const amount=parseFloat(document.getElementById('debtAmount').value)||0;
+  if(name&&amount>0){ debts.push({name,amount}); updateWalletDropdown(); updateWalletList(); updateDebtList();
+    document.getElementById('debtName').value=''; document.getElementById('debtAmount').value='';
+  }
+}
+function deleteDebt(idx){ debts.splice(idx,1); updateDebtList(); }
+
+function payBills(){ payAll(bills,'bill'); bills=[]; updateBillList(); }
+function payDebt(){ payAll(debts,'debt'); debts=[]; updateDebtList(); }
+function payAll(array,type){
+  if(array.length===0){ alert('No '+type+' to pay!'); return; }
+  if(!confirm('Do you want to pay all '+type+'?')) return;
+  let totalPay=array.reduce((sum,item)=>sum+item.amount,0);
+  let remaining=totalPay;
+  for(let w of wallets){ if(remaining<=0) break; if(w.balance>=remaining){ w.balance-=remaining; remaining=0; } else { remaining-=w.balance; w.balance=0; } }
+  if(remaining>0){ alert('❌ Insufficient funds across all wallets!'); return; }
+  updateWalletDropdown(); updateWalletList(); updateTotals();
+}
+
+function updateTotals(){
+  const mainTotal = wallets.reduce((sum,w)=>sum+w.balance,0);
+  document.getElementById('total').textContent = mainTotal;
+
+  const totalBills = bills.reduce((sum,b)=>sum+b.amount,0);
+  const totalDebt = debts.reduce((sum,d)=>sum+d.amount,0);
+
+  let billsTotal;
+  let debtTotal;
+
+  // DEFAULT: lahat naka sync sa main
+  billsTotal = mainTotal;
+  debtTotal = mainTotal;
+
+  // If may bills tracked (allocation only)
+  if(totalBills > 0){
+    billsTotal = mainTotal - totalBills;
+    if(billsTotal < 0) billsTotal = 0;
+  }
+
+  // If may debt tracked (allocation only)
+  if(totalDebt > 0){
+    debtTotal = mainTotal - totalDebt;
+    if(debtTotal < 0) debtTotal = 0;
+  }
+
+  document.getElementById('billsTotal').textContent = billsTotal;
+  document.getElementById('debtTotal').textContent = debtTotal;
+}
+
+// ===== Init =====
+updateWalletDropdown(); updateWalletList(); updateDailyExpenses(); updateBillList(); updateDebtList();
+</script>
+
+</body>
+</html>
