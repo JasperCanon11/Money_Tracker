@@ -271,17 +271,22 @@
     const list = type === 'bills' ? bills : debts;
     if(!list.length) return;
     document.getElementById('modalTitle').innerText = "Pay All " + type;
-    document.getElementById('modalDesc').innerText = "Deduct all from selected wallet:";
+    document.getElementById('modalDesc').innerText = "Deduct as many as possible from this wallet:";
     document.getElementById('modalInputs').innerHTML = `<select id="ps">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>`;
     document.getElementById('modalCancelBtn').style.display = "block";
     const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Pay All Now"; btn.style.background = 'var(--success)';
+    btn.innerText = "Confirm Pay All"; btn.style.background = 'var(--success)';
     btn.onclick = () => {
       const wIdx = document.getElementById('ps').value;
-      while(list.length > 0 && wallets[wIdx].balance >= list[0].amount){
-        let itm = list.shift();
-        wallets[wIdx].balance -= itm.amount;
-        history.push({ name: `Paid ${type}: ${itm.name}`, amount: itm.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
+      let i = 0;
+      while (i < list.length) {
+        if (wallets[wIdx].balance >= list[i].amount) {
+          let itm = list.splice(i, 1)[0];
+          wallets[wIdx].balance -= itm.amount;
+          history.push({ name: `Paid ${type}: ${itm.name}`, amount: itm.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
+        } else {
+          i++;
+        }
       }
       save(); closeModal();
     };
