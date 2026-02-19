@@ -12,6 +12,8 @@
       --accent-light: #e0e7ff;
       --success: #059669;
       --danger: #dc2626;
+      --warning: #f59e0b;
+      --purple: #8b5cf6;
       --text-main: #1e293b;
       --text-muted: #64748b;
       --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
@@ -70,9 +72,15 @@
       background: white; padding: 24px; border-radius: 24px; 
       margin-bottom: 24px; border: 1px solid #f1f5f9; 
       box-shadow: var(--card-shadow);
+      border-top-width: 5px;
     }
     .input-box h4 { margin: 0 0 16px 0; font-size: 0.9rem; color: var(--text-main); font-weight: 800; }
     
+    .input-bill { border-top-color: var(--danger); }
+    .input-expense { border-top-color: var(--warning); }
+    .input-debt { border-top-color: var(--purple); }
+    .input-wallet { border-top-color: var(--accent); }
+
     input, select { 
       width: 100%; padding: 14px 16px; border-radius: 14px; 
       border: 1px solid #e2e8f0; background: #f8fafc; 
@@ -112,7 +120,12 @@
       border: 1px solid #f1f5f9; margin-bottom: 12px; 
       display: flex; justify-content: space-between; align-items: center; 
       box-shadow: var(--card-shadow);
+      position: relative; overflow: hidden;
     }
+    
+    .list-item.line-bill { border-left: 6px solid var(--danger); }
+    .list-item.line-debt { border-left: 6px solid var(--purple); }
+    .list-item.line-expense { border-left: 6px solid var(--warning); }
 
     .action-btns { display: flex; gap: 8px; }
     .edit-btn, .del-btn { padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; border: none; cursor: pointer; }
@@ -129,6 +142,15 @@
       background: white; width: 90%; max-width: 340px; padding: 28px; 
       border-radius: 30px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
     }
+
+    .backup-controls {
+      display: flex; flex-direction: column; gap: 10px; margin-top: 30px; margin-bottom: 20px;
+    }
+    .backup-row { display: flex; gap: 10px; }
+    .btn-outline {
+      flex: 1; background: white; border: 2px solid #e2e8f0; padding: 12px; border-radius: 14px;
+      font-weight: 700; color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
+    }
     
     section { display: none; animation: fadeIn 0.4s ease; }
     section.active { display: block; }
@@ -142,8 +164,8 @@
     <h3 id="modalTitle" style="margin:0 0 10px 0; font-weight: 800;">Action</h3>
     <p id="modalDesc" style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"></p>
     <div id="modalInputs"></div>
-    <div style="display: flex; gap: 12px; margin-top: 24px;">
-      <button onclick="closeModal()" style="flex:1; padding:14px; border-radius:14px; border:none; background:#f1f5f9; font-weight:700; color:var(--text-muted)">Cancel</button>
+    <div id="modalFooter" style="display: flex; gap: 12px; margin-top: 24px;">
+      <button id="modalCancelBtn" onclick="closeModal()" style="flex:1; padding:14px; border-radius:14px; border:none; background:#f1f5f9; font-weight:700; color:var(--text-muted)">Cancel</button>
       <button id="modalConfirmBtn" style="flex:1; padding:14px; border-radius:14px; border:none; font-weight:700;">Confirm</button>
     </div>
   </div>
@@ -161,7 +183,7 @@
       <small>Current Savings</small>
       <b>₱<span id="mainTotal">0.00</span></b>
     </div>
-    <div class="input-box">
+    <div class="input-box input-wallet">
       <h4>Add New Wallet</h4>
       <input type="text" id="wName" placeholder="e.g. GCash, Maya, Cash">
       <input type="number" id="wBal" placeholder="0.00" inputmode="decimal">
@@ -172,6 +194,15 @@
       <button class="btn-text-action danger" onclick="confirmClearAll('wallets')">Clear All</button>
     </div>
     <div id="walletGrid"></div>
+
+    <div class="backup-controls">
+      <button class="btn-outline" style="border-color: var(--accent); color: var(--accent); background: #f5f3ff;" onclick="copyAsText()">📋 Copy All Data (Text)</button>
+      <div class="backup-row">
+        <button class="btn-outline" onclick="exportData()">💾 Export JSON</button>
+        <button class="btn-outline" onclick="document.getElementById('fileInput').click()">📂 Import JSON</button>
+      </div>
+      <input type="file" id="fileInput" style="display:none" onchange="importData(event)" accept=".json">
+    </div>
   </section>
 
   <section id="expenses">
@@ -179,31 +210,20 @@
       <div class="stat-card"><small>Safe to Spend</small><b style="color:var(--accent)">₱<span id="billForecast">0.00</span></b></div>
       <div class="stat-card"><small>Bills Total</small><b style="color:var(--danger)">₱<span id="totalBillsOnly">0.00</span></b></div>
     </div>
-    <div class="input-box">
+    <div class="input-box input-bill">
       <h4>Record Bill</h4>
       <input type="text" id="bName" placeholder="e.g. Electric, Rent">
       <input type="number" id="bAmt" placeholder="0.00" inputmode="decimal">
       <button class="btn-primary" onclick="addBill()">Add Bill</button>
     </div>
-    <div class="section-header">
-      <h5>Active Bills</h5>
-      <div class="header-actions">
-        <button class="btn-text-action success" onclick="openPayAll('bills')">Pay All</button>
-        <button class="btn-text-action danger" onclick="confirmClearAll('bills')">Clear All</button>
-      </div>
-    </div>
     <div id="billList"></div>
     <div id="billPager" class="pagination-controls"></div>
 
-    <div class="input-box" style="margin-top: 32px; border-top: 4px solid var(--success);">
-      <h4 style="color:var(--success)">Quick Spend</h4>
+    <div class="input-box input-expense" style="margin-top: 32px;">
+      <h4 style="color:var(--warning)">Quick Spend</h4>
       <input type="number" id="gAmt" placeholder="Amount ₱" inputmode="decimal">
       <select id="gWalletSelect"></select>
       <button class="btn-primary" style="background:var(--success);" onclick="addDailyExpense()">Record Spend</button>
-    </div>
-    <div class="section-header">
-      <h5>History</h5>
-      <button class="btn-text-action danger" onclick="confirmClearAll('history')">Clear All</button>
     </div>
     <div id="historyList"></div>
     <div id="historyPager" class="pagination-controls"></div>
@@ -214,18 +234,11 @@
       <div class="stat-card"><small>After Payback</small><b style="color:var(--accent)">₱<span id="debtForecast">0.00</span></b></div>
       <div class="stat-card"><small>Active Debts</small><b style="color:#b45309">₱<span id="totalDebtsOnly">0.00</span></b></div>
     </div>
-    <div class="input-box">
+    <div class="input-box input-debt">
       <h4>Record Debt</h4>
       <input type="text" id="dName" placeholder="Lender's name">
       <input type="number" id="dAmt" placeholder="0.00" inputmode="decimal">
-      <button class="btn-primary" onclick="addDebt()">Save Debt</button>
-    </div>
-    <div class="section-header">
-      <h5>Debt List</h5>
-      <div class="header-actions">
-        <button class="btn-text-action success" onclick="openPayAll('debts')">Pay All</button>
-        <button class="btn-text-action danger" onclick="confirmClearAll('debts')">Clear All</button>
-      </div>
+      <button class="btn-primary" style="background:var(--purple);" onclick="addDebt()">Save Debt</button>
     </div>
     <div id="debtList"></div>
     <div id="debtPager" class="pagination-controls"></div>
@@ -250,11 +263,54 @@
     refresh();
   }
 
+  // --- NEW: COPY AS TEXT FEATURE ---
+  function copyAsText() {
+    let text = `💰 MONEY TRACKER SUMMARY (${new Date().toLocaleDateString()})\n`;
+    text += `==============================\n\n`;
+    
+    text += `🏦 WALLETS:\n`;
+    wallets.forEach(w => text += `- ${w.name}: ₱${format(w.balance)}\n`);
+    text += `Total Savings: ₱${format(wallets.reduce((s,w)=>s+w.balance,0))}\n\n`;
+
+    text += `📑 UNPAID BILLS:\n`;
+    bills.forEach(b => text += `- ${b.name}: ₱${format(b.amount)}\n`);
+    text += `Total Bills: ₱${format(bills.reduce((s,b)=>s+b.amount,0))}\n\n`;
+
+    text += `💸 DEBTS TO PAY:\n`;
+    debts.forEach(d => text += `- ${d.name}: ₱${format(d.amount)}\n`);
+    text += `Total Debts: ₱${format(debts.reduce((s,d)=>s+d.amount,0))}\n\n`;
+
+    text += `📜 RECENT HISTORY (Last 10):\n`;
+    history.slice(-10).reverse().forEach(h => text += `[${h.date}] ${h.name} - ₱${format(h.amount)}\n`);
+    
+    text += `\nGenerated via Money Tracker Pro`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      showModalAlert("Copied!", "Data summary copied to clipboard. You can now paste it in Notepad or Word.");
+    });
+  }
+
   function showTab(id){
     document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     event.currentTarget.classList.add('active');
+  }
+
+  const modal = document.getElementById('customModal');
+  function closeModal(){ modal.style.display='none'; }
+
+  function showModalAlert(title, desc, isError = false) {
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalDesc').innerText = desc;
+    document.getElementById('modalInputs').innerHTML = "";
+    document.getElementById('modalCancelBtn').style.display = "none";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Okay";
+    btn.style.background = isError ? 'var(--danger)' : 'var(--accent)';
+    btn.style.color = 'white';
+    btn.onclick = closeModal;
+    modal.style.display='flex';
   }
 
   function addWallet(){
@@ -276,75 +332,22 @@
     const a=document.getElementById('gAmt'), wIdx=document.getElementById('gWalletSelect').value;
     if(a.value && wIdx !== ""){
       const amt = parseFloat(a.value);
+      const walletName = wallets[wIdx].name;
       if(wallets[wIdx].balance >= amt){
         wallets[wIdx].balance -= amt;
         const now = new Date();
         history.push({
-            name: "Daily Spend", amount: amt, wallet: wallets[wIdx].name, 
+            name: `Expense: ${walletName}`, 
+            amount: amt, 
+            wallet: walletName, 
             date: now.toLocaleDateString(),
             time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
         });
         a.value=''; save();
-      } else { alert("Insufficient funds!"); }
-    }
-  }
-
-  const modal = document.getElementById('customModal');
-  function closeModal(){ modal.style.display='none'; }
-
-  function openPayAll(type) {
-    const list = type === 'bills' ? bills : debts;
-    if (list.length === 0) return;
-    const total = list.reduce((s, x) => s + x.amount, 0);
-    
-    document.getElementById('modalTitle').innerText = "Pay All " + (type==='bills'?'Bills':'Debts');
-    document.getElementById('modalDesc').innerText = `Total: ₱${format(total)}. Select Wallet:`;
-    document.getElementById('modalInputs').innerHTML = `<select id="ps">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>`;
-    
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.style.background = 'var(--success)'; btn.style.color = 'white';
-    btn.onclick = () => {
-      const wIdx = document.getElementById('ps').value;
-      if (!wallets[wIdx]) return;
-      
-      let walletBal = wallets[wIdx].balance;
-      let paidCount = 0;
-      
-      // Pay as many as possible from the start of the list
-      while (list.length > 0 && walletBal >= list[0].amount) {
-        let item = list.shift();
-        walletBal -= item.amount;
-        history.push({
-          name: `Paid (All): ${item.name}`, 
-          amount: item.amount, 
-          wallet: wallets[wIdx].name, 
-          date: new Date().toLocaleDateString(), 
-          time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
-        });
-        paidCount++;
+      } else { 
+        showModalAlert("Insufficient Funds", `Your ${walletName} balance is too low.`, true);
       }
-      
-      wallets[wIdx].balance = walletBal;
-      save(); closeModal();
-      if (paidCount === 0) alert("Insufficient funds in selected wallet!");
-    };
-    modal.style.display='flex';
-  }
-
-  function confirmClearAll(type) {
-    document.getElementById('modalTitle').innerText = "Clear All Records?";
-    document.getElementById('modalDesc').innerText = `Warning: This will delete all your ${type} data forever.`;
-    document.getElementById('modalInputs').innerHTML = "";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.style.background = 'var(--danger)'; btn.style.color = 'white';
-    btn.onclick = () => {
-      if(type==='wallets') wallets = [];
-      else if(type==='bills') bills = [];
-      else if(type==='debts') debts = [];
-      else if(type==='history') history = [];
-      save(); closeModal();
-    };
-    modal.style.display='flex';
+    }
   }
 
   function openEdit(type, idx){
@@ -355,7 +358,9 @@
       <input type="text" id="en" value="${item.name}">
       <input type="number" id="ea" value="${item.balance !== undefined ? item.balance : item.amount}" inputmode="decimal">
     `;
+    document.getElementById('modalCancelBtn').style.display = "block";
     const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Save";
     btn.style.background = 'var(--accent)'; btn.style.color = 'white';
     btn.onclick = () => {
       const n = document.getElementById('en').value, a = parseFloat(document.getElementById('ea').value);
@@ -370,9 +375,11 @@
 
   function confirmDelete(type, idx){
     document.getElementById('modalTitle').innerText = "Delete Record";
-    document.getElementById('modalDesc').innerText = "Are you sure you want to remove this?";
+    document.getElementById('modalDesc').innerText = "Are you sure?";
     document.getElementById('modalInputs').innerHTML = "";
+    document.getElementById('modalCancelBtn').style.display = "block";
     const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Delete";
     btn.style.background = 'var(--danger)'; btn.style.color = 'white';
     btn.onclick = () => {
       if(type==='wallets') wallets.splice(idx,1);
@@ -387,77 +394,74 @@
   function openPayIndividual(type, idx){
     const list = type==='bills'?bills:debts;
     const item = list[idx];
-    document.getElementById('modalTitle').innerText = "Payment Confirmation";
-    document.getElementById('modalDesc').innerText = `Pay ₱${format(item.amount)} using:`;
+    const labelPrefix = type === 'bills' ? 'Paid bill' : 'Paid debt';
+    document.getElementById('modalTitle').innerText = "Confirm Payment";
     document.getElementById('modalInputs').innerHTML = `<select id="ps">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>`;
+    document.getElementById('modalCancelBtn').style.display = "block";
     const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Pay Now";
     btn.style.background = 'var(--success)'; btn.style.color = 'white';
     btn.onclick = () => {
       const wIdx = document.getElementById('ps').value;
       if(!wallets[wIdx]) return;
       if(wallets[wIdx].balance >= item.amount){
         wallets[wIdx].balance -= item.amount;
-        history.push({name: `Paid: ${item.name}`, amount: item.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})});
+        history.push({ name: `${labelPrefix}: ${wallets[wIdx].name}`, amount: item.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
         list.splice(idx,1); save(); closeModal();
-      } else { alert("Insufficient funds!"); }
+      } else { showModalAlert("Low Balance", "Wallet balance insufficient.", true); }
     };
     modal.style.display='flex';
+  }
+
+  function exportData() {
+    const blob = new Blob([JSON.stringify({ wallets, bills, debts, history })], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Tracker_Backup.json`; a.click();
+  }
+
+  function importData(e) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = JSON.parse(event.target.result);
+      wallets=data.wallets; bills=data.bills; debts=data.debts; history=data.history; save();
+    };
+    reader.readAsText(e.target.files[0]);
   }
 
   function renderPager(id, type, total){
     const max = Math.ceil(total/step);
     if(max <= 1) { document.getElementById(id).innerHTML = ""; return; }
-    document.getElementById(id).innerHTML = `
-      <button class="page-btn" ${pages[type]===0?'disabled':''} onclick="pages['${type}']--; refresh()" style="background:white; border:1px solid #f1f5f9; padding:8px 16px; border-radius:10px; cursor:pointer;">←</button>
-      <span style="color:var(--text-muted); font-size: 0.75rem;">Page ${pages[type]+1} of ${max}</span>
-      <button class="page-btn" ${pages[type]>=max-1?'disabled':''} onclick="pages['${type}']++; refresh()" style="background:white; border:1px solid #f1f5f9; padding:8px 16px; border-radius:10px; cursor:pointer;">→</button>
-    `;
+    document.getElementById(id).innerHTML = `<button onclick="pages['${type}']--; refresh()" ${pages[type]===0?'disabled':''} style="padding:8px; border-radius:10px; border:1px solid #ddd; background:white;">←</button><span style="font-size:0.7rem; margin:0 10px">${pages[type]+1}/${max}</span><button onclick="pages['${type}']++; refresh()" ${pages[type]>=max-1?'disabled':''} style="padding:8px; border-radius:10px; border:1px solid #ddd; background:white;">→</button>`;
   }
 
   function refresh(){
     const tCash = wallets.reduce((s,w)=>s+w.balance,0);
     const tBills = bills.reduce((s,b)=>s+b.amount,0);
     const tDebts = debts.reduce((s,d)=>s+d.amount,0);
-    
     document.getElementById('mainTotal').innerText = format(tCash);
     document.getElementById('billForecast').innerText = format(tCash - tBills);
     document.getElementById('totalBillsOnly').innerText = format(tBills);
     document.getElementById('debtForecast').innerText = format(tCash - tDebts);
     document.getElementById('totalDebtsOnly').innerText = format(tDebts);
     document.getElementById('gWalletSelect').innerHTML = wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('') || '<option value="">No Wallet</option>';
-
-    document.getElementById('walletGrid').innerHTML = wallets.map((w,i)=>`
-      <div class="wallet-card">
-        <b>${w.name}</b><span>₱${format(w.balance)}</span>
-        <div class="action-btns"><button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button><button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button></div>
-      </div>`).join('');
+    
+    document.getElementById('walletGrid').innerHTML = wallets.map((w,i)=>`<div class="wallet-card"><b>${w.name}</b><span>₱${format(w.balance)}</span><div class="action-btns"><button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button><button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button></div></div>`).join('');
 
     const bStart = pages.bills * step;
-    document.getElementById('billList').innerHTML = bills.slice(bStart, bStart + step).map((b,i)=>`
-      <div class="list-item">
-        <div><b style="font-size: 0.95rem;">${b.name}</b><br><small style="color:var(--text-muted)">₱${format(b.amount)}</small></div>
-        <div style="text-align:right"><button class="pay-btn" onclick="openPayIndividual('bills',${bStart+i})">Pay</button>
-        <div class="action-btns" style="margin-top:8px"><button class="edit-btn" onclick="openEdit('bills',${bStart+i})">Edit</button><button class="del-btn" onclick="confirmDelete('bills',${bStart+i})">🗑</button></div></div>
-      </div>`).join('');
+    document.getElementById('billList').innerHTML = bills.slice(bStart, bStart + step).map((b,i)=>`<div class="list-item line-bill"><div><b>${b.name}</b><br><small>₱${format(b.amount)}</small></div><div style="text-align:right"><button class="pay-btn" onclick="openPayIndividual('bills',${bStart+i})">Pay</button><div class="action-btns" style="margin-top:8px"><button class="edit-btn" onclick="openEdit('bills',${bStart+i})">Edit</button><button class="del-btn" onclick="confirmDelete('bills',${bStart+i})">🗑</button></div></div></div>`).join('');
     renderPager('billPager', 'bills', bills.length);
 
     const dStart = pages.debts * step;
-    document.getElementById('debtList').innerHTML = debts.slice(dStart, dStart + step).map((d,i)=>`
-      <div class="list-item">
-        <div><b style="font-size: 0.95rem;">${d.name}</b><br><small style="color:var(--text-muted)">₱${format(d.amount)}</small></div>
-        <div style="text-align:right"><button class="pay-btn" onclick="openPayIndividual('debts',${dStart+i})">Pay</button>
-        <div class="action-btns" style="margin-top:8px"><button class="edit-btn" onclick="openEdit('debts',${dStart+i})">Edit</button><button class="del-btn" onclick="confirmDelete('debts',${dStart+i})">🗑</button></div></div>
-      </div>`).join('');
+    document.getElementById('debtList').innerHTML = debts.slice(dStart, dStart + step).map((d,i)=>`<div class="list-item line-debt"><div><b>${d.name}</b><br><small>₱${format(d.amount)}</small></div><div style="text-align:right"><button class="pay-btn" onclick="openPayIndividual('debts',${dStart+i})">Pay</button><div class="action-btns" style="margin-top:8px"><button class="edit-btn" onclick="openEdit('debts',${dStart+i})">Edit</button><button class="del-btn" onclick="confirmDelete('debts',${dStart+i})">🗑</button></div></div></div>`).join('');
     renderPager('debtPager', 'debts', debts.length);
 
     const hReversed = history.slice().reverse();
     const hStart = pages.history * step;
-    document.getElementById('historyList').innerHTML = hReversed.slice(hStart, hStart + step).map((h,i)=>`
-      <div class="list-item">
-        <div><b style="font-size: 0.9rem;">${h.name}</b><br><small style="font-size: 0.7rem; color:var(--text-muted)">${h.wallet} • ${h.date} ${h.time || ''}</small></div>
-        <div style="text-align:right"><b style="color:var(--danger)">-₱${format(h.amount)}</b>
-        <div class="action-btns" style="margin-top:8px"><button class="edit-btn" onclick="openEdit('history',${history.length-1-(hStart+i)})">Edit</button><button class="del-btn" onclick="confirmDelete('history',${history.length-1-(hStart+i)})">🗑</button></div></div>
-      </div>`).join('');
+    document.getElementById('historyList').innerHTML = hReversed.slice(hStart, hStart + step).map((h,i)=> {
+      let colorClass = 'line-expense';
+      if(h.name.includes('Paid bill')) colorClass = 'line-bill';
+      if(h.name.includes('Paid debt')) colorClass = 'line-debt';
+      return `<div class="list-item ${colorClass}"><div><b>${h.name}</b><br><small>${h.wallet} • ${h.date}</small></div><div style="text-align:right"><b style="color:var(--danger)">-₱${format(h.amount)}</b><div class="action-btns" style="margin-top:8px"><button class="edit-btn" onclick="openEdit('history',${history.length-1-(hStart+i)})">Edit</button><button class="del-btn" onclick="confirmDelete('history',${history.length-1-(hStart+i)})">🗑</button></div></div></div>`;
+    }).join('');
     renderPager('historyPager', 'history', history.length);
   }
   refresh();
