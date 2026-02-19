@@ -192,7 +192,7 @@
       const amt = parseFloat(a.value);
       if(wallets[wIdx].balance >= amt){
         wallets[wIdx].balance -= amt;
-        history.push({ name: `Spend: ${wallets[wIdx].name}`, amount: amt, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
+        history.push({ name: `Expense: ${wallets[wIdx].name}`, amount: amt, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
         a.value=''; save();
       } else { showModalAlert("Low Balance", "Insufficient funds in the selected wallet!", true); }
     }
@@ -260,7 +260,7 @@
       const wIdx = document.getElementById('ps').value;
       if(wallets[wIdx].balance >= list[idx].amount){
         wallets[wIdx].balance -= list[idx].amount;
-        history.push({ name: `Paid ${type}: ${list[idx].name}`, amount: list[idx].amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
+        history.push({ name: `Paid ${type}: ${wallets[wIdx].name}`, amount: list[idx].amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
         list.splice(idx,1); save(); closeModal();
       } else { closeModal(); showModalAlert("Low Balance", "Insufficient funds in this wallet!", true); }
     };
@@ -283,7 +283,7 @@
         if (wallets[wIdx].balance >= list[i].amount) {
           let itm = list.splice(i, 1)[0];
           wallets[wIdx].balance -= itm.amount;
-          history.push({ name: `Paid ${type}: ${itm.name}`, amount: itm.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
+          history.push({ name: `Paid ${type}: ${wallets[wIdx].name}`, amount: itm.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
         } else {
           i++;
         }
@@ -332,7 +332,7 @@
 
     const hR = [...history].reverse();
     const hS = pages.history * step;
-    document.getElementById('historyList').innerHTML = hR.slice(hS, hS+step).map((h,i)=>`<div class="list-item ${h.name.includes('Paid bills')?'line-bill':h.name.includes('Paid debts')?'line-debt':'line-expense'}"><div><b>${h.name}</b><br><small>${h.wallet} • ${h.date}</small><div class="action-btns"><button class="del-btn" onclick="confirmDelete('history',${history.length-1-(hS+i)})">🗑</button></div></div><b style="color:var(--danger)">-₱${format(h.amount)}</b></div>`).join('');
+    document.getElementById('historyList').innerHTML = hR.slice(hS, hS+step).map((h,i)=>`<div class="list-item ${h.name.toLowerCase().includes('bills')?'line-bill':h.name.toLowerCase().includes('debts')?'line-debt':'line-expense'}"><div><b>${h.name}</b><br><small>${h.date}</small><div class="action-btns"><button class="del-btn" onclick="confirmDelete('history',${history.length-1-(hS+i)})">🗑</button></div></div><b style="color:var(--danger)">-₱${format(h.amount)}</b></div>`).join('');
     renderPager('historyPager', 'history', history.length);
   }
   refresh();
