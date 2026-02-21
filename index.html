@@ -431,7 +431,7 @@
           let partialAmt = wallet.balance;
           item.amount -= partialAmt;
           wallet.balance = 0;
-          summaryLines.push(`Partial: ${originalName} (Rem: ${format(item.amount)})`);
+          summaryLines.push(`Partial: ${originalName} (Remaining Balance: ${format(item.amount)})`);
           const log = { name: `${originalName} (Partial) via ${walletOrigName}`, amount: partialAmt, date: new Date().toLocaleDateString() };
           if(type==='bills') billHistory.push(log); else debtHistory.push(log);
           i++;
@@ -730,7 +730,7 @@ function copyTextSummary() {
 
     navigator.clipboard.writeText(report).then(() => {
       // Heto yung modal popup gamit yung logic mo
-      showMsg("Success", "Summary copied to clipboard! You can now paste it to your Notes or Messenger.");
+      showMsg("Success", "Summary copied to clipboard!.");
     }).catch(err => {
       showMsg("Error", "Failed to copy text.", true);
     });
