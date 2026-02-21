@@ -203,32 +203,47 @@
   <section id="budget">
     <div class="discipline-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <div><small style="font-weight: 800; color: var(--accent);">2-WEEK LIMIT</small><input type="number" id="spendLimit" value="6000" oninput="saveBudgetSettings()" style="width: 100px; margin:0; padding: 5px;"></div>
-        <div style="text-align: right;"><small style="font-weight: 800;">DAYS LEFT</small><input type="number" id="daysToGo" value="14" oninput="saveBudgetSettings()" style="width: 60px; margin:0; padding: 5px;"></div>
+        <div>
+          <small style="font-weight: 800; color: var(--accent);">2-WEEK LIMIT</small>
+          <input type="number" id="spendLimit" placeholder="Amount" oninput="saveBudgetSettings()" style="width: 110px; margin:0; padding: 5px;">
+        </div>
+        <div style="text-align: right;">
+          <small style="font-weight: 800;">DAYS LEFT</small>
+          <input type="number" id="daysToGo" placeholder="Days" oninput="saveBudgetSettings()" style="width: 60px; margin:0; padding: 5px;">
+        </div>
       </div>
+      
       <div style="background: var(--bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border)">
         <small>DAILY ALLOWANCE</small>
         <div style="font-size: 1.8rem; font-weight: 800; color: var(--success);">₱<span id="dailyLimitBudget">0.00</span></div>
       </div>
+      
       <div style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 5px;">
         <span style="font-size: 0.9rem;">Spent Today: <b id="spentToday">₱0.00</b></span>
         <span id="budgetStatus" style="font-weight: 800; font-size: 0.95rem;">✅ Safe</span>
+        
         <div style="background: var(--bg); width: 100%; padding: 10px; border-radius: 12px; margin-top: 5px; text-align: center; border: 1px solid var(--border)">
             <small style="font-weight: 800; color: var(--text-muted);">LIVE 2-WEEK BALANCE</small>
             <div style="font-weight: 800; color: var(--accent);">₱<span id="liveLimitDisplay">0.00</span></div>
         </div>
+        
         <button class="btn-secondary" style="background:var(--accent-light); color:var(--accent); margin-top:10px" onclick="confirmTransferToExtra()">Transfer to Extra Budget</button>
       </div>
     </div>
+
     <div class="input-box input-expense">
       <h4>Quick Spend</h4>
-      <input type="text" id="gDesc" placeholder="What did you spend on?">
+      <input type="text" id="gDesc" placeholder="Description">
       <input type="number" id="gAmt" placeholder="Amount ₱">
       <select id="gWalletSelect"></select>
       <button class="btn-primary" style="background:var(--success)" onclick="addDailyExpense()">Record Expense</button>
     </div>
-    <div class="section-header"><h5>Expense History</h5><button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">Clear All</button></div>
-    <input type="text" id="searchExp" class="search-bar" placeholder="🔍 Search expense history..." oninput="refresh()">
+
+    <div class="section-header">
+      <h5>Expense History</h5>
+      <button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">Clear All</button>
+    </div>
+    <input type="text" id="searchExp" class="search-bar" placeholder="🔍 Search history..." oninput="refresh()">
     <div id="expHistoryList"></div>
     <div id="expHistoryPager" class="pagination-controls"></div>
   </section>
@@ -307,12 +322,16 @@
   }
 
   function saveBudgetSettings() {
-    const newLimit = document.getElementById('spendLimit').value;
-    localStorage.setItem('WF_LIMIT', newLimit);
-    localStorage.setItem('WF_DAYS', document.getElementById('daysToGo').value);
-    liveLimit = parseFloat(newLimit) || 0;
-    save();
-  }
+    const configLimit = document.getElementById('spendLimit').value;
+    const configDays = document.getElementById('daysToGo').value;
+    
+    localStorage.setItem('WF_LIMIT_CFG', configLimit);
+    localStorage.setItem('WF_DAYS_CFG', configDays);
+    
+    // ISSUE #3: Live update ng limit base sa input
+    liveLimit = parseFloat(configLimit) || 0;
+    save(); 
+}
 
   function showTab(id){
     document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
@@ -574,17 +593,34 @@
   function addDebt(){ const n=document.getElementById('dName'), a=document.getElementById('dAmt'); if(n.value && a.value){ debts.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
   
   function addDailyExpense(){
-    const a=document.getElementById('gAmt'), d=document.getElementById('gDesc'), wIdx=document.getElementById('gWalletSelect').value;
+    const a = document.getElementById('gAmt'), 
+          d = document.getElementById('gDesc'), 
+          wIdx = document.getElementById('gWalletSelect').value;
+
     if(a.value && wIdx !== ""){
       const amt = parseFloat(a.value);
-      const purpose = d.value || "Daily Expense";
       if(wallets[wIdx].balance >= amt){
-        wallets[wIdx].balance -= amt; liveLimit -= amt;
-        expHistory.push({ name: `${purpose} via ${wallets[wIdx].name}`, amount: amt, date: new Date().toLocaleDateString() });
-        a.value=''; d.value=''; save();
-      } else { showMsg("Insufficient", "Not enough funds in this wallet.", true); }
+        wallets[wIdx].balance -= amt; 
+        liveLimit -= amt; // Live Sync calculation
+        const todayStr = new Date().toLocaleDateString();
+        expHistory.push({ name: (d.value || "Expense") + " via " + wallets[wIdx].name, amount: amt, date: todayStr });
+        
+        // Modal Logic
+        const cfgLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 0;
+        const cfgDays = parseFloat(localStorage.getItem('WF_DAYS_CFG')) || 1;
+        const dailyAllowance = cfgLimit / cfgDays;
+        const spentToday = expHistory.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
+
+        if (dailyAllowance > 0 && spentToday > dailyAllowance) {
+            // ISSUE #2: Custom Modal
+            showMsg("⚠️ OVERSPENT", `OVERSPENT PLEASE SAVE ₱${format(spentToday - dailyAllowance)}`, true);
+        }
+        a.value = ''; d.value = ''; save();
+      } else { 
+        showMsg("Insufficient Balance", "not Enough funds in this wallet.", true); 
+      }
     }
-  }
+}
 
   function openEdit(type, idx){
     let list = type==='wallets'?wallets:type==='bills'?bills:type==='debts'?debts:type==='expH'?expHistory:type==='billH'?billHistory:debtHistory;
@@ -626,72 +662,78 @@
     checkDateTransition();
     const tCash = wallets.reduce((s,w)=>s+w.balance,0), tBills = bills.reduce((s,b)=>s+b.amount,0), tDebts = debts.reduce((s,d)=>s+d.amount,0), tExps = expHistory.reduce((s,h)=>s+h.amount,0);
     const safeUnallocated = Math.max(0, unallocatedSalary), totalCap = tCash + safeUnallocated + tBills + tDebts + tExps;
+    
     document.getElementById('mainTotal').innerText = format(tCash + safeUnallocated + extraBudget);
     document.getElementById('billForecast').innerText = format((tCash + safeUnallocated) - tBills);
     document.getElementById('totalBillsOnly').innerText = format(tBills);
     document.getElementById('debtForecast').innerText = format((tCash + safeUnallocated) - tDebts);
     document.getElementById('totalDebtsOnly').innerText = format(tDebts);
+    
     if(totalCap > 0) {
         const pS = ((tCash + safeUnallocated) / totalCap) * 100, pB = (tBills / totalCap) * 100, pD = (tDebts / totalCap) * 100, pE = (tExps / totalCap) * 100;
-        document.getElementById('barSavings').style.width = pS + "%"; document.getElementById('barBills').style.width = pB + "%"; document.getElementById('barDebts').style.width = pD + "%"; document.getElementById('barExps').style.width = pE + "%";
-        document.getElementById('percSavings').innerText = Math.round(pS) + "%"; document.getElementById('percBills').innerText = Math.round(pB) + "%"; document.getElementById('percDebts').innerText = Math.round(pD) + "%"; document.getElementById('percExps').innerText = Math.round(pE) + "%";
+        document.getElementById('barSavings').style.width = pS + "%"; 
+        document.getElementById('barBills').style.width = pB + "%"; 
+        document.getElementById('barDebts').style.width = pD + "%"; 
+        document.getElementById('barExps').style.width = pE + "%";
+        document.getElementById('percSavings').innerText = Math.round(pS) + "%"; 
+        document.getElementById('percBills').innerText = Math.round(pB) + "%"; 
+        document.getElementById('percDebts').innerText = Math.round(pD) + "%"; 
+        document.getElementById('percExps').innerText = Math.round(pE) + "%";
         document.getElementById('chartTotalValue').innerText = "₱" + format(totalCap);
     }
 
     document.getElementById('gWalletSelect').innerHTML = wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('');
+    
     let walletsHTML = wallets.map((w,i)=>`<div style="background:var(--card); padding:15px; border-radius:18px; border:1px solid var(--border)"><b>${w.name}</b><br>₱${format(w.balance)}<div class="action-btns"><button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button><button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button></div></div>`).join('');
     walletsHTML += `<div style="background:#fffbeb; padding:15px; border-radius:18px; border:1px solid #fde68a; color:#92400e"><b>Extra Budget</b><br>₱${format(extraBudget)}<br><div class="action-btns"><button class="del-btn" onclick="confirmClearExtra()">Clear</button></div></div>`;
     document.getElementById('walletGrid').innerHTML = walletsHTML;
-
-    const savedLimit = localStorage.getItem('WF_LIMIT') || "6000";
-    const savedDays = localStorage.getItem('WF_DAYS') || "14";
+    
+    // ISSUE #1: Blanko sa Start (|| "")
+    const savedLimit = localStorage.getItem('WF_LIMIT_CFG') || ""; 
+    const savedDays = localStorage.getItem('WF_DAYS_CFG') || "";
     document.getElementById('spendLimit').value = savedLimit;
     document.getElementById('daysToGo').value = savedDays;
+
+    // ISSUE #4: Live Sync Display
     document.getElementById('liveLimitDisplay').innerText = format(liveLimit);
     
     const bDays = parseInt(savedDays) || 1;
-    const daily = liveLimit / bDays; 
+    const currentLimit = parseFloat(savedLimit) || 0;
+    const daily = currentLimit / bDays; 
     document.getElementById('dailyLimitBudget').innerText = format(daily);
+    
     const todayStr = new Date().toLocaleDateString(), spentT = expHistory.filter(h=>h.date===todayStr).reduce((s,h)=>s+h.amount,0);
     document.getElementById('spentToday').innerText = "₱"+format(spentT);
     
     const status = document.getElementById('budgetStatus');
-    if (spentT > daily && daily > 0) { status.innerText = `You overspent! Save ₱${format(spentT-daily)}`; status.style.color = "var(--danger)";
-    } else { status.innerText = "✅ Status: Safe"; status.style.color = "var(--success)"; }
+    if (spentT > daily && daily > 0) { 
+        status.innerText = `You overspent! Save ₱${format(spentT-daily)}`; 
+        status.style.color = "var(--danger)";
+    } else { 
+        status.innerText = "✅ Status: Safe"; 
+        status.style.color = "var(--success)";
+    }
 
     const drawList = (list, el, pag, type, isP=false) => {
       const s = pages[type]*step;
       document.getElementById(el).innerHTML = list.slice(s,s+step).map((item,i)=>`<div class="list-item line-${type.includes('bill')?'bill':type.includes('debt')?'debt':'expense'}"><div><b>${item.name}</b><br><small>₱${format(item.balance!==undefined?item.balance:item.amount)}</small><div class="action-btns"><button class="edit-btn" onclick="openEdit('${type}',${s+i})">Edit</button><button class="del-btn" onclick="confirmDelete('${type}',${s+i})">🗑</button></div></div>${isP?`<button class="pay-btn" onclick="openPayIndividual('${type}',${s+i})">Pay</button>`:''}</div>`).join('');
       renderPager(pag, type, list.length);
     }
-
-    const drawHist = (list, el, pag, type, searchId) => {
-      const query = document.getElementById(searchId).value.toLowerCase();
-      const filtered = list.filter(h => h.name.toLowerCase().includes(query)).reverse();
-      const s = pages[type]*step;
-      document.getElementById(el).innerHTML = filtered.slice(s,s+step).map((h,i)=>{
-        // NEW: Icon Logic based on Keywords
-        const icon = h.name.toLowerCase().includes('food') ? '🍔' : 
-                     h.name.toLowerCase().includes('trans') ? '🚌' : 
-                     h.name.toLowerCase().includes('bill') ? '⚡' : '🎁';
-
-        return `<div class="list-item" style="font-size:0.85rem">
-          <div style="display:flex; align-items:center">
-            <span style="font-size:1.2rem; margin-right:10px">${icon}</span>
-            <div><b>${h.name}</b><br><small>${h.date}</small><div class="action-btns"><button class="del-btn" onclick="confirmDelete('${type}',list.length-1-(s+i))">🗑</button></div></div>
-          </div>
-          <b style="color:var(--danger)">-₱${format(h.amount)}</b>
-        </div>`
-      }).join('');
-      renderPager(pag, type, filtered.length);
+    drawList(bills, 'billList', 'billPager', 'bills', true);
+    drawList(debts, 'debtList', 'debtPager', 'debts', true);
+    
+    const renderHistory = (key, el, pag, type, sId) => {
+        const list = key==='expHistory'?expHistory:key==='billHistory'?billHistory:debtHistory;
+        const q = document.getElementById(sId).value.toLowerCase();
+        const fil = list.filter(h => h.name.toLowerCase().includes(q)).reverse();
+        const s = pages[type]*step;
+        document.getElementById(el).innerHTML = fil.slice(s,s+step).map(h=>`<div class="list-item"><div><b>${h.name}</b><br><small>${h.date}</small></div><b>-₱${format(h.amount)}</b></div>`).join('');
+        renderPager(pag, type, fil.length);
     }
-
-    drawList(bills,'billList','billPager','bills',true); 
-    drawList(debts,'debtList','debtPager','debts',true);
-    drawHist(expHistory,'expHistoryList','expHistoryPager','expH', 'searchExp'); 
-    drawHist(billHistory,'billHistoryList','billHistoryPager','billH', 'searchBill');
-    drawHist(debtHistory,'debtHistoryList','debtHistoryPager','debtH', 'searchDebt');
-  }
+    renderHistory('expHistory', 'expHistoryList', 'expHistoryPager', 'expH', 'searchExp');
+    renderHistory('billHistory', 'billHistoryList', 'billHistoryPager', 'billH', 'searchBill');
+    renderHistory('debtHistory', 'debtHistoryList', 'debtHistoryPager', 'debtH', 'searchDebt');
+}
   refresh();
 
 function copyTextSummary() {
@@ -739,3 +781,4 @@ function copyTextSummary() {
 </script>
 </body>
 </html>
+
