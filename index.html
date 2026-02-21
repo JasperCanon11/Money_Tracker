@@ -6,97 +6,236 @@
   <title>Money Tracker Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #fdfdfd; --accent: #6366f1; --accent-light: #e0e7ff;
-      --success: #059669; --danger: #dc2626; --warning: #f59e0b;
-      --purple: #8b5cf6; --text-main: #1e293b; --text-muted: #64748b;
-      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-      --glass: rgba(255, 255, 255, 0.8);
-    }
-    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #f8fafc; color: var(--text-main); padding: 16px; }
-    .app-container { max-width: 480px; margin: 0 auto; width: 100%; }
-    header { 
-      display: flex; gap: 8px; background: var(--glass); backdrop-filter: blur(10px); padding: 6px; 
-      border-radius: 18px; margin-bottom: 24px; position: sticky; top: 10px; z-index: 100;
-      border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--card-shadow);
-    }
-    header button { flex: 1; background: transparent; border: none; padding: 12px 5px; font-weight: 700; border-radius: 14px; cursor: pointer; color: var(--text-muted); font-size: 0.85rem; }
-    header button.active { background: var(--accent); color: white; }
-    .card-main { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 30px 20px; border-radius: 28px; text-align: center; margin-bottom: 20px; color: white; }
-    .card-main b { font-size: 2.5rem; display: block; margin-top: 5px; font-weight: 800; }
-    .stat-row { display: flex; gap: 10px; margin-bottom: 20px; }
-    .stat-card { flex: 1; padding: 15px; border-radius: 20px; background: white; border: 1px solid #f1f5f9; box-shadow: var(--card-shadow); }
-    .stat-card small { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; }
-    .input-box { background: white; padding: 20px; border-radius: 24px; margin-bottom: 20px; border: 1px solid #f1f5f9; border-top-width: 6px; }
-    .input-bill { border-top-color: var(--danger); }
-    .input-expense { border-top-color: var(--warning); }
-    .input-debt { border-top-color: var(--purple); }
-    .input-wallet { border-top-color: var(--accent); }
-    input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 10px; font-size: 16px; }
-    .btn-primary { background: var(--accent); color: white; border: none; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px; padding: 0 5px; }
-    .section-header h5 { margin: 0; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
-    .btn-text-action { background: none; border: none; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
-    .btn-text-action.danger { color: var(--danger); } .btn-text-action.success { color: var(--success); }
-    .list-item { background: white; padding: 15px; border-radius: 20px; border: 1px solid #f1f5f9; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .line-bill { border-left: 6px solid var(--danger); }
-    .line-debt { border-left: 6px solid var(--purple); }
-    .line-expense { border-left: 6px solid var(--warning); }
-    .action-btns { display: flex; gap: 6px; margin-top: 8px; }
-    .edit-btn, .del-btn { padding: 6px 10px; border-radius: 8px; font-size: 0.7rem; border: none; cursor: pointer; font-weight: 700; }
-    .edit-btn { background: #f1f5f9; } .del-btn { background: #fff1f2; color: var(--danger); }
-    .pay-btn { background: #ecfdf5; color: var(--success); border: none; padding: 8px 12px; border-radius: 10px; font-weight: 800; }
-    .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-    .modal-content { background: white; width: 90%; max-width: 320px; padding: 25px; border-radius: 25px; text-align: center; }
-    section { display: none; } section.active { display: block; }
+  :root {
+    --bg: #fdfdfd;
+    --accent: #6366f1; 
+    --accent-light: #e0e7ff;
+    --success: #059669; 
+    --danger: #dc2626; 
+    --warning: #f59e0b;
+    --purple: #8b5cf6; 
+    --text-main: #1e293b; 
+    --text-muted: #64748b;
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    --glass: rgba(255, 255, 255, 0.8);
+    --card: #ffffff;
+    --border: #f1f5f9;
+  }
+
+  /* NEW: Dark Mode Variables */
+  body.dark-mode {
+    --bg: #0f172a; 
+    --card: #1e293b;
+    --text-main: #f1f5f9; 
+    --text-muted: #94a3b8;
+    --border: #334155; 
+    --glass: rgba(30, 41, 59, 0.8);
+    --accent-light: #312e81;
+  }
+  
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
+
+  body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    margin: 0; background: var(--bg);
+    color: var(--text-main); 
+    padding: 16px; 
+    transition: background 0.3s;
+  }
+
+  .app-container { max-width: 480px; margin: 0 auto; width: 100%; }
+  
+  header { 
+    display: flex; gap: 6px; background: var(--glass); backdrop-filter: blur(10px); padding: 6px;
+    border-radius: 18px; margin-bottom: 20px; position: sticky; top: 10px; z-index: 100; 
+    border: 1px solid var(--border); box-shadow: var(--card-shadow); overflow-x: auto;
+  }
+  
+  header button {
+    flex: 1; min-width: 85px; background: transparent; border: none;
+    padding: 12px 5px; font-weight: 700; border-radius: 14px; cursor: pointer; 
+    color: var(--text-muted); font-size: 0.8rem;
+  }
+  
+  header button.active { background: var(--accent); color: white; }
+  
+  .card-main {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); 
+    padding: 25px 20px; border-radius: 28px; text-align: center; margin-bottom: 20px; color: white; 
+  }
+  
+  .card-main b { font-size: 2.3rem; display: block; margin-top: 5px; font-weight: 800; }
+  
+  .discipline-card, .chart-box, .stat-card, .input-box, .list-item, .modal-content {
+    background: var(--card); border: 1px solid var(--border); border-radius: 24px; 
+    padding: 18px; margin-bottom: 20px; box-shadow: var(--card-shadow);
+  }
+  
+  .progress-container { height: 12px; background: #f1f5f9; border-radius: 10px; margin: 10px 0 20px; overflow: hidden; display: flex; }
+  .progress-bar { height: 100%; transition: width 0.5s ease; }
+  .legend { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+  .stat-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  .stat-card small { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; }
+  
+  .input-box { border-top-width: 6px; }
+  .input-bill { border-top-color: var(--danger); }
+  .input-expense { border-top-color: var(--warning); }
+  .input-debt { border-top-color: var(--purple); }
+  .input-wallet { border-top-color: var(--accent); }
+  
+  input, select { 
+    width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); 
+    margin-bottom: 10px; font-size: 16px; font-family: inherit; background: var(--card); color: var(--text-main);
+  }
+  
+  .btn-primary { background: var(--accent); color: white; border: none; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
+  .btn-secondary { background: var(--border); color: var(--text-main); border: none; padding: 10px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.75rem; width: 100%; margin-top: 5px; }
+  
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px; padding: 0 5px; }
+  .section-header h5 { margin: 0; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+  
+  .btn-text-action { background: none; border: none; font-weight: 700; font-size: 0.75rem; cursor: pointer; }
+  .btn-text-action.danger { color: var(--danger); } 
+  .btn-text-action.success { color: var(--success); }
+  
+  .list-item { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+  .line-bill { border-left: 6px solid var(--danger); }
+  .line-debt { border-left: 6px solid var(--purple); }
+  .line-expense { border-left: 6px solid var(--warning); }
+  
+  .action-btns { display: flex; gap: 6px; margin-top: 8px; }
+  .edit-btn, .del-btn { padding: 6px 10px; border-radius: 8px; font-size: 0.7rem; border: none; cursor: pointer; font-weight: 700; }
+  .edit-btn { background: var(--border); color: var(--text-main); }
+  .del-btn { background: #fff1f2; color: var(--danger); }
+  .pay-btn { background: #ecfdf5; color: var(--success); border: none; padding: 8px 12px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+  
+  .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+  
+  .modal-content { width: 90%; max-width: 320px; text-align: center; max-height: 90vh; overflow-y: auto; }
+  .input-row { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
+  .input-row input { margin-bottom: 0; flex: 1; }
+  .btn-all { background: var(--border); border: 1px solid var(--border); padding: 12px 10px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; color: var(--accent); cursor: pointer; }
+  
+  section { display: none; }
+  section.active { display: block; }
+  .search-bar { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; font-size: 0.85rem; background: var(--card); color: var(--text-main); }
+
   </style>
 </head>
 <body>
-
 <div id="customModal" class="modal-overlay">
   <div class="modal-content">
     <h3 id="modalTitle" style="margin-top:0">Action</h3>
-    <p id="modalDesc" style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;"></p>
+    <p id="modalDesc" style="color:var(--text-main); font-size: 0.95rem; line-height:1.5; margin-bottom: 15px; white-space: pre-wrap; font-weight:600"></p>
     <div id="modalInputs"></div>
     <div id="modalFooter" style="display:flex; gap:10px; margin-top:20px">
-      <button id="modalCancelBtn" onclick="closeModal()" style="flex:1; padding:12px; border:none; border-radius:12px; background:#f1f5f9; font-weight:700">Cancel</button>
+      <button id="modalCancelBtn" onclick="closeModal()" style="flex:1; padding:12px; border:none; border-radius:12px; background:var(--border); font-weight:700; color:var(--text-main)">Cancel</button>
       <button id="modalConfirmBtn" style="flex:1; padding:12px; border:none; border-radius:12px; color:white; font-weight:700">Confirm</button>
     </div>
   </div>
 </div>
 
 <div class="app-container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;">
+    <h3 style="margin:0; font-size: 1.1rem; font-weight: 800;">Tracker Pro</h3>
+    <button onclick="document.body.classList.toggle('dark-mode')" 
+            style="padding: 8px 12px; border-radius: 12px; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 1.1rem;">
+        🌙
+    </button>
+  </div>
+
   <header>
     <button class="tab-btn active" onclick="showTab('dashboard')">Wallets</button>
-    <button class="tab-btn" onclick="showTab('expenses')">Expenses</button>
+    <button class="tab-btn" onclick="showTab('budget')">Budget</button>
+    <button class="tab-btn" onclick="showTab('bills')">Bills</button>
     <button class="tab-btn" onclick="showTab('debts')">Debts</button>
   </header>
 
   <section id="dashboard" class="active">
     <div class="card-main"><small>Total Savings</small><b>₱<span id="mainTotal">0.00</span></b></div>
+    
+    <div class="chart-box">
+      <div class="legend"><span>Financial Breakdown</span><span id="chartTotalValue">₱0.00</span></div>
+      <div class="progress-container">
+        <div id="barSavings" class="progress-bar" style="background:var(--accent); width: 0%"></div>
+        <div id="barBills" class="progress-bar" style="background:var(--danger); width: 0%"></div>
+        <div id="barDebts" class="progress-bar" style="background:var(--purple); width: 0%"></div>
+        <div id="barExps" class="progress-bar" style="background:var(--warning); width: 0%"></div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:5px; text-align:center; font-size:0.55rem; font-weight:800;">
+        <div style="color:var(--accent)">SAVINGS<br><span id="percSavings">0%</span></div>
+        <div style="color:var(--danger)">BILLS<br><span id="percBills">0%</span></div>
+        <div style="color:var(--purple)">DEBTS<br><span id="percDebts">0%</span></div>
+        <div style="color:var(--warning)">EXPENSE<br><span id="percExps">0%</span></div>
+      </div>
+    </div>
+
     <div class="input-box input-wallet">
       <h4>Add Wallet</h4>
-      <input type="text" id="wName" placeholder="Name (e.g. GCash)">
-      <input type="number" id="wBal" placeholder="Balance ₱">
+      <input type="text" id="wName" placeholder="Wallet Name (e.g. GCash)">
+      <input type="number" id="wBal" placeholder="Initial Balance ₱">
       <button class="btn-primary" onclick="addWallet()">Save Wallet</button>
     </div>
-    <div class="section-header"><h5>Wallets</h5><button class="btn-text-action danger" onclick="confirmClearAll('wallets')">Clear All</button></div>
-    <div id="walletGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>
-    <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px">
-      <button class="btn-primary" style="background:#f5f3ff; color:var(--accent); border:1px solid var(--accent)" onclick="copyAsText()">📋 Copy Summary (Text)</button>
-      <div style="display:flex; gap:10px">
-        <button onclick="exportData()" style="flex:1; padding:10px; border-radius:10px; border:1px solid #ddd; background:white">💾 Export</button>
-        <button onclick="document.getElementById('fileInput').click()" style="flex:1; padding:10px; border-radius:10px; border:1px solid #ddd; background:white">📂 Import</button>
-      </div>
-      <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
+
+    <div class="section-header">
+        <h5>Wallets</h5>
+        <div style="text-align: right;">
+          <button class="btn-text-action success" onclick="openSalaryDistributor()">Salary Dist.</button> |
+          <button class="btn-text-action success" onclick="openExtraDistributor()">Extra Budget</button> |
+          <button class="btn-text-action success" onclick="openWalletRedistributor()">Redistribute</button> | 
+          <button class="btn-text-action danger" onclick="confirmClearAll('wallets')">Clear</button>
+        </div>
     </div>
+    <div id="walletGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
+
+    <div class="section-header"><h5>Data Management</h5></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:30px;">
+    <button class="btn-secondary" onclick="exportData()">📤 Export</button>
+    <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import</button>
+    <button class="btn-secondary" style="grid-column: span 2; background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent);" onclick="copyTextSummary()">
+        📋 Copy App Summary (English)
+    </button>
+    <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+</div>
   </section>
 
-  <section id="expenses">
+  <section id="budget">
+    <div class="discipline-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div><small style="font-weight: 800; color: var(--accent);">2-WEEK LIMIT</small><input type="number" id="spendLimit" value="6000" oninput="saveBudgetSettings()" style="width: 100px; margin:0; padding: 5px;"></div>
+        <div style="text-align: right;"><small style="font-weight: 800;">DAYS LEFT</small><input type="number" id="daysToGo" value="14" oninput="saveBudgetSettings()" style="width: 60px; margin:0; padding: 5px;"></div>
+      </div>
+      <div style="background: var(--bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border)">
+        <small>DAILY ALLOWANCE</small>
+        <div style="font-size: 1.8rem; font-weight: 800; color: var(--success);">₱<span id="dailyLimitBudget">0.00</span></div>
+      </div>
+      <div style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <span style="font-size: 0.9rem;">Spent Today: <b id="spentToday">₱0.00</b></span>
+        <span id="budgetStatus" style="font-weight: 800; font-size: 0.95rem;">✅ Safe</span>
+        <div style="background: var(--bg); width: 100%; padding: 10px; border-radius: 12px; margin-top: 5px; text-align: center; border: 1px solid var(--border)">
+            <small style="font-weight: 800; color: var(--text-muted);">LIVE 2-WEEK BALANCE</small>
+            <div style="font-weight: 800; color: var(--accent);">₱<span id="liveLimitDisplay">0.00</span></div>
+        </div>
+        <button class="btn-secondary" style="background:var(--accent-light); color:var(--accent); margin-top:10px" onclick="confirmTransferToExtra()">Transfer to Extra Budget</button>
+      </div>
+    </div>
+    <div class="input-box input-expense">
+      <h4>Quick Spend</h4>
+      <input type="text" id="gDesc" placeholder="What did you spend on?">
+      <input type="number" id="gAmt" placeholder="Amount ₱">
+      <select id="gWalletSelect"></select>
+      <button class="btn-primary" style="background:var(--success)" onclick="addDailyExpense()">Record Expense</button>
+    </div>
+    <div class="section-header"><h5>Expense History</h5><button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">Clear All</button></div>
+    <input type="text" id="searchExp" class="search-bar" placeholder="🔍 Search expense history..." oninput="refresh()">
+    <div id="expHistoryList"></div>
+    <div id="expHistoryPager" class="pagination-controls"></div>
+  </section>
+
+  <section id="bills">
     <div class="stat-row">
-      <div class="stat-card"><small>Available</small><b style="color:var(--accent)">₱<span id="billForecast">0.00</span></b></div>
+      <div class="stat-card"><small>Available After Bills</small><b style="color:var(--accent)">₱<span id="billForecast">0.00</span></b></div>
       <div class="stat-card"><small>Bills Total</small><b style="color:var(--danger)">₱<span id="totalBillsOnly">0.00</span></b></div>
     </div>
     <div class="input-box input-bill">
@@ -107,47 +246,72 @@
     </div>
     <div class="section-header"><h5>Active Bills</h5><div><button class="btn-text-action success" onclick="openPayAll('bills')">Pay All</button> | <button class="btn-text-action danger" onclick="confirmClearAll('bills')">Clear</button></div></div>
     <div id="billList"></div><div id="billPager" class="pagination-controls"></div>
-    <div class="input-box input-expense">
-      <h4>Quick Spend</h4>
-      <input type="number" id="gAmt" placeholder="Amount ₱">
-      <select id="gWalletSelect"></select>
-      <button class="btn-primary" style="background:var(--success)" onclick="addDailyExpense()">Record Spend</button>
-    </div>
-    <div class="section-header"><h5>History</h5><button class="btn-text-action danger" onclick="confirmClearAll('history')">Clear All</button></div>
-    <div id="historyList"></div><div id="historyPager" class="pagination-controls"></div>
+    <div class="section-header"><h5>Payment History (Bills)</h5><button class="btn-text-action danger" onclick="confirmClearAll('billHistory')">Clear All</button></div>
+    <input type="text" id="searchBill" class="search-bar" placeholder="🔍 Search bill history..." oninput="refresh()">
+    <div id="billHistoryList"></div><div id="billHistoryPager" class="pagination-controls"></div>
   </section>
 
   <section id="debts">
     <div class="stat-row">
-      <div class="stat-card"><small>After Payback</small><b style="color:var(--accent)">₱<span id="debtForecast">0.00</span></b></div>
+      <div class="stat-card"><small>Available After Debts</small><b style="color:var(--accent)">₱<span id="debtForecast">0.00</span></b></div>
       <div class="stat-card"><small>Total Debts</small><b style="color:var(--purple)">₱<span id="totalDebtsOnly">0.00</span></b></div>
     </div>
     <div class="input-box input-debt">
       <h4>Add Debt</h4>
-      <input type="text" id="dName" placeholder="Lender">
+      <input type="text" id="dName" placeholder="Lender / Name">
       <input type="number" id="dAmt" placeholder="Amount ₱">
       <button class="btn-primary" style="background:var(--purple)" onclick="addDebt()">Save Debt</button>
     </div>
     <div class="section-header"><h5>Debt List</h5><div><button class="btn-text-action success" onclick="openPayAll('debts')">Pay All</button> | <button class="btn-text-action danger" onclick="confirmClearAll('debts')">Clear</button></div></div>
     <div id="debtList"></div><div id="debtPager" class="pagination-controls"></div>
+    <div class="section-header"><h5>Payment History (Debts)</h5><button class="btn-text-action danger" onclick="confirmClearAll('debtHistory')">Clear All</button></div>
+    <input type="text" id="searchDebt" class="search-bar" placeholder="🔍 Search debt history..." oninput="refresh()">
+    <div id="debtHistoryList"></div><div id="debtHistoryPager" class="pagination-controls"></div>
   </section>
 </div>
 
 <script>
-  let wallets = JSON.parse(localStorage.getItem('W_F')) || [];
-  let bills = JSON.parse(localStorage.getItem('B_F')) || [];
-  let debts = JSON.parse(localStorage.getItem('D_F')) || [];
-  let history = JSON.parse(localStorage.getItem('H_F')) || [];
-  let pages = { bills: 0, debts: 0, history: 0 };
+  let wallets = JSON.parse(localStorage.getItem('WF_W')) || [];
+  let bills = JSON.parse(localStorage.getItem('WF_B')) || [];
+  let debts = JSON.parse(localStorage.getItem('WF_D')) || [];
+  let expHistory = JSON.parse(localStorage.getItem('WF_EH')) || [];
+  let billHistory = JSON.parse(localStorage.getItem('WF_BH')) || [];
+  let debtHistory = JSON.parse(localStorage.getItem('WF_DH')) || [];
+  let unallocatedSalary = parseFloat(localStorage.getItem('WF_US')) || 0;
+  let extraBudget = parseFloat(localStorage.getItem('WF_EB')) || 0;
+  let liveLimit = parseFloat(localStorage.getItem('WF_LIVE_LIMIT')) || 6000;
+  let lastSyncDate = localStorage.getItem('WF_LSD') || new Date().toLocaleDateString();
+  let pages = { bills: 0, debts: 0, expH: 0, billH: 0, debtH: 0 };
   const step = 5;
 
   function format(v){ return v.toLocaleString('en-PH',{minimumFractionDigits:2}); }
+  
   function save(){
-    localStorage.setItem('W_F', JSON.stringify(wallets));
-    localStorage.setItem('B_F', JSON.stringify(bills));
-    localStorage.setItem('D_F', JSON.stringify(debts));
-    localStorage.setItem('H_F', JSON.stringify(history));
+    localStorage.setItem('WF_W', JSON.stringify(wallets)); localStorage.setItem('WF_B', JSON.stringify(bills));
+    localStorage.setItem('WF_D', JSON.stringify(debts)); localStorage.setItem('WF_EH', JSON.stringify(expHistory));
+    localStorage.setItem('WF_BH', JSON.stringify(billHistory)); localStorage.setItem('WF_DH', JSON.stringify(debtHistory));
+    localStorage.setItem('WF_US', unallocatedSalary.toString()); localStorage.setItem('WF_EB', extraBudget.toString());
+    localStorage.setItem('WF_LIVE_LIMIT', liveLimit.toString()); localStorage.setItem('WF_LSD', lastSyncDate);
     refresh();
+  }
+
+  function checkDateTransition() {
+    const today = new Date().toLocaleDateString();
+    if (lastSyncDate !== today) {
+        let daysInput = document.getElementById('daysToGo');
+        let currentDays = parseInt(daysInput.value) || 14;
+        if (currentDays > 1) { daysInput.value = currentDays - 1; }
+        lastSyncDate = today;
+        saveBudgetSettings();
+    }
+  }
+
+  function saveBudgetSettings() {
+    const newLimit = document.getElementById('spendLimit').value;
+    localStorage.setItem('WF_LIMIT', newLimit);
+    localStorage.setItem('WF_DAYS', document.getElementById('daysToGo').value);
+    liveLimit = parseFloat(newLimit) || 0;
+    save();
   }
 
   function showTab(id){
@@ -158,17 +322,44 @@
   }
 
   function closeModal(){ document.getElementById('customModal').style.display='none'; }
-
-  function showModalAlert(title, desc, isError = false) {
+  
+  function showMsg(title, desc, isErr=false) {
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalDesc').innerText = desc;
     document.getElementById('modalInputs').innerHTML = "";
     document.getElementById('modalCancelBtn').style.display = "none";
     const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Okay";
-    btn.style.background = isError ? 'var(--danger)' : 'var(--accent)';
+    btn.innerText = "Okay"; btn.style.background = isErr ? 'var(--danger)' : 'var(--accent)';
     btn.onclick = closeModal;
     document.getElementById('customModal').style.display='flex';
+  }
+
+  function exportData() {
+    const data = { WF_W: wallets, WF_B: bills, WF_D: debts, WF_EH: expHistory, WF_BH: billHistory, WF_DH: debtHistory, WF_US: unallocatedSalary, WF_EB: extraBudget, WF_LIVE_LIMIT: liveLimit };
+    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MoneyTracker_Backup_${new Date().toLocaleDateString()}.json`;
+    a.click();
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if(confirm("Importing will overwrite current data. Continue?")) {
+            wallets = data.WF_W || []; bills = data.WF_B || []; debts = data.WF_D || [];
+            expHistory = data.WF_EH || []; billHistory = data.WF_BH || []; debtHistory = data.WF_DH || [];
+            unallocatedSalary = data.WF_US || 0; extraBudget = data.WF_EB || 0; liveLimit = data.WF_LIVE_LIMIT || 6000; 
+            save(); showMsg("Success", "Data Restored!");
+        }
+      } catch (err) { showMsg("Error", "Invalid Backup File", true); }
+    };
+    reader.readAsText(file);
   }
 
   function addWallet(){
@@ -176,166 +367,375 @@
     if(n.value){ wallets.push({name:n.value, balance:parseFloat(b.value)||0}); n.value=''; b.value=''; save(); }
   }
 
-  function addBill(){
-    const n=document.getElementById('bName'), a=document.getElementById('bAmt');
-    if(n.value && a.value){ bills.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); }
-  }
-
-  function addDebt(){
-    const n=document.getElementById('dName'), a=document.getElementById('dAmt');
-    if(n.value && a.value){ debts.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); }
-  }
-
-  function addDailyExpense(){
-    const a=document.getElementById('gAmt'), wIdx=document.getElementById('gWalletSelect').value;
-    if(a.value && wIdx !== ""){
-      const amt = parseFloat(a.value);
-      if(wallets[wIdx].balance >= amt){
-        wallets[wIdx].balance -= amt;
-        history.push({ name: `Expense: ${wallets[wIdx].name}`, amount: amt, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
-        a.value=''; save();
-      } else { showModalAlert("Low Balance", "Insufficient funds in the selected wallet!", true); }
-    }
-  }
-
-  function openEdit(type, idx){
-    const list = type==='wallets'?wallets:type==='bills'?bills:type==='debts'?debts:history;
-    const item = list[idx];
-    document.getElementById('modalTitle').innerText = "Edit Details";
-    document.getElementById('modalDesc').innerText = "";
-    document.getElementById('modalInputs').innerHTML = `<input type="text" id="en" value="${item.name}"><input type="number" id="ea" value="${item.balance !== undefined ? item.balance : item.amount}">`;
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Save"; btn.style.background = 'var(--accent)';
-    btn.onclick = () => {
-      const n = document.getElementById('en').value;
-      const a = parseFloat(document.getElementById('ea').value);
-      if(type==='wallets') { wallets[idx].name=n; wallets[idx].balance=a; }
-      else { list[idx].name=n; list[idx].amount=a; }
-      save(); closeModal();
-    };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function confirmDelete(type, idx){
-    document.getElementById('modalTitle').innerText = "Delete Record?";
-    document.getElementById('modalDesc').innerText = "Are you sure you want to delete this item?";
-    document.getElementById('modalInputs').innerHTML = "";
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Delete"; btn.style.background = 'var(--danger)';
-    btn.onclick = () => {
-      if(type==='wallets') wallets.splice(idx,1);
-      else if(type==='bills') bills.splice(idx,1);
-      else if(type==='debts') debts.splice(idx,1);
-      else history.splice(idx,1);
-      save(); closeModal();
-    };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function confirmClearAll(type){
-    document.getElementById('modalTitle').innerText = "Clear All " + type + "?";
-    document.getElementById('modalDesc').innerText = "All data in this section will be permanently removed.";
-    document.getElementById('modalInputs').innerHTML = "";
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Clear All"; btn.style.background = 'var(--danger)';
-    btn.onclick = () => {
-      if(type==='wallets') wallets=[]; else if(type==='bills') bills=[]; else if(type==='debts') debts=[]; else history=[];
-      save(); closeModal();
-    };
-    document.getElementById('customModal').style.display='flex';
-  }
-
   function openPayIndividual(type, idx){
     const list = type==='bills'?bills:debts;
-    document.getElementById('modalTitle').innerText = "Pay " + list[idx].name;
-    document.getElementById('modalDesc').innerText = "Select payment wallet:";
+    const item = list[idx];
+    document.getElementById('modalTitle').innerText = "Select Payment Source";
+    document.getElementById('modalDesc').innerText = `Payment for: ${item.name}\nAmount Due: ₱${format(item.amount)}`;
     document.getElementById('modalInputs').innerHTML = `<select id="ps">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>`;
     document.getElementById('modalCancelBtn').style.display = "block";
     const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Pay Now"; btn.style.background = 'var(--success)';
+    btn.innerText = "Confirm Payment"; btn.style.background = 'var(--success)';
     btn.onclick = () => {
-      const wIdx = document.getElementById('ps').value;
-      if(wallets[wIdx].balance >= list[idx].amount){
-        wallets[wIdx].balance -= list[idx].amount;
-        history.push({ name: `Paid ${type}: ${wallets[wIdx].name}`, amount: list[idx].amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
-        list.splice(idx,1); save(); closeModal();
-      } else { closeModal(); showModalAlert("Low Balance", "Insufficient funds in this wallet!", true); }
+      const walletIdx = document.getElementById('ps').value;
+      const wallet = wallets[walletIdx];
+      if (wallet.balance <= 0) { showMsg("Empty Wallet", "Selected wallet has no funds.", true); return; }
+      const originalName = item.name;
+      let summaryText = "";
+      if(wallet.balance >= item.amount){
+        const paidAmt = item.amount;
+        wallet.balance -= paidAmt;
+        list.splice(idx,1);
+        summaryText = `Payment successful (${originalName})\nRemaining: 0.00`;
+        const log = { name: `${originalName} via ${wallet.name}`, amount: paidAmt, date: new Date().toLocaleDateString() };
+        if(type==='bills') billHistory.push(log); else debtHistory.push(log);
+      } else {
+        const partialAmt = wallet.balance;
+        item.amount -= partialAmt;
+        wallet.balance = 0;
+        summaryText = `Partial payment successful (${originalName})\nRemaining: ${format(item.amount)}`;
+        const log = { name: `${originalName} (Partial) via ${wallet.name}`, amount: partialAmt, date: new Date().toLocaleDateString() };
+        if(type==='bills') billHistory.push(log); else debtHistory.push(log);
+      }
+      save(); showMsg("Success", summaryText);
     };
     document.getElementById('customModal').style.display='flex';
   }
 
   function openPayAll(type) {
-    const list = type === 'bills' ? bills : debts;
-    if(!list.length) return;
-    document.getElementById('modalTitle').innerText = "Pay All " + type;
-    document.getElementById('modalDesc').innerText = "Deduct as many as possible from this wallet:";
+    const list = type==='bills'?bills:debts;
+    if(list.length === 0) return;
+    document.getElementById('modalTitle').innerText = "Bulk Payment";
+    document.getElementById('modalDesc').innerText = "Process all items using selected wallet:";
     document.getElementById('modalInputs').innerHTML = `<select id="ps">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>`;
     document.getElementById('modalCancelBtn').style.display = "block";
     const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Confirm Pay All"; btn.style.background = 'var(--success)';
+    btn.innerText = "Execute Bulk Pay"; btn.style.background = 'var(--success)';
     btn.onclick = () => {
-      const wIdx = document.getElementById('ps').value;
-      let i = 0;
+      const walletIdx = document.getElementById('ps').value;
+      let wallet = wallets[walletIdx];
+      let i = 0, summaryLines = [];
+      const walletOrigName = wallet.name;
+      if (wallet.balance <= 0) { showMsg("Empty Wallet", "Selected wallet has no funds.", true); return; }
       while (i < list.length) {
-        if (wallets[wIdx].balance >= list[i].amount) {
-          let itm = list.splice(i, 1)[0];
-          wallets[wIdx].balance -= itm.amount;
-          history.push({ name: `Paid ${type}: ${wallets[wIdx].name}`, amount: itm.amount, wallet: wallets[wIdx].name, date: new Date().toLocaleDateString() });
+        if (wallet.balance <= 0) break;
+        let item = list[i], originalName = item.name;
+        if (wallet.balance >= item.amount) {
+          let paidAmt = item.amount;
+          wallet.balance -= paidAmt;
+          summaryLines.push(`Paid: ${originalName}`);
+          const log = { name: `${originalName} via ${walletOrigName}`, amount: paidAmt, date: new Date().toLocaleDateString() };
+          if(type==='bills') billHistory.push(log); else debtHistory.push(log);
+          list.splice(i, 1); 
         } else {
+          let partialAmt = wallet.balance;
+          item.amount -= partialAmt;
+          wallet.balance = 0;
+          summaryLines.push(`Partial: ${originalName} (Rem: ${format(item.amount)})`);
+          const log = { name: `${originalName} (Partial) via ${walletOrigName}`, amount: partialAmt, date: new Date().toLocaleDateString() };
+          if(type==='bills') billHistory.push(log); else debtHistory.push(log);
           i++;
         }
       }
-      save(); closeModal();
+      save(); showMsg("Result", summaryLines.join('\n') || "No funds.");
     };
     document.getElementById('customModal').style.display='flex';
   }
 
-  function copyAsText(){
-    let t = `💰 MONEY SUMMARY (${new Date().toLocaleDateString()})\n\n🏦 WALLETS:\n` + wallets.map(w => `- ${w.name}: ₱${format(w.balance)}`).join('\n');
-    t += `\n\n📑 UNPAID BILLS:\n` + bills.map(b => `- ${b.name}: ₱${format(b.amount)}`).join('\n');
-    t += `\n\n💸 DEBTS:\n` + debts.map(d => `- ${d.name}: ₱${format(d.amount)}`).join('\n');
-    navigator.clipboard.writeText(t).then(()=>showModalAlert("Copied!", "Summary copied to clipboard. Ready to paste."));
+  function openExtraDistributor() {
+    if(wallets.length === 0) { showMsg("No Wallets", "Add a wallet first.", true); return; }
+    document.getElementById('modalTitle').innerText = "Extra Budget Distributor";
+    document.getElementById('modalInputs').innerHTML = `
+      <div style="background:var(--bg); padding:12px; border-radius:15px; margin-bottom:15px; border:1px solid var(--border); text-align:left">
+        <small style="font-weight:800">AVAILABLE EXTRA BUDGET</small>
+        <div style="font-size:1.4rem; font-weight:800; color:var(--warning)">₱${format(extraBudget)}</div>
+      </div>
+      ${wallets.map((w,i)=>`<div style="text-align:left; font-size:0.8rem"><b>To ${w.name}</b></div><div class="input-row"><input type="number" class="extra-input" data-idx="${i}" placeholder="0.00"><button class="btn-all" onclick="setAllExtra(${i})">ALL</button></div>`).join('')}
+    `;
+    document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Distribute Extra"; btn.style.background = 'var(--warning)';
+    btn.onclick = () => {
+      const inputs = document.querySelectorAll('.extra-input');
+      let allocated = 0;
+      inputs.forEach(input => { allocated += (parseFloat(input.value) || 0); });
+      if (allocated > extraBudget + 0.01) { showMsg("Over Budget", "Exceeds extra funds!", true); return; }
+      inputs.forEach(input => { const idx = input.getAttribute('data-idx'); wallets[idx].balance += (parseFloat(input.value) || 0); });
+      extraBudget = Math.max(0, extraBudget - allocated); save(); closeModal();
+    };
+    document.getElementById('customModal').style.display='flex';
   }
 
-  function exportData(){ const b=new Blob([JSON.stringify({wallets,bills,debts,history})],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Tracker_Backup.json'; a.click(); }
-  function importData(e){ const r=new FileReader(); r.onload=(ev)=>{ const d=JSON.parse(ev.target.result); wallets=d.wallets; bills=d.bills; debts=d.debts; history=d.history; save(); }; r.readAsText(e.target.files[0]); }
+  function setAllExtra(targetIdx) {
+      const inputs = document.querySelectorAll('.extra-input');
+      let currentAllocated = 0;
+      inputs.forEach(input => { if(parseInt(input.getAttribute('data-idx')) !== targetIdx) currentAllocated += (parseFloat(input.value) || 0); });
+      let available = extraBudget - currentAllocated;
+      inputs.forEach(input => { if(parseInt(input.getAttribute('data-idx')) === targetIdx) input.value = Math.max(0, available).toFixed(2); });
+  }
+
+  function confirmTransferToExtra() {
+    document.getElementById('modalTitle').innerText = "Transfer Funds";
+    document.getElementById('modalDesc').innerText = `Transfer ₱${format(liveLimit)} to your Extra Budget?\n\nThis will reset your live balance.`;
+    document.getElementById('modalInputs').innerHTML = "";
+    document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Confirm"; btn.style.background = 'var(--accent)';
+    btn.onclick = () => {
+      extraBudget += liveLimit; liveLimit = 0; save(); closeModal();
+      showMsg("Success", "Funds transferred to Extra Budget!");
+    };
+    document.getElementById('customModal').style.display='flex';
+  }
+
+  function confirmClearExtra() {
+    document.getElementById('modalTitle').innerText = "Clear Extra Budget";
+    document.getElementById('modalDesc').innerText = "Are you sure you want to clear your Extra Budget?";
+    document.getElementById('modalInputs').innerHTML = ""; document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Clear All"; btn.style.background = 'var(--danger)';
+    btn.onclick = () => { extraBudget = 0; save(); closeModal(); };
+    document.getElementById('customModal').style.display='flex';
+  }
+
+  function openSalaryDistributor() {
+    if(wallets.length === 0) { showMsg("No Wallets", "Add a wallet first.", true); return; }
+    document.getElementById('modalTitle').innerText = "Salary Distributor";
+    document.getElementById('modalInputs').innerHTML = `
+      <div style="background:var(--bg); padding:12px; border-radius:15px; margin-bottom:15px; border:1px solid var(--border); text-align:left">
+        <small style="font-weight:800">UNALLOCATED SALARY</small>
+        <div style="font-size:1.4rem; font-weight:800; color:var(--accent)">₱<span id="unallocatedDisplay">${format(unallocatedSalary)}</span></div>
+      </div>
+      <input type="number" id="incomeInput" placeholder="New Income ₱" oninput="calcRemainingSal()">
+      <div id="salRemaining" style="margin-bottom:15px; font-weight:800; color:var(--success); background:#ecfdf5; padding:10px; border-radius:10px;">Available: ₱${format(unallocatedSalary)}</div>
+      ${wallets.map((w,i)=>`<div style="text-align:left; font-size:0.8rem"><b>To ${w.name}</b></div><div class="input-row"><input type="number" class="sal-input" data-idx="${i}" placeholder="0.00" oninput="calcRemainingSal()"><button class="btn-all" onclick="setAllValue('sal-input', ${i})">ALL</button></div>`).join('')}
+    `;
+    document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Confirm Distribution"; btn.style.background = 'var(--success)';
+    btn.onclick = () => {
+      const income = parseFloat(document.getElementById('incomeInput').value) || 0;
+      const inputs = document.querySelectorAll('.sal-input');
+      let totalAvailable = unallocatedSalary + income, allocated = 0;
+      inputs.forEach(input => { allocated += (parseFloat(input.value) || 0); });
+      if (allocated > totalAvailable + 0.01) { showMsg("Over Budget", "Total exceeds available funds!", true); return; }
+      inputs.forEach(input => { const idx = input.getAttribute('data-idx'); wallets[idx].balance += (parseFloat(input.value) || 0); });
+      unallocatedSalary = Math.max(0, totalAvailable - allocated); save(); closeModal();
+    };
+    document.getElementById('customModal').style.display='flex';
+  }
+
+  function openWalletRedistributor() {
+    if(wallets.length < 2) { showMsg("Restricted", "You need at least 2 wallets.", true); return; }
+    document.getElementById('modalTitle').innerText = "Internal Transfer";
+    document.getElementById('modalInputs').innerHTML = `
+      <select id="srcIdx" onchange="updateDestDrop()">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>
+      <select id="destIdx"></select>
+      <div class="input-row"><input type="number" id="trAmt" placeholder="Amount ₱" oninput="calcRedistRemaining()"><button class="btn-all" onclick="setTrAll()">ALL</button></div>
+      <div id="redistStatus" style="padding:10px; border-radius:10px; font-weight:800; font-size:0.9rem">Source Rem: ₱0.00</div>
+    `;
+    updateDestDrop(); calcRedistRemaining();
+    document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Transfer"; btn.style.background = 'var(--accent)';
+    btn.onclick = () => {
+      const s = parseInt(document.getElementById('srcIdx').value), d = parseInt(document.getElementById('destIdx').value), a = parseFloat(document.getElementById('trAmt').value) || 0;
+      if (a <= 0 || a > wallets[s].balance + 0.01) { showMsg("Error", "Check the amount.", true); return; }
+      wallets[s].balance -= a; wallets[d].balance += a; save(); closeModal();
+    };
+    document.getElementById('customModal').style.display = 'flex';
+  }
+
+  function updateDestDrop() { 
+    const s = parseInt(document.getElementById('srcIdx').value);
+    document.getElementById('destIdx').innerHTML = wallets.map((w,i) => i === s ? '' : `<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('');
+  }
+  function setTrAll() { const s = parseInt(document.getElementById('srcIdx').value); document.getElementById('trAmt').value = wallets[s].balance.toFixed(2); calcRedistRemaining(); }
+  function calcRedistRemaining() {
+    const s = parseInt(document.getElementById('srcIdx').value), amt = parseFloat(document.getElementById('trAmt').value) || 0, rem = wallets[s].balance - amt;
+    const el = document.getElementById('redistStatus'); el.innerText = `Source Remaining: ₱${format(rem)}`;
+    el.style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
+  }
+  function calcRemainingSal() {
+    const income = parseFloat(document.getElementById('incomeInput').value) || 0;
+    let allocated = 0; document.querySelectorAll('.sal-input').forEach(i => allocated += (parseFloat(i.value) || 0));
+    const rem = (unallocatedSalary + income) - allocated;
+    const el = document.getElementById('salRemaining'); el.innerText = `Remaining: ₱${format(rem)}`; el.style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
+  }
+  function setAllValue(className, targetIdx) {
+    const inputs = document.querySelectorAll('.' + className); let currentAllocated = 0;
+    inputs.forEach(input => { if(parseInt(input.getAttribute('data-idx')) !== targetIdx) currentAllocated += (parseFloat(input.value) || 0); });
+    let available = (unallocatedSalary + (parseFloat(document.getElementById('incomeInput').value) || 0)) - currentAllocated;
+    inputs.forEach(input => { if(parseInt(input.getAttribute('data-idx')) === targetIdx) input.value = Math.max(0, available).toFixed(2); });
+    calcRemainingSal();
+  }
+
+  function addBill(){ const n=document.getElementById('bName'), a=document.getElementById('bAmt'); if(n.value && a.value){ bills.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
+  function addDebt(){ const n=document.getElementById('dName'), a=document.getElementById('dAmt'); if(n.value && a.value){ debts.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
+  
+  function addDailyExpense(){
+    const a=document.getElementById('gAmt'), d=document.getElementById('gDesc'), wIdx=document.getElementById('gWalletSelect').value;
+    if(a.value && wIdx !== ""){
+      const amt = parseFloat(a.value);
+      const purpose = d.value || "Daily Expense";
+      if(wallets[wIdx].balance >= amt){
+        wallets[wIdx].balance -= amt; liveLimit -= amt;
+        expHistory.push({ name: `${purpose} via ${wallets[wIdx].name}`, amount: amt, date: new Date().toLocaleDateString() });
+        a.value=''; d.value=''; save();
+      } else { showMsg("Insufficient", "Not enough funds in this wallet.", true); }
+    }
+  }
+
+  function openEdit(type, idx){
+    let list = type==='wallets'?wallets:type==='bills'?bills:type==='debts'?debts:type==='expH'?expHistory:type==='billH'?billHistory:debtHistory;
+    const item = list[idx];
+    document.getElementById('modalTitle').innerText = "Edit Entry";
+    document.getElementById('modalInputs').innerHTML = `<input type="text" id="en" value="${item.name}"><input type="number" id="ea" value="${item.balance!==undefined?item.balance:item.amount}">`;
+    document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Update"; btn.style.background = 'var(--accent)';
+    btn.onclick = () => { item.name = document.getElementById('en').value; const a = parseFloat(document.getElementById('ea').value); if(item.balance!==undefined) item.balance=a; else item.amount=a; save(); closeModal(); };
+    document.getElementById('customModal').style.display='flex';
+  }
+
+  function confirmDelete(type, idx){
+    document.getElementById('modalTitle').innerText = "Delete Record";
+    document.getElementById('modalDesc').innerText = "Are you sure you want to delete this?";
+    document.getElementById('modalInputs').innerHTML = ""; document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Delete"; btn.style.background = 'var(--danger)';
+    btn.onclick = () => { if(type==='wallets') wallets.splice(idx,1); else if(type==='bills') bills.splice(idx,1); else if(type==='debts') debts.splice(idx,1); else if(type==='expH') expHistory.splice(idx,1); else if(type==='billH') billHistory.splice(idx,1); else if(type==='debtH') debtHistory.splice(idx,1); save(); closeModal(); };
+    document.getElementById('customModal').style.display='flex';
+  }
+
+  function confirmClearAll(type){
+    document.getElementById('modalTitle').innerText = "Clear All";
+    document.getElementById('modalDesc').innerText = "Warning: This will clear all data in this section.";
+    document.getElementById('modalInputs').innerHTML = ""; document.getElementById('modalCancelBtn').style.display = "block";
+    const btn = document.getElementById('modalConfirmBtn'); btn.innerText = "Wipe Section"; btn.style.background = 'var(--danger)';
+    btn.onclick = () => { if(type==='wallets') wallets=[]; else if(type==='bills') bills=[]; else if(type==='debts') debts=[]; else if(type==='expHistory') expHistory=[]; else if(type==='billHistory') billHistory=[]; else if(type==='debtHistory') debtHistory=[]; save(); closeModal(); };
+    document.getElementById('customModal').style.display='flex';
+  }
 
   function renderPager(id, type, total){
-    const max = Math.ceil(total/step);
-    if(max <= 1) { document.getElementById(id).innerHTML=""; return; }
-    document.getElementById(id).innerHTML = `<button onclick="pages['${type}']--; refresh()" ${pages[type]===0?'disabled':''} style="padding:5px 12px; border-radius:10px; border:1px solid #ddd; background:white">←</button> <span style="font-size:0.75rem">${pages[type]+1}/${max}</span> <button onclick="pages['${type}']++; refresh()" ${pages[type]>=max-1?'disabled':''} style="padding:5px 12px; border-radius:10px; border:1px solid #ddd; background:white">→</button>`;
+    const max = Math.ceil(total/step); if(max <= 1) { document.getElementById(id).innerHTML=""; return; }
+    document.getElementById(id).innerHTML = `<button onclick="pages['${type}']--; refresh()" ${pages[type]===0?'disabled':''}>←</button> <span>${pages[type]+1}/${max}</span> <button onclick="pages['${type}']++; refresh()" ${pages[type]>=max-1?'disabled':''}>→</button>`;
   }
 
   function refresh(){
-    const tCash = wallets.reduce((s,w)=>s+w.balance,0);
-    const tBills = bills.reduce((s,b)=>s+b.amount,0);
-    const tDebts = debts.reduce((s,d)=>s+d.amount,0);
-    document.getElementById('mainTotal').innerText = format(tCash);
-    document.getElementById('billForecast').innerText = format(tCash - tBills);
+    checkDateTransition();
+    const tCash = wallets.reduce((s,w)=>s+w.balance,0), tBills = bills.reduce((s,b)=>s+b.amount,0), tDebts = debts.reduce((s,d)=>s+d.amount,0), tExps = expHistory.reduce((s,h)=>s+h.amount,0);
+    const safeUnallocated = Math.max(0, unallocatedSalary), totalCap = tCash + safeUnallocated + tBills + tDebts + tExps;
+    document.getElementById('mainTotal').innerText = format(tCash + safeUnallocated + extraBudget);
+    document.getElementById('billForecast').innerText = format((tCash + safeUnallocated) - tBills);
     document.getElementById('totalBillsOnly').innerText = format(tBills);
-    document.getElementById('debtForecast').innerText = format(tCash - tDebts);
+    document.getElementById('debtForecast').innerText = format((tCash + safeUnallocated) - tDebts);
     document.getElementById('totalDebtsOnly').innerText = format(tDebts);
+    if(totalCap > 0) {
+        const pS = ((tCash + safeUnallocated) / totalCap) * 100, pB = (tBills / totalCap) * 100, pD = (tDebts / totalCap) * 100, pE = (tExps / totalCap) * 100;
+        document.getElementById('barSavings').style.width = pS + "%"; document.getElementById('barBills').style.width = pB + "%"; document.getElementById('barDebts').style.width = pD + "%"; document.getElementById('barExps').style.width = pE + "%";
+        document.getElementById('percSavings').innerText = Math.round(pS) + "%"; document.getElementById('percBills').innerText = Math.round(pB) + "%"; document.getElementById('percDebts').innerText = Math.round(pD) + "%"; document.getElementById('percExps').innerText = Math.round(pE) + "%";
+        document.getElementById('chartTotalValue').innerText = "₱" + format(totalCap);
+    }
+
     document.getElementById('gWalletSelect').innerHTML = wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('');
+    let walletsHTML = wallets.map((w,i)=>`<div style="background:var(--card); padding:15px; border-radius:18px; border:1px solid var(--border)"><b>${w.name}</b><br>₱${format(w.balance)}<div class="action-btns"><button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button><button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button></div></div>`).join('');
+    walletsHTML += `<div style="background:#fffbeb; padding:15px; border-radius:18px; border:1px solid #fde68a; color:#92400e"><b>Extra Budget</b><br>₱${format(extraBudget)}<br><div class="action-btns"><button class="del-btn" onclick="confirmClearExtra()">Clear</button></div></div>`;
+    document.getElementById('walletGrid').innerHTML = walletsHTML;
 
-    document.getElementById('walletGrid').innerHTML = wallets.map((w,i)=>`<div style="background:white; padding:15px; border-radius:18px; border:1px solid #eee"><b>${w.name}</b><br>₱${format(w.balance)}<div class="action-btns"><button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button><button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button></div></div>`).join('');
+    const savedLimit = localStorage.getItem('WF_LIMIT') || "6000";
+    const savedDays = localStorage.getItem('WF_DAYS') || "14";
+    document.getElementById('spendLimit').value = savedLimit;
+    document.getElementById('daysToGo').value = savedDays;
+    document.getElementById('liveLimitDisplay').innerText = format(liveLimit);
+    
+    const bDays = parseInt(savedDays) || 1;
+    const daily = liveLimit / bDays; 
+    document.getElementById('dailyLimitBudget').innerText = format(daily);
+    const todayStr = new Date().toLocaleDateString(), spentT = expHistory.filter(h=>h.date===todayStr).reduce((s,h)=>s+h.amount,0);
+    document.getElementById('spentToday').innerText = "₱"+format(spentT);
+    
+    const status = document.getElementById('budgetStatus');
+    if (spentT > daily && daily > 0) { status.innerText = `You overspent! Save ₱${format(spentT-daily)}`; status.style.color = "var(--danger)";
+    } else { status.innerText = "✅ Status: Safe"; status.style.color = "var(--success)"; }
 
-    const bS = pages.bills * step;
-    document.getElementById('billList').innerHTML = bills.slice(bS, bS+step).map((b,i)=>`<div class="list-item line-bill"><div><b>${b.name}</b><br><small>₱${format(b.amount)}</small><div class="action-btns"><button class="edit-btn" onclick="openEdit('bills',${bS+i})">Edit</button><button class="del-btn" onclick="confirmDelete('bills',${bS+i})">🗑</button></div></div><button class="pay-btn" onclick="openPayIndividual('bills',${bS+i})">Pay</button></div>`).join('');
-    renderPager('billPager', 'bills', bills.length);
+    const drawList = (list, el, pag, type, isP=false) => {
+      const s = pages[type]*step;
+      document.getElementById(el).innerHTML = list.slice(s,s+step).map((item,i)=>`<div class="list-item line-${type.includes('bill')?'bill':type.includes('debt')?'debt':'expense'}"><div><b>${item.name}</b><br><small>₱${format(item.balance!==undefined?item.balance:item.amount)}</small><div class="action-btns"><button class="edit-btn" onclick="openEdit('${type}',${s+i})">Edit</button><button class="del-btn" onclick="confirmDelete('${type}',${s+i})">🗑</button></div></div>${isP?`<button class="pay-btn" onclick="openPayIndividual('${type}',${s+i})">Pay</button>`:''}</div>`).join('');
+      renderPager(pag, type, list.length);
+    }
 
-    const dS = pages.debts * step;
-    document.getElementById('debtList').innerHTML = debts.slice(dS, dS+step).map((d,i)=>`<div class="list-item line-debt"><div><b>${d.name}</b><br><small>₱${format(d.amount)}</small><div class="action-btns"><button class="edit-btn" onclick="openEdit('debts',${dS+i})">Edit</button><button class="del-btn" onclick="confirmDelete('debts',${dS+i})">🗑</button></div></div><button class="pay-btn" onclick="openPayIndividual('debts',${dS+i})">Pay</button></div>`).join('');
-    renderPager('debtPager', 'debts', debts.length);
+    const drawHist = (list, el, pag, type, searchId) => {
+      const query = document.getElementById(searchId).value.toLowerCase();
+      const filtered = list.filter(h => h.name.toLowerCase().includes(query)).reverse();
+      const s = pages[type]*step;
+      document.getElementById(el).innerHTML = filtered.slice(s,s+step).map((h,i)=>{
+        // NEW: Icon Logic based on Keywords
+        const icon = h.name.toLowerCase().includes('food') ? '🍔' : 
+                     h.name.toLowerCase().includes('trans') ? '🚌' : 
+                     h.name.toLowerCase().includes('bill') ? '⚡' : '🎁';
 
-    const hR = [...history].reverse();
-    const hS = pages.history * step;
-    document.getElementById('historyList').innerHTML = hR.slice(hS, hS+step).map((h,i)=>`<div class="list-item ${h.name.toLowerCase().includes('bills')?'line-bill':h.name.toLowerCase().includes('debts')?'line-debt':'line-expense'}"><div><b>${h.name}</b><br><small>${h.date}</small><div class="action-btns"><button class="del-btn" onclick="confirmDelete('history',${history.length-1-(hS+i)})">🗑</button></div></div><b style="color:var(--danger)">-₱${format(h.amount)}</b></div>`).join('');
-    renderPager('historyPager', 'history', history.length);
+        return `<div class="list-item" style="font-size:0.85rem">
+          <div style="display:flex; align-items:center">
+            <span style="font-size:1.2rem; margin-right:10px">${icon}</span>
+            <div><b>${h.name}</b><br><small>${h.date}</small><div class="action-btns"><button class="del-btn" onclick="confirmDelete('${type}',list.length-1-(s+i))">🗑</button></div></div>
+          </div>
+          <b style="color:var(--danger)">-₱${format(h.amount)}</b>
+        </div>`
+      }).join('');
+      renderPager(pag, type, filtered.length);
+    }
+
+    drawList(bills,'billList','billPager','bills',true); 
+    drawList(debts,'debtList','debtPager','debts',true);
+    drawHist(expHistory,'expHistoryList','expHistoryPager','expH', 'searchExp'); 
+    drawHist(billHistory,'billHistoryList','billHistoryPager','billH', 'searchBill');
+    drawHist(debtHistory,'debtHistoryList','debtHistoryPager','debtH', 'searchDebt');
   }
   refresh();
+
+function copyTextSummary() {
+    let report = "📊 MONEY TRACKER PRO SUMMARY\n";
+    report += "Date: " + new Date().toLocaleString() + "\n";
+    report += "----------------------------------\n\n";
+
+    const totalCash = wallets.reduce((s, w) => s + w.balance, 0);
+    const eb = typeof extraBudget !== 'undefined' ? extraBudget : 0;
+    report += "💰 TOTAL SAVINGS: PHP " + format(totalCash + eb) + "\n\n";
+
+    report += "--- WALLET BREAKDOWN ---\n";
+    wallets.forEach(w => {
+      report += `${w.name}: PHP ${format(w.balance)}\n`;
+    });
+    if (eb > 0) report += `Extra Budget: PHP ${format(eb)}\n`;
+
+    report += "\n--- LATEST EXPENSES ---\n";
+    if (expHistory.length > 0) {
+      expHistory.slice(-10).reverse().forEach(h => {
+        report += `• ${h.date} | ${h.name} (-PHP ${format(h.amount)})\n`;
+      });
+    }
+
+    report += "\n--- UNPAID BILLS ---\n";
+    if (bills.length > 0) {
+      bills.forEach(b => { report += `[ ] ${b.name}: PHP ${format(b.amount)}\n`; });
+    }
+
+    report += "\n--- UNPAID DEBTS ---\n";
+    if (debts.length > 0) {
+      debts.forEach(d => { report += `[ ] ${d.name}: PHP ${format(d.amount)}\n`; });
+    }
+
+    report += "\n----------------------------------\nGenerated via Money Tracker Pro";
+
+    navigator.clipboard.writeText(report).then(() => {
+      // Heto yung modal popup gamit yung logic mo
+      showMsg("Success", "Summary copied to clipboard! You can now paste it to your Notes or Messenger.");
+    }).catch(err => {
+      showMsg("Error", "Failed to copy text.", true);
+    });
+  }
+
 </script>
 </body>
 </html>
