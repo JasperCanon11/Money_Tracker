@@ -22,9 +22,8 @@
     --border: #f1f5f9;
   }
 
-  /* NEW: Dark Mode Variables */
   body.dark-mode {
-    --bg: #0f172a; 
+    --bg: #0f172a;
     --card: #1e293b;
     --text-main: #f1f5f9; 
     --text-muted: #94a3b8;
@@ -38,7 +37,7 @@
   body { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
     margin: 0; background: var(--bg);
-    color: var(--text-main); 
+    color: var(--text-main);
     padding: 16px; 
     transition: background 0.3s;
   }
@@ -61,13 +60,15 @@
   
   .card-main {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); 
-    padding: 25px 20px; border-radius: 28px; text-align: center; margin-bottom: 20px; color: white; 
+    padding: 25px 20px; border-radius: 28px;
+    text-align: center; margin-bottom: 20px; color: white; 
   }
   
   .card-main b { font-size: 2.3rem; display: block; margin-top: 5px; font-weight: 800; }
   
   .discipline-card, .chart-box, .stat-card, .input-box, .list-item, .modal-content {
-    background: var(--card); border: 1px solid var(--border); border-radius: 24px; 
+    background: var(--card);
+    border: 1px solid var(--border); border-radius: 24px; 
     padding: 18px; margin-bottom: 20px; box-shadow: var(--card-shadow);
   }
   
@@ -120,7 +121,6 @@
   section { display: none; }
   section.active { display: block; }
   .search-bar { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; font-size: 0.85rem; background: var(--card); color: var(--text-main); }
-
   </style>
 </head>
 <body>
@@ -139,10 +139,7 @@
 <div class="app-container">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;">
     <h3 style="margin:0; font-size: 1.1rem; font-weight: 800;">Tracker Pro</h3>
-    <button onclick="document.body.classList.toggle('dark-mode')" 
-            style="padding: 8px 12px; border-radius: 12px; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 1.1rem;">
-        🌙
-    </button>
+    <button onclick="document.body.classList.toggle('dark-mode')" style="padding: 8px 12px; border-radius: 12px; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text-main); font-size: 1.1rem;">🌙</button>
   </div>
 
   <header>
@@ -154,7 +151,6 @@
 
   <section id="dashboard" class="active">
     <div class="card-main"><small>Total Savings</small><b>₱<span id="mainTotal">0.00</span></b></div>
-    
     <div class="chart-box">
       <div class="legend"><span>Financial Breakdown</span><span id="chartTotalValue">₱0.00</span></div>
       <div class="progress-container">
@@ -170,14 +166,12 @@
         <div style="color:var(--warning)">EXPENSE<br><span id="percExps">0%</span></div>
       </div>
     </div>
-
     <div class="input-box input-wallet">
       <h4>Add Wallet</h4>
       <input type="text" id="wName" placeholder="Wallet Name (e.g. GCash)">
       <input type="number" id="wBal" placeholder="Initial Balance ₱">
       <button class="btn-primary" onclick="addWallet()">Save Wallet</button>
     </div>
-
     <div class="section-header">
         <h5>Wallets</h5>
         <div style="text-align: right;">
@@ -188,16 +182,13 @@
         </div>
     </div>
     <div id="walletGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
-
     <div class="section-header"><h5>Data Management</h5></div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:30px;">
-    <button class="btn-secondary" onclick="exportData()">📤 Export</button>
-    <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import</button>
-    <button class="btn-secondary" style="grid-column: span 2; background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent);" onclick="copyTextSummary()">
-        📋 Copy App Summary (English)
-    </button>
-    <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-</div>
+      <button class="btn-secondary" onclick="exportData()">📤 Export</button>
+      <button class="btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import</button>
+      <button class="btn-secondary" style="grid-column: span 2; background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent);" onclick="copyTextSummary()">📋 Copy App Summary (English)</button>
+      <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+    </div>
   </section>
 
   <section id="budget">
@@ -212,25 +203,20 @@
           <input type="number" id="daysToGo" placeholder="Days" oninput="saveBudgetSettings()" style="width: 60px; margin:0; padding: 5px;">
         </div>
       </div>
-      
       <div style="background: var(--bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border)">
         <small>DAILY ALLOWANCE</small>
         <div style="font-size: 1.8rem; font-weight: 800; color: var(--success);">₱<span id="dailyLimitBudget">0.00</span></div>
       </div>
-      
       <div style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 5px;">
         <span style="font-size: 0.9rem;">Spent Today: <b id="spentToday">₱0.00</b></span>
         <span id="budgetStatus" style="font-weight: 800; font-size: 0.95rem;">✅ Safe</span>
-        
         <div style="background: var(--bg); width: 100%; padding: 10px; border-radius: 12px; margin-top: 5px; text-align: center; border: 1px solid var(--border)">
             <small style="font-weight: 800; color: var(--text-muted);">LIVE 2-WEEK BALANCE</small>
             <div style="font-weight: 800; color: var(--accent);">₱<span id="liveLimitDisplay">0.00</span></div>
         </div>
-        
         <button class="btn-secondary" style="background:var(--accent-light); color:var(--accent); margin-top:10px" onclick="confirmTransferToExtra()">Transfer to Extra Budget</button>
       </div>
     </div>
-
     <div class="input-box input-expense">
       <h4>Quick Spend</h4>
       <input type="text" id="gDesc" placeholder="Description">
@@ -238,7 +224,6 @@
       <select id="gWalletSelect"></select>
       <button class="btn-primary" style="background:var(--success)" onclick="addDailyExpense()">Record Expense</button>
     </div>
-
     <div class="section-header">
       <h5>Expense History</h5>
       <button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">Clear All</button>
@@ -294,7 +279,13 @@
   let debtHistory = JSON.parse(localStorage.getItem('WF_DH')) || [];
   let unallocatedSalary = parseFloat(localStorage.getItem('WF_US')) || 0;
   let extraBudget = parseFloat(localStorage.getItem('WF_EB')) || 0;
-  let liveLimit = parseFloat(localStorage.getItem('WF_LIVE_LIMIT')) || 6000;
+  
+  // LIVE SYNC LOGIC: Check if live limit already exists, otherwise use config
+  let liveLimit = parseFloat(localStorage.getItem('WF_LIVE_LIMIT'));
+  if (isNaN(liveLimit)) {
+      liveLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 6000;
+  }
+  
   let lastSyncDate = localStorage.getItem('WF_LSD') || new Date().toLocaleDateString();
   let pages = { bills: 0, debts: 0, expH: 0, billH: 0, debtH: 0 };
   const step = 5;
@@ -302,11 +293,16 @@
   function format(v){ return v.toLocaleString('en-PH',{minimumFractionDigits:2}); }
   
   function save(){
-    localStorage.setItem('WF_W', JSON.stringify(wallets)); localStorage.setItem('WF_B', JSON.stringify(bills));
-    localStorage.setItem('WF_D', JSON.stringify(debts)); localStorage.setItem('WF_EH', JSON.stringify(expHistory));
-    localStorage.setItem('WF_BH', JSON.stringify(billHistory)); localStorage.setItem('WF_DH', JSON.stringify(debtHistory));
-    localStorage.setItem('WF_US', unallocatedSalary.toString()); localStorage.setItem('WF_EB', extraBudget.toString());
-    localStorage.setItem('WF_LIVE_LIMIT', liveLimit.toString()); localStorage.setItem('WF_LSD', lastSyncDate);
+    localStorage.setItem('WF_W', JSON.stringify(wallets)); 
+    localStorage.setItem('WF_B', JSON.stringify(bills));
+    localStorage.setItem('WF_D', JSON.stringify(debts));
+    localStorage.setItem('WF_EH', JSON.stringify(expHistory));
+    localStorage.setItem('WF_BH', JSON.stringify(billHistory)); 
+    localStorage.setItem('WF_DH', JSON.stringify(debtHistory));
+    localStorage.setItem('WF_US', unallocatedSalary.toString()); 
+    localStorage.setItem('WF_EB', extraBudget.toString());
+    localStorage.setItem('WF_LIVE_LIMIT', liveLimit.toString()); 
+    localStorage.setItem('WF_LSD', lastSyncDate);
     refresh();
   }
 
@@ -314,10 +310,23 @@
     const today = new Date().toLocaleDateString();
     if (lastSyncDate !== today) {
         let daysInput = document.getElementById('daysToGo');
-        let currentDays = parseInt(daysInput.value) || 14;
-        if (currentDays > 1) { daysInput.value = currentDays - 1; }
+        let currentDays = parseInt(daysInput.value) || 0;
+        
+        // 1. Paglipas ng araw, bawas ang Days Left
+        if (currentDays > 1) { 
+            daysInput.value = currentDays - 1;
+        } else if (currentDays === 1) {
+            daysInput.value = 0;
+        }
+
+        // 2. Update the reference date
         lastSyncDate = today;
-        saveBudgetSettings();
+        
+        // 3. I-save agad ang pagbabago sa days
+        const configLimit = document.getElementById('spendLimit').value;
+        localStorage.setItem('WF_LIMIT_CFG', configLimit);
+        localStorage.setItem('WF_DAYS_CFG', daysInput.value);
+        save();
     }
   }
 
@@ -328,10 +337,11 @@
     localStorage.setItem('WF_LIMIT_CFG', configLimit);
     localStorage.setItem('WF_DAYS_CFG', configDays);
     
-    // ISSUE #3: Live update ng limit base sa input
+    // SYNC: Update live limit variable when config limit is manually changed
     liveLimit = parseFloat(configLimit) || 0;
+    
     save(); 
-}
+  }
 
   function showTab(id){
     document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
@@ -371,10 +381,17 @@
       try {
         const data = JSON.parse(e.target.result);
         if(confirm("Importing will overwrite current data. Continue?")) {
-            wallets = data.WF_W || []; bills = data.WF_B || []; debts = data.WF_D || [];
-            expHistory = data.WF_EH || []; billHistory = data.WF_BH || []; debtHistory = data.WF_DH || [];
-            unallocatedSalary = data.WF_US || 0; extraBudget = data.WF_EB || 0; liveLimit = data.WF_LIVE_LIMIT || 6000; 
-            save(); showMsg("Success", "Data Restored!");
+            wallets = data.WF_W || []; 
+            bills = data.WF_B || []; 
+            debts = data.WF_D || [];
+            expHistory = data.WF_EH || []; 
+            billHistory = data.WF_BH || []; 
+            debtHistory = data.WF_DH || [];
+            unallocatedSalary = data.WF_US || 0; 
+            extraBudget = data.WF_EB || 0; 
+            liveLimit = data.WF_LIVE_LIMIT || 0; 
+            save(); 
+            showMsg("Success", "Data Restored!");
         }
       } catch (err) { showMsg("Error", "Invalid Backup File", true); }
     };
@@ -596,31 +613,32 @@
     const a = document.getElementById('gAmt'), 
           d = document.getElementById('gDesc'), 
           wIdx = document.getElementById('gWalletSelect').value;
-
     if(a.value && wIdx !== ""){
       const amt = parseFloat(a.value);
       if(wallets[wIdx].balance >= amt){
         wallets[wIdx].balance -= amt; 
-        liveLimit -= amt; // Live Sync calculation
+        
+        // SYNC: Bawas sa live limit pool tuwing gagastos
+        liveLimit = Math.max(0, liveLimit - amt); 
+
         const todayStr = new Date().toLocaleDateString();
         expHistory.push({ name: (d.value || "Expense") + " via " + wallets[wIdx].name, amount: amt, date: todayStr });
         
-        // Modal Logic
+        // Modal logic for overspending
         const cfgLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 0;
         const cfgDays = parseFloat(localStorage.getItem('WF_DAYS_CFG')) || 1;
         const dailyAllowance = cfgLimit / cfgDays;
-        const spentToday = expHistory.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
-
-        if (dailyAllowance > 0 && spentToday > dailyAllowance) {
-            // ISSUE #2: Custom Modal
-            showMsg("⚠️ OVERSPENT", `OVERSPENT PLEASE SAVE ₱${format(spentToday - dailyAllowance)}`, true);
+        const spentTodayVal = expHistory.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
+        
+        if (dailyAllowance > 0 && spentTodayVal > dailyAllowance) {
+            showMsg("⚠️ OVERSPENT", `OVERSPENT PLEASE SAVE ₱${format(spentTodayVal - dailyAllowance)}`, true);
         }
         a.value = ''; d.value = ''; save();
       } else { 
-        showMsg("Insufficient Balance", "not Enough funds in this wallet.", true); 
+        showMsg("Insufficient Balance", "not Enough funds in this wallet.", true);
       }
     }
-}
+  }
 
   function openEdit(type, idx){
     let list = type==='wallets'?wallets:type==='bills'?bills:type==='debts'?debts:type==='expH'?expHistory:type==='billH'?billHistory:debtHistory;
@@ -662,7 +680,6 @@
     checkDateTransition();
     const tCash = wallets.reduce((s,w)=>s+w.balance,0), tBills = bills.reduce((s,b)=>s+b.amount,0), tDebts = debts.reduce((s,d)=>s+d.amount,0), tExps = expHistory.reduce((s,h)=>s+h.amount,0);
     const safeUnallocated = Math.max(0, unallocatedSalary), totalCap = tCash + safeUnallocated + tBills + tDebts + tExps;
-    
     document.getElementById('mainTotal').innerText = format(tCash + safeUnallocated + extraBudget);
     document.getElementById('billForecast').innerText = format((tCash + safeUnallocated) - tBills);
     document.getElementById('totalBillsOnly').innerText = format(tBills);
@@ -683,18 +700,16 @@
     }
 
     document.getElementById('gWalletSelect').innerHTML = wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('');
-    
     let walletsHTML = wallets.map((w,i)=>`<div style="background:var(--card); padding:15px; border-radius:18px; border:1px solid var(--border)"><b>${w.name}</b><br>₱${format(w.balance)}<div class="action-btns"><button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button><button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button></div></div>`).join('');
     walletsHTML += `<div style="background:#fffbeb; padding:15px; border-radius:18px; border:1px solid #fde68a; color:#92400e"><b>Extra Budget</b><br>₱${format(extraBudget)}<br><div class="action-btns"><button class="del-btn" onclick="confirmClearExtra()">Clear</button></div></div>`;
     document.getElementById('walletGrid').innerHTML = walletsHTML;
     
-    // ISSUE #1: Blanko sa Start (|| "")
-    const savedLimit = localStorage.getItem('WF_LIMIT_CFG') || ""; 
+    const savedLimit = localStorage.getItem('WF_LIMIT_CFG') || "";
     const savedDays = localStorage.getItem('WF_DAYS_CFG') || "";
     document.getElementById('spendLimit').value = savedLimit;
     document.getElementById('daysToGo').value = savedDays;
-
-    // ISSUE #4: Live Sync Display
+    
+    // LIVE SYNC DISPLAY
     document.getElementById('liveLimitDisplay').innerText = format(liveLimit);
     
     const bDays = parseInt(savedDays) || 1;
@@ -702,15 +717,16 @@
     const daily = currentLimit / bDays; 
     document.getElementById('dailyLimitBudget').innerText = format(daily);
     
-    const todayStr = new Date().toLocaleDateString(), spentT = expHistory.filter(h=>h.date===todayStr).reduce((s,h)=>s+h.amount,0);
+    const todayStr = new Date().toLocaleDateString();
+    const spentT = expHistory.filter(h=>h.date===todayStr).reduce((s,h)=>s+h.amount,0);
     document.getElementById('spentToday').innerText = "₱"+format(spentT);
     
     const status = document.getElementById('budgetStatus');
     if (spentT > daily && daily > 0) { 
-        status.innerText = `You overspent! Save ₱${format(spentT-daily)}`; 
+        status.innerText = `You overspent!\nSave ₱${format(spentT-daily)}`; 
         status.style.color = "var(--danger)";
     } else { 
-        status.innerText = "✅ Status: Safe"; 
+        status.innerText = "✅ Status: Safe";
         status.style.color = "var(--success)";
     }
 
@@ -734,51 +750,34 @@
     renderHistory('billHistory', 'billHistoryList', 'billHistoryPager', 'billH', 'searchBill');
     renderHistory('debtHistory', 'debtHistoryList', 'debtHistoryPager', 'debtH', 'searchDebt');
 }
-  refresh();
+
+refresh();
 
 function copyTextSummary() {
     let report = "📊 MONEY TRACKER PRO SUMMARY\n";
     report += "Date: " + new Date().toLocaleString() + "\n";
     report += "----------------------------------\n\n";
-
     const totalCash = wallets.reduce((s, w) => s + w.balance, 0);
     const eb = typeof extraBudget !== 'undefined' ? extraBudget : 0;
     report += "💰 TOTAL SAVINGS: PHP " + format(totalCash + eb) + "\n\n";
-
     report += "--- WALLET BREAKDOWN ---\n";
-    wallets.forEach(w => {
-      report += `${w.name}: PHP ${format(w.balance)}\n`;
-    });
+    wallets.forEach(w => { report += `${w.name}: PHP ${format(w.balance)}\n`; });
     if (eb > 0) report += `Extra Budget: PHP ${format(eb)}\n`;
-
     report += "\n--- LATEST EXPENSES ---\n";
     if (expHistory.length > 0) {
-      expHistory.slice(-10).reverse().forEach(h => {
-        report += `• ${h.date} | ${h.name} (-PHP ${format(h.amount)})\n`;
-      });
+      expHistory.slice(-10).reverse().forEach(h => { report += `• ${h.date} | ${h.name} (-PHP ${format(h.amount)})\n`; });
     }
-
     report += "\n--- UNPAID BILLS ---\n";
-    if (bills.length > 0) {
-      bills.forEach(b => { report += `[ ] ${b.name}: PHP ${format(b.amount)}\n`; });
-    }
-
+    if (bills.length > 0) { bills.forEach(b => { report += `[ ] ${b.name}: PHP ${format(b.amount)}\n`; }); }
     report += "\n--- UNPAID DEBTS ---\n";
-    if (debts.length > 0) {
-      debts.forEach(d => { report += `[ ] ${d.name}: PHP ${format(d.amount)}\n`; });
-    }
-
+    if (debts.length > 0) { debts.forEach(d => { report += `[ ] ${d.name}: PHP ${format(d.amount)}\n`; }); }
     report += "\n----------------------------------\nGenerated via Money Tracker Pro";
-
     navigator.clipboard.writeText(report).then(() => {
-      // Heto yung modal popup gamit yung logic mo
       showMsg("Success", "Summary copied to clipboard!.");
     }).catch(err => {
       showMsg("Error", "Failed to copy text.", true);
     });
-  }
-
+}
 </script>
 </body>
 </html>
-
