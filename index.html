@@ -306,28 +306,53 @@
     refresh();
   }
 
-  function checkDateTransition() {
-    const today = new Date().toLocaleDateString();
-    if (lastSyncDate !== today) {
-        let daysInput = document.getElementById('daysToGo');
-        let currentDays = parseInt(daysInput.value) || 0;
+function checkDateTransition() {
+
+    const today = new Date();
+
+    const todayString = today.toLocaleDateString();
+
+    
+
+    // Kunin ang mga huling naka-save na settings para hindi mag-empty
+
+    let savedLimit = localStorage.getItem('WF_LIMIT_CFG');
+
+    let savedDays = localStorage.getItem('WF_DAYS_CFG');
+
+
+
+    if (lastSyncDate !== todayString) {
+
+        // I-calculate ang gap ng mga araw
+
+        const lastDateObj = new Date(lastSyncDate);
+        const diffInTime = today.getTime() - lastDateObj.getTime();
+        const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+
         
-        // 1. Paglipas ng araw, bawas ang Days Left
-        if (currentDays > 1) { 
-            daysInput.value = currentDays - 1;
-        } else if (currentDays === 1) {
-            daysInput.value = 0;
+        if (diffInDays > 0) {
+            let currentDays = parseInt(savedDays) || 0;
+            let newDays = Math.max(0, currentDays - diffInDays);
+
+            // I-update ang storage at ang input field
+            localStorage.setItem('WF_DAYS_CFG', newDays.toString());
+            document.getElementById('daysToGo').value = newDays;
+
         }
 
-        // 2. Update the reference date
-        lastSyncDate = today;
-        
-        // 3. I-save agad ang pagbabago sa days
-        const configLimit = document.getElementById('spendLimit').value;
-        localStorage.setItem('WF_LIMIT_CFG', configLimit);
-        localStorage.setItem('WF_DAYS_CFG', daysInput.value);
-        save();
+        // Update ang reference date para sa susunod na check
+        lastSyncDate = todayString;
+        localStorage.setItem('WF_LSD', lastSyncDate);
+
+        // Siguraduhin na hindi mawawala ang limit settings
+        if (savedLimit) {
+            localStorage.setItem('WF_LIMIT_CFG', savedLimit);
+        }
+
+        save(); // I-save lahat ng changes
     }
+
   }
 
   function saveBudgetSettings() {
