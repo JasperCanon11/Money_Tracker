@@ -525,38 +525,33 @@ function openPayIndividual(type, idx){
     document.getElementById('customModal').style.display='flex';
 }
 
- function openExtraDistributor() {
-    if(wallets.length === 0) { showMsg("No Wallets", "Add a wallet first.", true); return; }
+function openExtraDistributor() {
+    if(wallets.length === 0) { 
+        showMsg("No Wallets", "Please add a wallet in the Wallets Tab first.", true); 
+        return; 
+    }
     
     document.getElementById('modalTitle').innerText = "Extra Budget Manager";
     
-    // UI Layout: Deduction (Top) + Current Balance + Distribution (Bottom)
+    // Ipinapakita dito ang 'extraBudget' variable balance
     document.getElementById('modalInputs').innerHTML = `
-      <div style="background:var(--accent-light); padding:12px; border-radius:15px; margin-bottom:15px; text-align:left; border:1px solid var(--accent)">
-        <small style="font-weight:800; color:var(--accent)">➕ ADD FROM WALLET (DEDUCT)</small>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-          <select id="deductSrcIdx" style="width:100%; margin-bottom:0; font-size:0.85rem; padding:8px;">
-            ${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}
-          </select>
-          <div style="display:flex; gap:5px;">
-            <input type="number" id="deductAmt" placeholder="Amount to Deduct" style="flex:1; margin-bottom:0; font-size:0.85rem;">
-            <button class="pay-btn" onclick="executeManualDeduct()" style="white-space:nowrap; background:var(--accent)">Deduct</button>
-          </div>
-        </div>
-      </div>
-
       <div style="background:var(--bg); padding:12px; border-radius:15px; margin-bottom:15px; border:1px solid var(--border); text-align:left">
         <small style="font-weight:800">AVAILABLE EXTRA BUDGET</small>
         <div style="font-size:1.4rem; font-weight:800; color:var(--warning)">₱${format(extraBudget)}</div>
       </div>
 
+      <div style="margin-bottom:15px; text-align:left;">
+        <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">TRANSFER FEE PER ALLOCATION (DEDUCT FROM EXTRA):</label>
+        <input type="number" id="extraFeeAmt" placeholder="0.00 ₱" step="0.01" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-top:5px;">
+      </div>
+
       <div style="text-align:left;">
-        <small style="font-weight:800; color:var(--success)">📤 DISTRIBUTE TO WALLETS</small>
+        <small style="font-weight:800; color:var(--success)">📤 ALLOCATE TO WALLETS (ADD TO BALANCE)</small>
         ${wallets.map((w,i)=>`
           <div style="margin-top:8px; font-size:0.8rem"><b>To ${w.name}</b></div>
           <div class="input-row">
             <input type="number" class="extra-input" data-idx="${i}" placeholder="0.00">
-            <button class="btn-all" onclick="setAllExtra(${i})">ALL</button>
+            <button class="btn-all" onclick="setAllValue('extra-input', ${i})">ALL</button>
           </div>
         `).join('')}
       </div>
@@ -569,23 +564,56 @@ function openPayIndividual(type, idx){
 
     btn.onclick = () => {
       const inputs = document.querySelectorAll('.extra-input');
-      let allocated = 0;
-      inputs.forEach(input => { allocated += (parseFloat(input.value) || 0); });
+      const perItemFee = parseFloat(document.getElementById('extraFeeAmt').value) || 0;
+      let totalNeededFromExtra = 0;
+
+      // 1. Calculate total (Amount to ADD + Fees)
+      inputs.forEach(input => { 
+        const val = (parseFloat(input.value) || 0);
+        if (val > 0) {
+          totalNeededFromExtra += (val + perItemFee);
+        }
+      });
       
-      if (allocated > extraBudget + 0.01) { 
-        showMsg("Over Budget", "Exceeds extra funds!", true); 
+      // 2. Check kung sapat ang extraBudget pool
+      if (totalNeededFromExtra > extraBudget + 0.01) { 
+        showMsg("Over Budget", `Kulang ang extra funds. Need ₱${format(totalNeededFromExtra)} kasama ang fees.`, true); 
         return; 
       }
 
+      // 3. EXECUTE: Add to Wallet, Deduct from Extra Pool
       inputs.forEach(input => { 
         const idx = input.getAttribute('data-idx'); 
-        wallets[idx].balance += (parseFloat(input.value) || 0); 
+        const amountToAdd = (parseFloat(input.value) || 0);
+
+        if (amountToAdd > 0) {
+          // ADDITION: Dagdag sa wallet balance
+          wallets[idx].balance += amountToAdd;
+
+          // Record history para sa transparency
+          expHistory.push({
+            name: `Allocated to ${wallets[idx].name}`,
+            amount: amountToAdd,
+            date: new Date().toLocaleDateString()
+          });
+
+          // Record Fee kung meron
+          if (perItemFee > 0) {
+            expHistory.push({
+              name: `Fee: Extra➔${wallets[idx].name}`,
+              amount: perItemFee,
+              date: new Date().toLocaleDateString()
+            });
+          }
+        }
       });
 
-      extraBudget = Math.max(0, extraBudget - allocated); 
+      // Ibawas ang kabuuan sa extraBudget pool variable
+      extraBudget = Math.max(0, extraBudget - totalNeededFromExtra); 
+      
       save(); 
       closeModal();
-      showMsg("Success", "Funds distributed successfully!");
+      showMsg("Success", `Funds allocated! Total ₱${format(totalNeededFromExtra)} deducted from Extra Budget pool.`);
     };
 
     document.getElementById('customModal').style.display='flex';
@@ -1008,7 +1036,7 @@ function openBudgetSpend() {
 
 function confirmTransferToExtra() {
     document.getElementById('modalTitle').innerText = "Transfer to Extra Budget";
-    document.getElementById('modalDesc').innerText = `Do you want to transfer your remaining 2-week balance (₱${format(liveLimit)}) to your Extra Budget?\n\nThis will reset your Live Budget to 0.`;
+    document.getElementById('modalDesc').innerText = `Do you want to transfer your remaining 2-week balance (₱${format(liveLimit)}) to your Extra Budget Pool?\n\nThis will reset your Live Budget to 0.`;
     document.getElementById('modalInputs').innerHTML = "";
     document.getElementById('modalCancelBtn').style.display = "block";
     
@@ -1017,14 +1045,20 @@ function confirmTransferToExtra() {
     btn.style.background = 'var(--accent)';
     
     btn.onclick = () => {
+        // Ang liveLimit ay idadagdag sa extraBudget variable (Yung pool mo)
         extraBudget += liveLimit; 
+        
+        // I-reset ang liveLimit para sa susunod na cycle
         liveLimit = 0; 
+        
         save(); 
         closeModal(); 
-        showMsg("Success", "Funds successfully moved to Extra Budget!");
+        showMsg("Success", "Funds successfully moved to Extra Budget Pool!");
     };
     document.getElementById('customModal').style.display = 'flex';
 }
+
+
 </script>
 </body>
 </html>
