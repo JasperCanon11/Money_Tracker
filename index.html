@@ -804,36 +804,31 @@ function calcRedistRemaining() {
   function addBill(){ const n=document.getElementById('bName'), a=document.getElementById('bAmt'); if(n.value && a.value){ bills.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
   function addDebt(){ const n=document.getElementById('dName'), a=document.getElementById('dAmt'); if(n.value && a.value){ debts.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
   
-  function addDailyExpense(){
+  function addDailyExpense() {
     const a = document.getElementById('gAmt'), 
           d = document.getElementById('gDesc'), 
           wIdx = document.getElementById('gWalletSelect').value;
-    if(a.value && wIdx !== ""){
-      const amt = parseFloat(a.value);
-      if(wallets[wIdx].balance >= amt){
-        wallets[wIdx].balance -= amt; 
-        
-        // SYNC: Bawas sa live limit pool tuwing gagastos
-        liveLimit = Math.max(0, liveLimit - amt); 
 
-        const todayStr = new Date().toLocaleDateString();
-        expHistory.push({ name: (d.value || "Expense") + " via " + wallets[wIdx].name, amount: amt, date: todayStr });
-        
-        // Modal logic for overspending
-        const cfgLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 0;
-        const cfgDays = parseFloat(localStorage.getItem('WF_DAYS_CFG')) || 1;
-        const dailyAllowance = cfgLimit / cfgDays;
-        const spentTodayVal = expHistory.filter(h => h.date === todayStr).reduce((s, h) => s + h.amount, 0);
-        
-        if (dailyAllowance > 0 && spentTodayVal > dailyAllowance) {
-            showMsg("⚠️ OVERSPENT", `OVERSPENT PLEASE SAVE ₱${format(spentTodayVal - dailyAllowance)}`, true);
+    if (a.value && wIdx !== "") {
+        const amt = parseFloat(a.value);
+        if (wallets[wIdx].balance >= amt) {
+            wallets[wIdx].balance -= amt;
+
+            expHistory.push({
+                // Importante: Nilagyan natin ng (QS) sa dulo
+                name: (d.value || "Quick Spend") + " (QS)", 
+                amount: amt,
+                date: new Date().toLocaleDateString()
+            });
+
+            a.value = ''; d.value = '';
+            save(); 
+            showMsg("Success", "Wallet balance updated!");
+        } else {
+            showMsg("Insufficient Balance", "Kulang ang balance sa wallet.", true);
         }
-        a.value = ''; d.value = ''; save();
-      } else { 
-        showMsg("Insufficient Balance", "not Enough funds in this wallet.", true);
-      }
     }
-  }
+}
 
   function openEdit(type, idx){
     let list = type==='wallets'?wallets:type==='bills'?bills:type==='debts'?debts:type==='expH'?expHistory:type==='billH'?billHistory:debtHistory;
@@ -871,7 +866,7 @@ function calcRedistRemaining() {
     document.getElementById(id).innerHTML = `<button onclick="pages['${type}']--; refresh()" ${pages[type]===0?'disabled':''}>←</button> <span>${pages[type]+1}/${max}</span> <button onclick="pages['${type}']++; refresh()" ${pages[type]>=max-1?'disabled':''}>→</button>`;
   }
 
-  function refresh(){
+function refresh(){
     checkDateTransition();
     const tCash = wallets.reduce((s,w)=>s+w.balance,0), tBills = bills.reduce((s,b)=>s+b.amount,0), tDebts = debts.reduce((s,d)=>s+d.amount,0), tExps = expHistory.reduce((s,h)=>s+h.amount,0);
     const safeUnallocated = Math.max(0, unallocatedSalary), totalCap = tCash + safeUnallocated + tBills + tDebts + tExps;
@@ -913,8 +908,13 @@ function calcRedistRemaining() {
     document.getElementById('dailyLimitBudget').innerText = format(daily);
     
     const todayStr = new Date().toLocaleDateString();
-    const spentT = expHistory.filter(h=>h.date===todayStr).reduce((s,h)=>s+h.amount,0);
-    document.getElementById('spentToday').innerText = "₱"+format(spentT);
+    
+    // UPDATE DITO: In-exclude natin ang (QS)
+    const spentT = expHistory
+        .filter(h => h.date === todayStr && !h.name.includes("(QS)"))
+        .reduce((s, h) => s + h.amount, 0);
+        
+    document.getElementById('spentToday').innerText = "₱" + format(spentT);
     
     const status = document.getElementById('budgetStatus');
     if (spentT > daily && daily > 0) { 
@@ -945,8 +945,6 @@ function calcRedistRemaining() {
     renderHistory('billHistory', 'billHistoryList', 'billHistoryPager', 'billH', 'searchBill');
     renderHistory('debtHistory', 'debtHistoryList', 'debtHistoryPager', 'debtH', 'searchDebt');
 }
-
-refresh();
 
 function copyTextSummary() {
     let report = "📊 MONEY TRACKER PRO SUMMARY\n";
@@ -1036,25 +1034,119 @@ function openBudgetSpend() {
 
 function confirmTransferToExtra() {
     document.getElementById('modalTitle').innerText = "Transfer to Extra Budget";
-    document.getElementById('modalDesc').innerText = `Do you want to transfer your remaining 2-week balance (₱${format(liveLimit)}) to your Extra Budget Pool?\n\nThis will reset your Live Budget to 0.`;
-    document.getElementById('modalInputs').innerHTML = "";
-    document.getElementById('modalCancelBtn').style.display = "block";
+    document.getElementById('modalDesc').innerText = "Choose a transfer method to move your funds to the Extra Budget Pool.";
     
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Confirm Transfer"; 
-    btn.style.background = 'var(--accent)';
+    const getWalletOptions = () => wallets.map((w, index) => `<option value="${index}">${w.name} (₱${format(w.balance)})</option>`).join('');
     
-    btn.onclick = () => {
-        // Ang liveLimit ay idadagdag sa extraBudget variable (Yung pool mo)
-        extraBudget += liveLimit; 
+    document.getElementById('modalInputs').innerHTML = `
+        <div style="background: var(--accent-light); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent);">
+            <p style="font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Option 1: Quick Transfer</p>
+            <p style="font-size: 13px; color: var(--text-main); margin-bottom: 12px;">Move entire balance (<b>₱${format(liveLimit)}</b>) without wallet deduction.</p>
+            <button type="button" id="transferAllBtn" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700; font-size:12px; transition: 0.3s;">
+                TRANSFER ALL NOW
+            </button>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 15px; position: relative;">
+            <hr style="border: 0; border-top: 1px solid #eee;">
+            <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; background: white; padding: 0 10px; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); text-transform: uppercase;">OR MANUAL DEDUCTION</span>
+        </div>
+
+        <div id="deductionRows">
+            <div class="deduc-group" style="margin-bottom:15px; padding:12px; border:1px solid #eee; border-radius:15px; background: #fafafa;">
+                <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Source Wallet</label>
+                <select class="dWallet" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px; font-family:inherit; font-size:13px; margin-top:4px;">
+                    ${getWalletOptions()}
+                </select>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Deduct Amount</label>
+                        <input type="number" class="dAmt" placeholder="0.00" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
+                    </div>
+                    <div style="width:100px;">
+                        <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Transfer Fee</label>
+                        <input type="number" class="dFee" value="0" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
+                    </div>
+                </div>
+            </div>
+        </div>
         
-        // I-reset ang liveLimit para sa susunod na cycle
-        liveLimit = 0; 
-        
-        save(); 
-        closeModal(); 
-        showMsg("Success", "Funds successfully moved to Extra Budget Pool!");
+        <button type="button" id="addRowBtn" style="width:100%; padding:10px; background:none; color:var(--accent); border:1.5px dashed var(--accent); border-radius:10px; cursor:pointer; font-size:11px; font-weight:700; margin-bottom:15px; text-transform: uppercase;">
+            + Add Another Wallet
+        </button>
+    `;
+
+    // --- BUTTON ACTIONS ---
+
+    // Quick Transfer (No Deduction)
+    document.getElementById('transferAllBtn').onclick = () => {
+        if (liveLimit <= 0) return showMsg("Error", "No funds available to transfer.");
+        extraBudget += liveLimit;
+        liveLimit = 0;
+        save(); closeModal();
+        showMsg("Success", "All funds moved to Extra Budget!");
     };
+
+    // Add Row
+    document.getElementById('addRowBtn').onclick = () => {
+        if (document.querySelectorAll('.deduc-group').length >= 3) return showMsg("Limit", "Max 3 wallets reached.");
+        const newRow = document.createElement('div');
+        newRow.className = 'deduc-group';
+        newRow.style = "margin-bottom:15px; padding:12px; border:1px solid #eee; border-radius:15px; background: #fafafa;";
+        newRow.innerHTML = `
+            <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Source Wallet</label>
+            <select class="dWallet" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px; font-family:inherit; font-size:13px; margin-top:4px;">
+                ${getWalletOptions()}
+            </select>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Deduct Amount</label>
+                    <input type="number" class="dAmt" placeholder="0.00" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
+                </div>
+                <div style="width:100px;">
+                    <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Transfer Fee</label>
+                    <input type="number" class="dFee" value="0" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
+                </div>
+            </div>
+        `;
+        document.getElementById('deductionRows').appendChild(newRow);
+    };
+
+    // Manual Deduction Confirm
+    const btn = document.getElementById('modalConfirmBtn');
+    btn.innerText = "Confirm Manual Deduction";
+    btn.onclick = () => {
+        const rows = document.querySelectorAll('.deduc-group');
+        let totalToExtra = 0;
+
+        for (let row of rows) {
+            const wIdx = parseInt(row.querySelector('.dWallet').value);
+            const amt = parseFloat(row.querySelector('.dAmt').value) || 0;
+            const fee = parseFloat(row.querySelector('.dFee').value) || 0;
+            if (amt > 0) {
+                if (wallets[wIdx].balance < (amt + fee)) return showMsg("Error", `Insufficient funds in ${wallets[wIdx].name}`);
+                totalToExtra += amt;
+            }
+        }
+
+        if (totalToExtra <= 0) return showMsg("Error", "Please enter a deduction amount.");
+        if (totalToExtra > liveLimit) return showMsg("Error", "Amount exceeds your Live Limit.");
+
+        // Execute
+        rows.forEach(row => {
+            const wIdx = parseInt(row.querySelector('.dWallet').value);
+            const amt = parseFloat(row.querySelector('.dAmt').value) || 0;
+            const fee = parseFloat(row.querySelector('.dFee').value) || 0;
+            if (amt > 0) wallets[wIdx].balance -= (amt + fee);
+        });
+
+        extraBudget += totalToExtra;
+        liveLimit -= totalToExtra;
+        save(); closeModal();
+        showMsg("Success", "Deduction and Transfer successful!");
+    };
+
+    document.getElementById('modalCancelBtn').style.display = "block";
     document.getElementById('customModal').style.display = 'flex';
 }
 
