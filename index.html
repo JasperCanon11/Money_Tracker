@@ -918,11 +918,12 @@ body.dark-mode {
   </div>
 
   <header>
-    <button class="tab-btn active" onclick="showTab('dashboard')">Wallets</button>
-    <button class="tab-btn" onclick="showTab('budget')">Budget</button>
-    <button class="tab-btn" onclick="showTab('bills')">Bills</button>
-    <button class="tab-btn" onclick="showTab('debts')">Debts</button>
-  </header>
+  <button class="tab-btn active" onclick="showTab('dashboard')">Wallets</button>
+  <button class="tab-btn" onclick="showTab('budget')">Budget</button>
+  <button class="tab-btn" onclick="showTab('bills')">Bills</button>
+  <button class="tab-btn" onclick="showTab('debts')">Debts</button>
+  <button class="tab-btn" onclick="showTab('salarycalc')">Salary</button>
+</header>
 
   <section id="dashboard" class="active">
     <div class="card-main"><small>Total Savings</small><b>₱<span id="mainTotal">0.00</span></b></div>
@@ -1046,12 +1047,23 @@ body.dark-mode {
       </div>
     </div>
     <div class="input-box input-expense">
-      <h4>Quick Spend</h4>
-      <input type="text" id="gDesc" placeholder="Description">
-      <input type="number" id="gAmt" placeholder="Amount ₱">
-      <select id="gWalletSelect"></select>
-      <button class="btn-primary" style="background:var(--success)" onclick="addDailyExpense()">Add Expense</button>
+  <h4>Quick Spend</h4>
+<div class="budget-inline-stats" style="margin-bottom:10px;">
+    <div class="budget-inline-box">
+      <small>Quick Spend Today</small>
+      <b id="quickSpentToday">₱0.00</b>
     </div>
+    <div class="budget-inline-box">
+      <small>Quick Spend Left</small>
+      <b id="quickRemainingToday">₱1000.00</b>
+    </div>
+  </div>
+
+  <input type="text" id="gDesc" placeholder="Description">
+  <input type="number" id="gAmt" placeholder="Amount ₱">
+  <select id="gWalletSelect"></select>
+  <button class="btn-primary" onclick="addDailyExpense()">Add Expense</button>
+</div>
     <div class="section-header">
       <h5>Expense History</h5>
       <button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">Clear All</button>
@@ -1116,6 +1128,52 @@ body.dark-mode {
 <div id="debtHistoryList"></div>
 <div id="debtHistoryPager" class="pagination-controls"></div>
   </section>
+  <section id="salarycalc">
+  <div class="card-main">
+    <small>Salary Calculation</small>
+    <b>₱<span id="salaryFinalCutoff">0.00</span></b>
+  </div>
+
+  <div class="input-box">
+    <h4>Salary Calculation</h4>
+
+    <input type="number" id="salaryBasic" placeholder="Basic Salary Per Month ₱" oninput="saveSalaryCalc()">
+    <input type="number" id="salaryDeduction" placeholder="Deduction Per Cutoff ₱" oninput="saveSalaryCalc()">
+    <input type="number" id="salaryAbsentDays" placeholder="Absent Days" oninput="saveSalaryCalc()">
+
+    <select id="salaryAbsentType" oninput="saveSalaryCalc()">
+      <option value="whole">Whole Day</option>
+      <option value="half">Half Day</option>
+    </select>
+
+    <select id="salaryWorkSchedule" oninput="saveSalaryCalc()">
+      <option value="monfri">Monday to Friday</option>
+      <option value="monsat">Monday to Saturday</option>
+    </select>
+
+    <div class="budget-inline-stats" style="margin-top:10px;">
+      <div class="budget-inline-box">
+        <small>Salary Per Cutoff</small>
+        <b id="salaryPerCutoffDisplay">₱0.00</b>
+      </div>
+      <div class="budget-inline-box">
+        <small>Daily Rate</small>
+        <b id="salaryDailyRateDisplay">₱0.00</b>
+      </div>
+    </div>
+
+    <div class="budget-inline-stats" style="margin-top:10px;">
+      <div class="budget-inline-box">
+        <small>Absent Deduction</small>
+        <b id="salaryAbsentDeductionDisplay">₱0.00</b>
+      </div>
+      <div class="budget-inline-box">
+        <small>Final Salary Per Cutoff</small>
+        <b id="salaryTakeHomeDisplay">₱0.00</b>
+      </div>
+    </div>
+  </div>
+</section>
 </div>
 
 <script>
@@ -1127,6 +1185,11 @@ body.dark-mode {
   let debtHistory = JSON.parse(localStorage.getItem('WF_DH')) || [];
   let unallocatedSalary = parseFloat(localStorage.getItem('WF_US')) || 0;
   let extraBudget = parseFloat(localStorage.getItem('WF_EB')) || 0;
+  let salaryBasic = parseFloat(localStorage.getItem('WF_SALARY_BASIC')) || 0;
+let salaryDeduction = parseFloat(localStorage.getItem('WF_SALARY_DEDUCTION')) || 0;
+let salaryAbsentDays = parseFloat(localStorage.getItem('WF_SALARY_ABSENT_DAYS')) || 0;
+let salaryAbsentType = localStorage.getItem('WF_SALARY_ABSENT_TYPE') || "whole";
+let salaryWorkSchedule = localStorage.getItem('WF_SALARY_WORK_SCHEDULE') || "monfri";
   
   // LIVE SYNC LOGIC: Check if live limit already exists, otherwise use config
   let liveLimit = parseFloat(localStorage.getItem('WF_LIVE_LIMIT'));
@@ -1155,6 +1218,11 @@ const step = 5;
     localStorage.setItem('WF_LSD', lastSyncDate);
     localStorage.setItem('WF_CYCLE_START', cycleStartDate || "");
     localStorage.setItem('WF_CYCLE_ID', currentCycleId.toString());
+    localStorage.setItem('WF_SALARY_BASIC', salaryBasic.toString());
+localStorage.setItem('WF_SALARY_DEDUCTION', salaryDeduction.toString());
+localStorage.setItem('WF_SALARY_ABSENT_DAYS', salaryAbsentDays.toString());
+localStorage.setItem('WF_SALARY_ABSENT_TYPE', salaryAbsentType);
+localStorage.setItem('WF_SALARY_WORK_SCHEDULE', salaryWorkSchedule);
     refresh();
   }
 
@@ -1647,24 +1715,43 @@ function calcRedistRemaining() {
   function addBill(){ const n=document.getElementById('bName'), a=document.getElementById('bAmt'); if(n.value && a.value){ bills.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
   function addDebt(){ const n=document.getElementById('dName'), a=document.getElementById('dAmt'); if(n.value && a.value){ debts.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
   
-  function addDailyExpense() {
-    const a = document.getElementById('gAmt'), 
-          d = document.getElementById('gDesc'), 
+function addDailyExpense() {
+    const a = document.getElementById('gAmt'),
+          d = document.getElementById('gDesc'),
           wIdx = document.getElementById('gWalletSelect').value;
 
     if (a.value && wIdx !== "") {
         const amt = parseFloat(a.value);
+        const todayStr = new Date().toLocaleDateString();
+
+        const quickSpentToday = expHistory
+            .filter(h => h.date === todayStr && h.name.includes("(QS)"))
+            .reduce((s, h) => s + h.amount, 0);
+
+        const quickDailyLimit = 1000;
+
+        if ((quickSpentToday + amt) > quickDailyLimit) {
+            showMsg(
+                "Quick Spend Limit Reached",
+                `Your Quick Spend is limited to ₱${format(quickDailyLimit)} per day.\nToday's total is already ₱${format(quickSpentToday)}.`,
+                true
+            );
+            return;
+        }
+
         if (wallets[wIdx].balance >= amt) {
             wallets[wIdx].balance -= amt;
 
             expHistory.push({
-    name: `${d.value || "Quick Spend"} (Wallet: ${wallets[wIdx].name}) (QS)`,
-    amount: amt,
-    date: new Date().toLocaleDateString()
-});
-            a.value = ''; d.value = '';
-            save(); 
-            showMsg("Success", "Wallet balance updated!");
+                name: `${d.value || "Quick Spend"} (Wallet: ${wallets[wIdx].name}) (QS)`,
+                amount: amt,
+                date: todayStr
+            });
+
+            a.value = '';
+            d.value = '';
+            save();
+            showMsg("Success", "Quick Spend recorded!");
         } else {
             showMsg("Insufficient Balance", "Kulang ang balance sa wallet.", true);
         }
@@ -1812,6 +1899,15 @@ function refresh() {
         .reduce((s, h) => s + h.amount, 0);
 
     document.getElementById('spentToday').innerText = "₱" + format(spentT);
+    const quickSpentToday = expHistory
+    .filter(h => h.date === todayStr && h.name.includes("(QS)"))
+    .reduce((s, h) => s + h.amount, 0);
+
+const quickDailyLimit = 1000;
+const quickRemainingToday = Math.max(0, quickDailyLimit - quickSpentToday);
+
+document.getElementById('quickSpentToday').innerText = "₱" + format(quickSpentToday);
+document.getElementById('quickRemainingToday').innerText = "₱" + format(quickRemainingToday);
 
     // Budget Progress Logic
     const totalCycleSpent = expHistory
@@ -1903,8 +1999,46 @@ function refresh() {
     renderHistory('expHistory', 'expHistoryList', 'expHistoryPager', 'expH', 'searchExp');
     renderHistory('billHistory', 'billHistoryList', 'billHistoryPager', 'billH', 'searchBill');
     renderHistory('debtHistory', 'debtHistoryList', 'debtHistoryPager', 'debtH', 'searchDebt');
+
+    // Salary Calculation
+const salaryBasicInput = document.getElementById('salaryBasic');
+const salaryDeductionInput = document.getElementById('salaryDeduction');
+const salaryAbsentDaysInput = document.getElementById('salaryAbsentDays');
+const salaryAbsentTypeInput = document.getElementById('salaryAbsentType');
+const salaryWorkScheduleInput = document.getElementById('salaryWorkSchedule');
+
+if (salaryBasicInput) salaryBasicInput.value = salaryBasic || "";
+if (salaryDeductionInput) salaryDeductionInput.value = salaryDeduction || "";
+if (salaryAbsentDaysInput) salaryAbsentDaysInput.value = salaryAbsentDays || "";
+if (salaryAbsentTypeInput) salaryAbsentTypeInput.value = salaryAbsentType || "whole";
+if (salaryWorkScheduleInput) salaryWorkScheduleInput.value = salaryWorkSchedule || "monfri";
+
+const workingDaysDivisor = salaryWorkSchedule === "monsat" ? 26 : 22;
+const salaryPerCutoff = salaryBasic / 2;
+const salaryDailyRate = salaryBasic / workingDaysDivisor;
+
+let absentDeduction = 0;
+if (salaryAbsentType === "half") {
+  absentDeduction = (salaryDailyRate / 2) * salaryAbsentDays;
+} else {
+  absentDeduction = salaryDailyRate * salaryAbsentDays;
 }
 
+const finalSalaryPerCutoff = Math.max(0, salaryPerCutoff - salaryDeduction - absentDeduction);
+
+const salaryPerCutoffDisplay = document.getElementById('salaryPerCutoffDisplay');
+const salaryDailyRateDisplay = document.getElementById('salaryDailyRateDisplay');
+const salaryAbsentDeductionDisplay = document.getElementById('salaryAbsentDeductionDisplay');
+const salaryTakeHomeDisplay = document.getElementById('salaryTakeHomeDisplay');
+const salaryFinalCutoff = document.getElementById('salaryFinalCutoff');
+
+if (salaryPerCutoffDisplay) salaryPerCutoffDisplay.innerText = "₱" + format(salaryPerCutoff);
+if (salaryDailyRateDisplay) salaryDailyRateDisplay.innerText = "₱" + format(salaryDailyRate);
+if (salaryAbsentDeductionDisplay) salaryAbsentDeductionDisplay.innerText = "₱" + format(absentDeduction);
+if (salaryTakeHomeDisplay) salaryTakeHomeDisplay.innerText = "₱" + format(finalSalaryPerCutoff);
+if (salaryFinalCutoff) salaryFinalCutoff.innerText = format(finalSalaryPerCutoff);
+
+}
 // ILAGAY ITO SA PINAKA-BABA NG SCRIPT PARA GUMANA PAGKA-REFRESH
 window.onload = function() {
     refresh();
@@ -2151,6 +2285,16 @@ function resetBudgetCycle() {
   };
 
   document.getElementById('customModal').style.display = 'flex';
+}
+
+function saveSalaryCalc() {
+  salaryBasic = parseFloat(document.getElementById('salaryBasic').value) || 0;
+  salaryDeduction = parseFloat(document.getElementById('salaryDeduction').value) || 0;
+  salaryAbsentDays = parseFloat(document.getElementById('salaryAbsentDays').value) || 0;
+  salaryAbsentType = document.getElementById('salaryAbsentType').value || "whole";
+  salaryWorkSchedule = document.getElementById('salaryWorkSchedule').value || "monfri";
+
+  save();
 }
 
 </script>
