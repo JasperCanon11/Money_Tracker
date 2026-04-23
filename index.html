@@ -1,2302 +1,2528 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Money Tracker Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-  :root {
-  --bg: #0a0a0a;
-  --bg-soft: #101010;
-    --surface: #ffffff;
-    --card: #ffffff;
-    --card-2: #ffffff;
-    --border: rgba(0, 0, 0, 0.08);
-    --border-strong: rgba(0, 0, 0, 0.14);
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>money-tracker ~</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  /* VSCode Dark+ inspired */
+  --bg:        #1e1e1e;
+  --bg2:       #252526;
+  --bg3:       #2d2d30;
+  --bg4:       #333337;
+  --panel:     #252526;
+  --border:    #3e3e42;
+  --border2:   #555558;
 
-    --text-main: #111827;
-    --text-muted: #6b7280;
-    --text-soft: #9ca3af;
+  /* Syntax colors */
+  --green:     #4ec9b0;   /* types / teal */
+  --green2:    #6a9955;   /* comments */
+  --blue:      #569cd6;   /* keywords */
+  --blue2:     #4fc1ff;   /* variables */
+  --yellow:    #dcdcaa;   /* functions */
+  --yellow2:   #d7ba7d;   /* strings */
+  --orange:    #ce9178;   /* strings alt */
+  --red:       #f44747;   /* errors */
+  --purple:    #c586c0;   /* control */
+  --cyan:      #9cdcfe;   /* params */
 
-    --accent: #111111;
-    --accent-light: rgba(0, 0, 0, 0.05);
+  --text:      #d4d4d4;
+  --text-mid:  #9d9d9d;
+  --text-dim:  #5a5a5a;
 
-    --success: #22c55e;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --purple: #8b5cf6;
+  --cursor:    #4ec9b0;
+  --selection: rgba(78,201,176,0.15);
 
-    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
-    --shadow-card: 0 18px 40px rgba(0, 0, 0, 0.10);
-
-    --radius-lg: 20px;
-    --radius-md: 14px;
-    --radius-sm: 12px;
-    --btn-height: 46px;
-  }
-
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-
- html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: linear-gradient(180deg, #050505 0%, #0b0b0b 100%);
-  color: var(--text-main);
+  --radius:    4px;
+  --radius-md: 6px;
 }
 
-body.dark-mode {
-  background: linear-gradient(180deg, #050505 0%, #0b0b0b 100%);
-  color: var(--text-main);
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+html, body {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 13px;
 }
 
-  body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at top left, rgba(255,255,255,0.04), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(255,255,255,0.03), transparent 24%);
-  z-index: 0;
-
-  }
-
-  .app-container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
-    padding: 20px 16px 34px;
-  }
-
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    padding: 4px 2px 0;
-  }
-
-  .title-stack h3 {
-    margin: 0;
-    font-size: 1.55rem;
-    line-height: 1.1;
-    letter-spacing: -0.04em;
-    font-weight: 800;
-    color: #ffffff;
-  }
-
-  .title-stack p {
-    margin: 6px 0 0;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: #a1a1aa;
-    font-weight: 700;
-  }
-
-  .theme-toggle {
-    border: 1px solid var(--border);
-    background: #ffffff;
-    color: var(--text-main);
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 800;
-    transition: 0.2s ease;
-    box-shadow: none;
-  }
-
-  .theme-toggle:active {
-    transform: scale(0.98);
-  }
-
-  header {
-    display: flex;
-    gap: 8px;
-    padding: 6px;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    margin-bottom: 16px;
-    position: sticky;
-    top: 10px;
-    z-index: 5;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-soft);
-  }
-
-  header button {
-    flex: 1;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    min-height: 42px;
-    padding: 10px 8px;
-    border-radius: 14px;
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    transition: 0.2s ease;
-  }
-
-  header button.active {
-    background: #111111;
-    color: #ffffff;
-  }
-
-  section {
-    display: none;
-  }
-
-  section.active {
-    display: block;
-  }
-
-  .card-main,
-  .chart-box,
-  .discipline-card,
-  .stat-card,
-  .input-box,
-  .list-item,
-  .modal-content,
-  #walletGrid > div {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-soft);
-  }
-
-  .card-main {
-    padding: 28px 22px;
-    margin-bottom: 14px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    text-align: left;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .card-main::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(135deg, rgba(0,0,0,0.03), transparent 35%);
-  }
-
-  .card-main small {
-    display: block;
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-  .card-main b {
-  display: block;
-  margin-top: 10px;
-  font-size: 2.85rem;
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: var(--text-main);
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  z-index: 9999;
 }
 
-  .chart-box {
-    padding: 16px;
-    margin-bottom: 14px;
-    background: #ffffff;
-  }
-
-  .legend {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .progress-container {
-    width: 100%;
-    height: 11px;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #e5e7eb;
-    border: 1px solid var(--border);
-    margin-bottom: 12px;
-    display: flex;
-  }
-
-  .progress-bar {
-    height: 100%;
-    transition: width 0.25s ease;
-  }
-
-  .input-box {
-    padding: 16px;
-    margin-bottom: 14px;
-    background: #ffffff;
-  }
-
-  .input-box h4 {
-    margin: 0 0 14px;
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--text-main);
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 18px 0 12px;
-  }
-
-  .section-header h5 {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 800;
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 0 60px;
 }
 
-  input,
-  select,
-  textarea,
-  .search-bar {
-    width: 100%;
-    outline: none;
-    background: #ffffff !important;
-    border: 1px solid #d1d5db;
-    color: #111827;
-    border-radius: var(--radius-md);
-    padding: 13px 14px;
-    font: inherit;
-    transition: 0.2s ease;
-    box-shadow: none;
-  }
-
-  input,
-  select,
-  textarea {
-    margin-bottom: 10px;
-  }
-
-  input::placeholder,
-  textarea::placeholder,
-  .search-bar::placeholder {
-    color: #9ca3af;
-  }
-
-  input:focus,
-  select:focus,
-  textarea:focus,
-  .search-bar:focus {
-    border-color: rgba(0,0,0,0.2);
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-  }
-
-  button {
-    font: inherit;
-  }
-
-  /* =========================
-     GLOBAL BUTTON BASE
-  ========================= */
-  .btn-primary,
-  .btn-secondary,
-  .btn-cancel,
-  .cancel-btn,
-  .confirm-btn,
-  .success-btn,
-  .danger-btn,
-  .transfer-btn,
-  .btn-all,
-  .edit-btn,
-  .del-btn,
-  .pay-btn,
-  .btn-text-action,
-  .pagination-controls button,
-  #modalFooter button {
-    min-height: var(--btn-height);
-    border-radius: var(--radius-md);
-    font-weight: 800;
-    cursor: pointer;
-    transition: 0.2s ease;
-    padding: 12px 16px;
-  }
-
-  /* =========================
-     WHITE BUTTONS / BLACK TEXT
-     Confirm / Save / Add / Pay / Edit
-  ========================= */
-  .btn-primary,
-.confirm-btn,
-.success-btn,
-.transfer-btn,
-.pay-btn {
-  background: #111111 !important;
-  color: #ffffff !important;
-  border: 1px solid #111111 !important;
+/* ── TITLE BAR ──────────────────── */
+.titlebar {
+  background: #323233;
+  border-bottom: 1px solid #1e1e1e;
+  padding: 0 14px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.edit-btn {
-  background: #ffffff !important;
-  color: #111111 !important;
-  border: 1px solid #d1d5db !important;
+.titlebar-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 
-  /* =========================
-     BLACK BUTTONS / WHITE TEXT
-     Cancel / Back / Secondary
-  ========================= */
-  .btn-secondary,
-  .btn-cancel,
-  .cancel-btn {
-    background: #111111 !important;
-    color: #ffffff !important;
-    border: 1px solid #111111 !important;
-  }
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+}
+.dot-red    { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green  { background: #28c840; }
 
-  /* =========================
-     DELETE / DANGER
-     BLACK BUTTON + WHITE TEXT
-  ========================= */
-  .del-btn,
-  .danger-btn {
-    background: #111111 !important;
-    color: #ffffff !important;
-    border: 1px solid #111111 !important;
-  }
+.titlebar-title {
+  font-size: 12px;
+  color: var(--text-mid);
+  letter-spacing: 0.3px;
+}
 
-  /* =========================
-     SMALL AUX BUTTONS
-  ========================= */
-  .btn-all,
-  .pagination-controls button {
-    background: #111111;
-    color: #ffffff;
-    border: 1px solid #111111;
-    min-height: 40px;
-    padding: 8px 12px;
-  }
+.titlebar-title span { color: var(--green); }
 
-  .btn-all {
-    min-width: 56px;
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
+.titlebar-right {
+  font-size: 11px;
+  color: var(--text-dim);
+}
 
-  .btn-text-action {
-  background: transparent;
+/* ── STATUSBAR ──────────────────── */
+.statusbar {
+  background: #007acc;
+  padding: 0 14px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 11px;
+  color: #fff;
+  position: sticky;
+  top: 35px;
+  z-index: 99;
+}
+
+.statusbar-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.9;
+}
+
+/* ── TAB BAR ─────────────────────── */
+.tabbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 57px;
+  z-index: 98;
+}
+.tabbar::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  flex-shrink: 0;
   border: none;
-  padding: 0;
-  min-height: auto;
-  color: #ffffff;
-  font-size: 0.74rem;
-  font-weight: 800;
+  background: var(--bg2);
+  color: var(--text-mid);
+  height: 35px;
+  padding: 0 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid transparent;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  position: relative;
 }
 
-.btn-text-action.success {
-  color: #ffffff;
+.tab-btn::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%; transform: translateY(-50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green2);
+  opacity: 0;
 }
 
-.btn-text-action.danger {
-  color: #ffffff;
+.tab-btn.active {
+  background: var(--bg);
+  color: var(--text);
+  border-bottom-color: var(--bg);
+  margin-bottom: -1px;
 }
 
-.header-actions-inline {
+.tab-btn.active::before { opacity: 1; }
+.tab-btn:not(.active):hover { background: var(--bg3); color: var(--text); }
+
+/* ── SECTIONS ───────────────────── */
+section {
+  display: none;
+  padding: 16px 14px 0;
+  animation: fadeIn 0.15s ease both;
+}
+section.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── COMMENT HEADER ─────────────── */
+.code-comment {
+  color: var(--green2);
+  font-size: 12px;
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+
+.code-comment .line-num {
+  color: var(--text-dim);
+  user-select: none;
+  margin-right: 16px;
+  display: inline-block;
+  width: 24px;
+  text-align: right;
+}
+
+/* ── HERO BLOCK ─────────────────── */
+.hero {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  position: relative;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.hero-comment { color: var(--green2); font-size: 11px; margin-bottom: 6px; }
+
+.hero-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hero-keyword { color: var(--blue); font-size: 13px; }
+.hero-var     { color: var(--cyan); font-size: 13px; }
+.hero-op      { color: var(--text-mid); font-size: 13px; }
+.hero-amount  {
+  color: var(--green);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.hero-type    { color: var(--blue2); font-size: 11px; align-self: center; }
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px; height: 28px;
+  background: var(--cursor);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 1.2s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── PANEL ──────────────────────── */
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.panel-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-mid);
+}
+
+.panel-header-left .ph-icon { color: var(--yellow); }
+.panel-header-left .ph-name { color: var(--yellow); }
+.panel-header-left .ph-type { color: var(--blue); }
+.panel-header-left .ph-brace { color: var(--text); }
+
+.panel-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel-body { padding: 14px; }
+
+/* ── BREAKDOWN ──────────────────── */
+.breakdown-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg4);
+  display: flex;
+  overflow: hidden;
+  margin-bottom: 12px;
+  gap: 1px;
+  border-radius: 2px;
+}
+.progress-bar { height: 100%; transition: width 0.4s ease; }
+
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+}
+
+.bd-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  font-size: 11px;
+}
+
+.bd-item .bi-key   { margin-bottom: 3px; }
+.bd-item .bi-val   { font-size: 12px; font-weight: 600; }
+.bd-item .bi-pct   { color: var(--text-dim); font-size: 10px; margin-top: 2px; }
+
+/* ── FORM ────────────────────────── */
+.form-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.form-block-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--yellow);
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.header-separator {
-  color: #ffffff;
-  font-size: 0.74rem;
-  font-weight: 800;
-}
+.form-block-header .fn-name { color: var(--yellow); }
+.form-block-header .fn-paren { color: var(--text); }
+.form-block-header .fn-param { color: var(--orange); }
+.form-block-header .fn-brace { color: var(--text); }
 
-  /* =========================
-     FULL WIDTH BUTTON HELPERS
-  ========================= */
-  .btn-primary,
-  .btn-secondary,
-  .btn-cancel,
-  .cancel-btn,
-  .confirm-btn {
-    width: 100%;
-  }
+.form-body { padding: 12px 14px; }
 
-  /* =========================
-     LIST ITEMS
-  ========================= */
-  .list-item {
-    padding: 14px 14px 13px;
-    margin-bottom: 10px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  }
-
-  .list-item b {
-    display: block;
-    font-size: 0.95rem;
-    margin-bottom: 6px;
-    color: var(--text-main);
-  }
-
-  .list-item small {
-    color: var(--text-muted);
-    font-size: 0.74rem;
-  }
-
-  .line-bill,
-  .line-debt,
-  .line-expense {
-    border-left: 3px solid #8a8a8a;
-  }
-
-  .line-bill {
-    border-left-color: #6b7280;
-  }
-
-  .line-debt {
-    border-left-color: #a1a1aa;
-  }
-
-  .line-expense {
-    border-left-color: #d4d4d8;
-  }
-
-  /* =========================
-     STAT CARDS
-  ========================= */
-  .stat-card,
-  .discipline-card {
-    padding: 15px;
-    background: #ffffff;
-  }
-
-  .stat-card b,
-  .discipline-card b {
-    display: block;
-    font-size: 1.2rem;
-    margin-top: 4px;
-  }
-
-  .stat-card small,
-  .discipline-card small {
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 800;
-  }
-
-  .search-bar {
-    margin-bottom: 14px;
-  }
-
-  .pagination-controls {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 14px;
-  }
-
-  /* =========================
-     MODAL
-  ========================= */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-  }
-
-  .modal-content {
-    width: 100%;
-    max-width: 430px;
-    padding: 22px 18px 18px;
-    background: #ffffff;
-    color: #111111;
-  }
-
-  .modal-content h3 {
-    margin: 0 0 10px;
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: #111111;
-  }
-
-  #modalDesc {
-    color: #374151 !important;
-  }
-
-  #modalInputs input,
-  #modalInputs select,
-  #modalInputs textarea {
-    background: #ffffff !important;
-    color: #111111 !important;
-    border: 1px solid #d1d5db !important;
-  }
-
-  #modalFooter {
-    display: flex;
-    gap: 10px;
-    margin-top: 18px;
-    background: transparent;
-    padding-top: 8px;
-  }
-
-  #modalFooter button {
-    flex: 1;
-  }
-
-  #modalCancelBtn {
-    background: #111111 !important;
-    color: #ffffff !important;
-    border: 1px solid #111111 !important;
-    box-shadow: none !important;
-  }
-
-  #modalConfirmBtn {
-    background: #111111 !important;
-    color: #ffffff !important;
-    border: 1px solid #111111 !important;
-    box-shadow: none !important;
-  }
-
-  /* =========================
-     WALLET GRID
-  ========================= */
-  #walletGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  #walletGrid > div {
-    padding: 16px !important;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 20px !important;
-    box-shadow: var(--shadow-soft);
-    color: #111111 !important;
-  }
-
-  #walletGrid > div b {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 0.95rem;
-    color: var(--text-main);
-  }
-
-  #walletGrid > div:last-child {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-    border-color: #e5e7eb !important;
-    color: #111111 !important;
-  }
-
-  /* =========================
-     GENERIC
-  ========================= */
-  hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f3f4f6;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 999px;
-    border: 2px solid #f3f4f6;
-  }
-
-  /* =========================
-     HOVER STATES
-  ========================= */
-  .btn-primary:hover,
-  .confirm-btn:hover,
-  .success-btn:hover,
-  .transfer-btn:hover,
-  .pay-btn:hover,
-  .edit-btn:hover,
-  .btn-all:hover,
-  .pagination-controls button:hover,
-  header button:hover {
-    transform: translateY(-1px);
-    filter: brightness(0.96);
-  }
-
-  .btn-secondary:hover,
-  .btn-cancel:hover,
-  .cancel-btn:hover,
-  .del-btn:hover,
-  .danger-btn:hover,
-  #modalCancelBtn:hover,
-  #modalConfirmBtn:hover {
-    transform: translateY(-1px);
-    background: #222222 !important;
-    border-color: #222222 !important;
-  }
-
-  .theme-toggle:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.04);
-  }
-
-  .btn-text-action:hover {
-    opacity: 0.85;
-  }
-
-  /* =========================
-     ACTIVE STATES
-  ========================= */
-  .btn-primary:active,
-  .btn-secondary:active,
-  .btn-cancel:active,
-  .cancel-btn:active,
-  .confirm-btn:active,
-  .success-btn:active,
-  .transfer-btn:active,
-  .pay-btn:active,
-  .edit-btn:active,
-  .del-btn:active,
-  .danger-btn:active,
-  .btn-all:active,
-  .pagination-controls button:active,
-  header button:active,
-  .theme-toggle:active {
-    transform: translateY(0);
-  }
-
-  /* =========================
-     MOBILE
-  ========================= */
-  @media (max-width: 540px) {
-    .app-container {
-      padding: 18px 12px 28px;
-    }
-
-    .topbar {
-      margin-bottom: 12px;
-    }
-
-    .title-stack h3 {
-      font-size: 1.35rem;
-    }
-
-    header {
-      padding: 6px;
-      border-radius: 18px;
-      gap: 6px;
-    }
-
-    header button {
-      min-width: 80px;
-      font-size: 0.73rem;
-      padding: 10px 6px;
-    }
-
-    .card-main {
-      padding: 26px 18px;
-    }
-
-    .card-main b {
-      font-size: 2.25rem;
-    }
-
-    .chart-box,
-    .input-box,
-    .modal-content,
-    .list-item,
-    .stat-card,
-    .discipline-card {
-      border-radius: 18px;
-    }
-
-    #walletGrid {
-      grid-template-columns: 1fr;
-    }
-
-    #modalFooter {
-      flex-direction: column;
-    }
-  }
-  .breakdown-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
   gap: 8px;
-  text-align: center;
-  margin-top: 12px;
 }
 
-.breakdown-item {
-  font-size: 0.62rem;
-  font-weight: 800;
-  line-height: 1.25;
+.field-key {
+  color: var(--cyan);
+  font-size: 12px;
+  min-width: 90px;
+  flex-shrink: 0;
 }
 
-.breakdown-item span {
-  display: block;
-  margin-top: 4px;
-  font-size: 0.78rem;
-  font-weight: 800;
+.field-colon { color: var(--text-mid); margin-right: 4px; }
+
+input, select, textarea {
+  flex: 1;
+  width: 100%;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 7px 10px !important;
+  color: var(--orange) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  outline: none !important;
+  transition: border-color 0.15s;
+  margin-bottom: 0 !important;
 }
 
-.breakdown-item small {
-  display: block;
-  margin-top: 2px;
-  font-size: 0.64rem;
-  color: var(--text-main);
-  opacity: 0.9;
+input::placeholder, textarea::placeholder {
+  color: var(--text-dim) !important;
+  font-style: italic;
 }
-.budget-inline-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green) !important;
+  box-shadow: 0 0 0 2px rgba(78,201,176,0.1) !important;
+}
+
+select option { background: var(--bg2); color: var(--text); }
+
+/* standalone inputs */
+.form-body input,
+.form-body select,
+.form-body textarea {
+  width: 100%;
+  margin-bottom: 8px !important;
+}
+
+/* ── BUTTONS ─────────────────────── */
+button { font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: all 0.15s; }
+
+.btn-primary, .confirm-btn, .success-btn, .transfer-btn, .pay-btn {
+  background: transparent !important;
+  color: var(--green) !important;
+  border: 1px solid var(--green) !important;
+  border-radius: var(--radius) !important;
+  height: 34px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  width: 100%;
+  letter-spacing: 0.3px !important;
+}
+
+.btn-primary:hover, .confirm-btn:hover {
+  background: rgba(78,201,176,0.1) !important;
+  box-shadow: 0 0 12px rgba(78,201,176,0.15) !important;
+}
+
+.btn-secondary, .btn-cancel, .cancel-btn {
+  background: transparent !important;
+  color: var(--text-mid) !important;
+  border: 1px solid var(--border2) !important;
+  border-radius: var(--radius) !important;
+  height: 34px !important;
+  font-size: 12px !important;
+  font-family: 'JetBrains Mono', monospace !important;
   width: 100%;
 }
 
-.budget-inline-box {
-  background: #f8fafc;
+.btn-secondary:hover { border-color: var(--text-mid) !important; color: var(--text) !important; }
+
+.edit-btn {
+  background: transparent !important;
+  color: var(--blue) !important;
+  border: 1px solid rgba(86,156,214,0.3) !important;
+  border-radius: var(--radius) !important;
+  font-size: 11px !important;
+  padding: 3px 10px !important;
+  height: 26px !important;
+  width: auto !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.edit-btn:hover { background: rgba(86,156,214,0.1) !important; }
+
+.del-btn, .danger-btn {
+  background: transparent !important;
+  color: var(--red) !important;
+  border: 1px solid rgba(244,71,71,0.3) !important;
+  border-radius: var(--radius) !important;
+  font-size: 11px !important;
+  padding: 3px 10px !important;
+  height: 26px !important;
+  width: auto !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.del-btn:hover { background: rgba(244,71,71,0.1) !important; }
+
+.pay-btn {
+  background: transparent !important;
+  color: var(--green) !important;
+  border: 1px solid rgba(78,201,176,0.3) !important;
+  border-radius: var(--radius) !important;
+  font-size: 11px !important;
+  padding: 3px 10px !important;
+  height: 26px !important;
+  width: auto !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  letter-spacing: 0 !important;
+}
+
+.pay-btn:hover { background: rgba(78,201,176,0.1) !important; }
+
+.btn-all {
+  background: transparent !important;
+  color: var(--yellow) !important;
+  border: 1px solid rgba(220,220,170,0.3) !important;
+  border-radius: var(--radius) !important;
+  font-size: 10px !important;
+  padding: 0 8px !important;
+  min-height: 28px !important;
+  width: auto !important;
+  height: auto !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.btn-text-action {
+  background: transparent; border: none;
+  color: var(--text-dim); font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0; height: auto; width: auto;
+}
+.btn-text-action:hover { color: var(--text); }
+.btn-text-action.success { color: var(--green2); }
+.btn-text-action.success:hover { color: var(--green); }
+.btn-text-action.danger  { color: var(--red); opacity: 0.7; }
+.btn-text-action.danger:hover { opacity: 1; }
+
+/* ── SECTION HEADER ─────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-header h5 {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.section-header h5::before {
+  content: '// ';
+  color: var(--green2);
+}
+
+.header-actions-inline { display: flex; align-items: center; gap: 10px; }
+.header-separator { color: var(--border2); }
+
+/* ── LIST ITEMS ─────────────────── */
+.list-item {
+  background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-left: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.list-item:hover { background: var(--bg3); }
+
+.line-bill::before  { content: none; }
+.line-bill  { border-left-color: var(--red); }
+.line-debt  { border-left-color: var(--purple); }
+.line-expense { border-left-color: var(--yellow2); }
+
+.list-item b {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cyan);
+  margin-bottom: 2px;
+}
+
+.list-item small { font-size: 11px; color: var(--green2); }
+.list-item-left { flex: 1; min-width: 0; }
+.list-item-left b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.action-btns { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+
+/* ── STAT ROW ───────────────────── */
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-card small {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.stat-card small::before { content: '// '; color: var(--green2); }
+
+.stat-card b {
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+  letter-spacing: -0.3px;
+}
+
+/* ── WALLET GRID ────────────────── */
+#walletGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wallet-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--green);
+  border-radius: var(--radius);
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  transition: border-color 0.15s;
+  position: relative;
+}
+
+.wallet-card:hover { border-color: var(--green); border-top-color: var(--green); }
+
+.wallet-label {
+  display: block;
+  font-size: 10px;
+  color: var(--green2);
+  margin-bottom: 3px;
+}
+
+.wallet-label::before { content: '// '; }
+
+.wallet-name {
+  display: block;
+  font-size: 11px;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wallet-amount {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+
+/* ── BUDGET COMPONENTS ──────────── */
+.discipline-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.budget-inline-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.budget-inline-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
   text-align: center;
 }
 
 .budget-inline-box small {
   display: block;
-  color: var(--text-muted);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 800;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
 }
 
+.budget-inline-box small::before { content: '# '; color: var(--green2); }
+
 .budget-inline-box b {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--green);
   display: block;
-  margin-top: 6px;
-  font-size: 1.05rem;
-  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .budget-progress-wrap {
-  width: 100%;
-  background: #f8fafc;
+  background: var(--bg3);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: var(--radius);
+  padding: 10px;
+  margin-bottom: 8px;
 }
 
-.budget-progress-top,
-.budget-progress-bottom {
+.budget-progress-top, .budget-progress-bottom {
   display: flex;
   justify-content: space-between;
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--text-muted);
+  font-size: 10px;
+  color: var(--text-dim);
 }
 
 .budget-progress-track {
-  margin: 10px 0 8px;
+  margin: 8px 0 6px;
   width: 100%;
-  height: 12px;
-  border-radius: 999px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg4);
   overflow: hidden;
-  background: #e5e7eb;
 }
 
 .budget-progress-fill {
   width: 0%;
   height: 100%;
-  border-radius: 999px;
-  background: var(--success);
-  transition: width 0.25s ease;
+  border-radius: 2px;
+  background: var(--green);
+  transition: width 0.3s ease, background 0.3s ease;
 }
 
-.wallet-card {
-  background: var(--card);
-  padding: 16px;
-  border-radius: 18px;
+.daily-box {
+  background: var(--bg3);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: center;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.wallet-label {
+.daily-box small {
   display: block;
-  color: var(--text-muted);
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 800;
+  font-size: 10px;
+  color: var(--text-dim);
   margin-bottom: 6px;
 }
 
-.wallet-name {
-  display: block;
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-  color: var(--text-main);
-}
-
-.wallet-amount {
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--text-main);
-  margin-bottom: 12px;
-}
-
-.action-btns {
-  display: flex;
-  gap: 8px;
-}
-.empty-state {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px dashed #d1d5db;
-  border-radius: 18px;
-  padding: 18px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.88rem;
+.daily-box .daily-amount {
+  font-size: 30px;
   font-weight: 700;
+  color: var(--blue2);
+  letter-spacing: -0.5px;
 }
 
+#budgetStatus {
+  font-size: 11px;
+  text-align: center;
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  width: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--green);
+}
+
+.live-limit-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.live-limit-box small {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.live-limit-box b {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--blue2);
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── SEARCH ─────────────────────── */
+.search-bar {
+  width: 100%;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 7px 10px !important;
+  color: var(--orange) !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+.search-bar::placeholder { color: var(--text-dim) !important; font-style: italic; }
+.search-bar:focus { border-color: var(--green) !important; }
+
+/* ── PAGINATION ─────────────────── */
+.pagination-controls {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; margin-top: 10px; font-size: 11px; color: var(--text-dim);
+}
+
+.pagination-controls button {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--blue) !important;
+  border-radius: var(--radius) !important;
+  padding: 0 10px !important;
+  height: 26px !important;
+  min-height: auto !important;
+  width: auto !important;
+  font-size: 11px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.pagination-controls button:hover { border-color: var(--blue) !important; background: rgba(86,156,214,0.1) !important; }
+
+/* ── EMPTY ──────────────────────── */
+.empty-state {
+  background: var(--bg3);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.empty-state::before { content: '// '; color: var(--green2); }
+
+/* ── MODAL ──────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  display: none; align-items: flex-end; justify-content: center;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+}
+
+.modal-content {
+  width: 100%; max-width: 600px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--green);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 20px 18px 36px;
+  animation: slideUp 0.2s ease both;
+  color: var(--text) !important;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.modal-handle { width: 36px; height: 3px; background: var(--border2); border-radius: 2px; margin: -6px auto 16px; }
+
+.modal-content h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--yellow) !important;
+  margin-bottom: 8px;
+}
+
+.modal-content h3::before { content: 'function '; color: var(--blue); }
+.modal-content h3::after  { content: '() {'; color: var(--text-mid); }
+
+#modalDesc {
+  font-size: 11px;
+  color: var(--green2) !important;
+  line-height: 1.8;
+  margin-bottom: 14px;
+  white-space: pre-wrap;
+  font-style: italic;
+}
+
+#modalDesc::before { content: '// '; }
+
+#modalInputs input,
+#modalInputs select,
+#modalInputs textarea {
+  background: var(--bg) !important;
+  color: var(--orange) !important;
+  border: 1px solid var(--border) !important;
+  margin-bottom: 8px !important;
+  border-radius: var(--radius) !important;
+}
+
+#modalFooter {
+  display: flex; gap: 8px; margin-top: 16px;
+  background: transparent !important;
+  padding-top: 0 !important;
+}
+
+#modalFooter button { flex: 1; }
+
+#modalCancelBtn {
+  background: transparent !important;
+  color: var(--text-mid) !important;
+  border: 1px solid var(--border2) !important;
+  box-shadow: none !important;
+}
+
+#modalConfirmBtn {
+  background: transparent !important;
+  color: var(--green) !important;
+  border: 1px solid var(--green) !important;
+  box-shadow: none !important;
+}
+
+#modalConfirmBtn:hover { background: rgba(78,201,176,0.1) !important; }
+
+/* ── LEGACY COMPAT ───────────────── */
+.card-main {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 10px;
+}
+
+.card-main small {
+  font-size: 10px;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 4px;
+}
+.card-main small::before { content: '// '; color: var(--green2); }
+
+.card-main b {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--green);
+  display: block;
+  letter-spacing: -0.5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.chart-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.legend span:first-child::before { content: '// '; color: var(--green2); }
+
+.progress-container {
+  width: 100%; height: 4px; border-radius: 2px;
+  background: var(--bg4); display: flex; margin-bottom: 14px; gap: 1px; overflow: hidden;
+}
+
+.input-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.input-box h4 {
+  font-size: 11px;
+  color: var(--yellow);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.input-box h4::before { content: 'function '; color: var(--blue); }
+.input-box h4::after  { content: '() {'; color: var(--text-mid); }
+
+/* standalone inputs in input-box */
+.input-box input,
+.input-box select,
+.input-box textarea {
+  margin-bottom: 8px !important;
+  width: 100%;
+}
+
+/* ── DATA GRID ───────────────────── */
+.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 20px; }
+.data-grid .btn-full { grid-column: span 2; }
+
+/* ── MISC ────────────────────────── */
+.input-row { display: flex; gap: 6px; align-items: center; }
+.input-row input { flex: 1; margin-bottom: 0 !important; }
+
+.budget-limit-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; gap: 10px; }
+.budget-limit-side { display: flex; flex-direction: column; gap: 4px; }
+.budget-limit-side label { font-size: 10px; color: var(--text-dim); }
+.budget-limit-side label::before { content: '// '; color: var(--green2); }
+.budget-limit-side input { width: 110px; margin: 0 !important; }
+
+.extra-card { border-top-color: var(--yellow2) !important; }
+.extra-card .wallet-amount { color: var(--yellow2) !important; }
+
+#expHistoryList .list-item,
+#billHistoryList .list-item,
+#debtHistoryList .list-item { display: flex; justify-content: space-between; align-items: center; }
+
+/* ── SCROLLBAR ───────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+@media (max-width: 480px) {
+  section { padding: 12px 10px 0; }
+  #walletGrid { grid-template-columns: 1fr; }
+  .breakdown-grid { grid-template-columns: repeat(2,1fr); }
+  .data-grid { grid-template-columns: 1fr; }
+  .data-grid .btn-full { grid-column: span 1; }
+  .daily-box .daily-amount { font-size: 24px; }
+}
+
+/* ── LINE NUMBER GUTTER ──────────── */
+.gutter {
+  color: var(--text-dim);
+  font-size: 10px;
+  padding: 6px 14px 2px;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.gutter-path { color: var(--blue2); }
+.gutter-sep  { color: var(--text-dim); }
+.gutter-file { color: var(--yellow2); }
+
+/* ── KEYWORD TAGS ────────────────── */
+.kw-const  { color: var(--blue); }
+.kw-let    { color: var(--blue); }
+.kw-fn     { color: var(--blue); }
+.kw-str    { color: var(--orange); }
+.kw-num    { color: var(--green); }
+.kw-type   { color: var(--blue2); }
+.kw-op     { color: var(--text-mid); }
+.kw-comment{ color: var(--green2); font-style: italic; }
+
+/* wallet card debt indicator */
+.debt-badge {
+  position: absolute;
+  top: 6px; right: 8px;
+  font-size: 9px;
+  color: var(--red);
+  opacity: 0.7;
+}
 </style>
 </head>
-<body class="dark-mode">
+<body>
+
+<!-- MODAL -->
 <div id="customModal" class="modal-overlay">
   <div class="modal-content">
-    <h3 id="modalTitle" style="margin-top:0">Action</h3>
-    <p id="modalDesc" style="color:var(--text-main); font-size: 0.95rem; line-height:1.5; margin-bottom: 15px; white-space: pre-wrap; font-weight:600"></p>
+    <div class="modal-handle"></div>
+    <h3 id="modalTitle">action</h3>
+    <p id="modalDesc"></p>
     <div id="modalInputs"></div>
-    <div id="modalFooter" style="display:flex; gap:10px; margin-top:20px">
-      <button id="modalCancelBtn" class="danger-btn" onclick="closeModal()" style="flex:1; padding:12px; border:none; border-radius:14px; font-weight:800; box-shadow:0 12px 22px rgba(220,38,38,0.16)">Cancel</button>
-      <button id="modalConfirmBtn" class="success-btn" style="flex:1; padding:12px; border:none; border-radius:14px; color:white; font-weight:800; box-shadow:0 12px 22px rgba(22,163,74,0.18)">Confirm</button>
+    <div id="modalFooter">
+      <button id="modalCancelBtn" onclick="closeModal()">// cancel</button>
+      <button id="modalConfirmBtn">→ confirm</button>
     </div>
   </div>
 </div>
 
-<div class="app-container">
-  <div class="topbar">
-    <div class="title-stack">
-      <h3>Money Tracker</h3>
-      <p>Clean black edition</p>
+<div class="app">
+
+  <!-- TITLE BAR -->
+  <div class="titlebar">
+    <div class="titlebar-dots">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
     </div>
-    
+    <div class="titlebar-title">
+      <span>money-tracker</span>.js — Personal Finance
+    </div>
+    <div class="titlebar-right">UTF-8</div>
   </div>
 
-  <header>
-  <button class="tab-btn active" onclick="showTab('dashboard')">Wallets</button>
-  <button class="tab-btn" onclick="showTab('budget')">Budget</button>
-  <button class="tab-btn" onclick="showTab('bills')">Bills</button>
-  <button class="tab-btn" onclick="showTab('debts')">Debts</button>
-  <button class="tab-btn" onclick="showTab('salarycalc')">Salary</button>
-</header>
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <div class="statusbar-item">⎇ main</div>
+    <div class="statusbar-item">JS</div>
+    <div class="statusbar-item">Ln 1, Col 1</div>
+    <div class="statusbar-item" style="margin-left:auto">✓ No Errors</div>
+  </div>
 
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <button class="tab-btn active" onclick="showTab('dashboard')">wallets.js</button>
+    <button class="tab-btn" onclick="showTab('budget')">budget.js</button>
+    <button class="tab-btn" onclick="showTab('bills')">bills.js</button>
+    <button class="tab-btn" onclick="showTab('debts')">debts.js</button>
+    <button class="tab-btn" onclick="showTab('salarycalc')">salary.js</button>
+  </div>
+
+  <!-- ── DASHBOARD ──────────────── -->
   <section id="dashboard" class="active">
-    <div class="card-main"><small>Total Savings</small><b>₱<span id="mainTotal">0.00</span></b></div>
-    <div class="chart-box">
-      <div class="legend"><span>Financial Breakdown</span><span id="chartTotalValue">₱0.00</span></div>
-      <div class="progress-container">
-        <div id="barSavings" class="progress-bar" style="background:var(--success); width: 0%"></div>
-        <div id="barBills" class="progress-bar" style="background:var(--danger); width: 0%"></div>
-        <div id="barDebts" class="progress-bar" style="background:var(--purple); width: 0%"></div>
-        <div id="barExps" class="progress-bar" style="background:var(--warning); width: 0%"></div>
+    <div class="gutter">
+      <span class="gutter-path">~/finance</span>
+      <span class="gutter-sep">/</span>
+      <span class="gutter-file">wallets.js</span>
+    </div>
+
+    <div style="padding: 14px 14px 0">
+
+      <div class="hero">
+        <div class="hero-comment">// total savings across all wallets</div>
+        <div class="hero-line">
+          <span class="hero-keyword">const</span>
+          <span class="hero-var">totalSavings</span>
+          <span class="hero-op">=</span>
+          <span class="hero-amount">₱<span id="mainTotal">0.00</span></span>
+          <span class="hero-type">// PHP</span>
+          <span class="cursor-blink"></span>
+        </div>
       </div>
-      <div class="breakdown-grid">
-  <div class="breakdown-item" style="color:var(--success)">
-    SAVINGS
-    <span id="amtSavings">₱0.00</span>
-    <small id="percSavings">0%</small>
-  </div>
-  <div class="breakdown-item" style="color:var(--danger)">
-    BILLS
-    <span id="amtBills">₱0.00</span>
-    <small id="percBills">0%</small>
-  </div>
-  <div class="breakdown-item" style="color:var(--purple)">
-    DEBTS
-    <span id="amtDebts">₱0.00</span>
-    <small id="percDebts">0%</small>
-  </div>
-  <div class="breakdown-item" style="color:var(--warning)">
-    EXPENSE
-    <span id="amtExps">₱0.00</span>
-    <small id="percExps">0%</small>
-  </div>
-</div>
+
+      <div class="chart-box">
+        <div class="legend">
+          <span>financialBreakdown</span>
+          <span id="chartTotalValue" style="color:var(--green2)">₱0.00</span>
+        </div>
+        <div class="progress-container">
+          <div id="barSavings" class="progress-bar" style="background:var(--green);width:0%"></div>
+          <div id="barBills"   class="progress-bar" style="background:var(--red);width:0%"></div>
+          <div id="barDebts"   class="progress-bar" style="background:var(--purple);width:0%"></div>
+          <div id="barExps"    class="progress-bar" style="background:var(--yellow2);width:0%"></div>
+        </div>
+        <div class="breakdown-grid">
+          <div class="bd-item">
+            <div class="bi-key" style="color:var(--green)">savings:</div>
+            <div class="bi-val" style="color:var(--green)" id="amtSavings">₱0.00</div>
+            <div class="bi-pct" id="percSavings">0%</div>
+          </div>
+          <div class="bd-item">
+            <div class="bi-key" style="color:var(--red)">bills:</div>
+            <div class="bi-val" style="color:var(--red)" id="amtBills">₱0.00</div>
+            <div class="bi-pct" id="percBills">0%</div>
+          </div>
+          <div class="bd-item">
+            <div class="bi-key" style="color:var(--purple)">debts:</div>
+            <div class="bi-val" style="color:var(--purple)" id="amtDebts">₱0.00</div>
+            <div class="bi-pct" id="percDebts">0%</div>
+          </div>
+          <div class="bd-item">
+            <div class="bi-key" style="color:var(--yellow2)">expenses:</div>
+            <div class="bi-val" style="color:var(--yellow2)" id="amtExps">₱0.00</div>
+            <div class="bi-pct" id="percExps">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-box">
+        <h4>addWallet</h4>
+        <input type="text"   id="wName" placeholder='"wallet name..."'>
+        <input type="number" id="wBal"  placeholder="0.00  // initial balance">
+        <button class="btn-primary" onclick="addWallet()">→ addWallet()</button>
+      </div>
+
+      <div class="section-header">
+        <h5>wallets</h5>
+        <div class="header-actions-inline">
+          <button class="btn-text-action success" onclick="openSalaryDistributor()">salary.dist()</button>
+          <span class="header-separator">·</span>
+          <button class="btn-text-action success" onclick="openExtraDistributor()">extra.alloc()</button>
+          <span class="header-separator">·</span>
+          <button class="btn-text-action success" onclick="openWalletRedistributor()">transfer()</button>
+          <span class="header-separator">·</span>
+          <button class="btn-text-action danger" onclick="confirmClearAll('wallets')">clear()</button>
+        </div>
+      </div>
+
+      <div id="walletGrid"></div>
+
+      <div class="section-header"><h5>data management</h5></div>
+      <div class="data-grid">
+        <button class="btn-secondary" onclick="exportData()">↑ export()</button>
+        <button class="btn-secondary" onclick="document.getElementById('importFile').click()">↓ import()</button>
+        <button class="btn-secondary btn-full" onclick="copyTextSummary()">clipboard.write(summary)</button>
+        <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+      </div>
+
     </div>
-    <div class="input-box input-wallet">
-      <h4>Add Wallet</h4>
-      <input type="text" id="wName" placeholder="Wallet Name (e.g. GCash)">
-      <input type="number" id="wBal" placeholder="Initial Balance ₱">
-      <button class="btn-primary" onclick="addWallet()">Add Wallet</button>
-    </div>
-    <div class="section-header">
-        <h5>Wallets</h5>
-        <div class="header-actions-inline" style="justify-content:flex-end; flex-wrap:wrap;">
-  <button class="btn-text-action success" onclick="openSalaryDistributor()">Salary Dist.</button>
-  <span class="header-separator">|</span>
-  <button class="btn-text-action success" onclick="openExtraDistributor()">Extra Budget</button>
-  <span class="header-separator">|</span>
-  <button class="btn-text-action success" onclick="openWalletRedistributor()">Redistribute</button>
-  <span class="header-separator">|</span>
-  <button class="btn-text-action danger" onclick="confirmClearAll('wallets')">Clear</button>
-</div>
-    </div>
-    <div id="walletGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;"></div>
-    <div class="section-header"><h5>Data Management</h5></div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:30px;">
-  <button class="btn-primary" onclick="exportData()">📤 Export</button>
-  <button class="btn-primary" onclick="document.getElementById('importFile').click()">📥 Import</button>
-  <button class="btn-primary" style="grid-column: span 2;" onclick="copyTextSummary()">📋 Copy App Summary (English)</button>
-  <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-</div>
   </section>
 
+  <!-- ── BUDGET ─────────────────── -->
   <section id="budget">
-    <div class="discipline-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <div>
-          <small style="font-weight: 800; color: var(--accent);">2-WEEK LIMIT</small>
-          <input type="number" id="spendLimit" placeholder="Amount" oninput="saveBudgetSettings()" style="width: 110px; margin:0; padding: 5px;">
+    <div class="gutter">
+      <span class="gutter-path">~/finance</span>
+      <span class="gutter-sep">/</span>
+      <span class="gutter-file">budget.js</span>
+    </div>
+    <div style="padding:14px 14px 0">
+      <div class="discipline-card">
+        <div class="panel-header" style="background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 14px;font-size:11px;display:flex;justify-content:space-between">
+          <span style="color:var(--yellow)">BudgetConfig</span>
+          <span style="color:var(--text-dim)">// 2-week cycle</span>
         </div>
-        <div style="text-align: right;">
-          <small style="font-weight: 800;">DAYS LEFT</small>
-          <input type="number" id="daysToGo" placeholder="Days" oninput="saveBudgetSettings()" style="width: 60px; margin:0; padding: 5px;">
+        <div style="padding:14px">
+          <div class="budget-limit-header">
+            <div class="budget-limit-side">
+              <label>limit</label>
+              <input type="number" id="spendLimit" placeholder="0.00" oninput="saveBudgetSettings()">
+            </div>
+            <div class="budget-limit-side" style="align-items:flex-end">
+              <label>daysLeft</label>
+              <input type="number" id="daysToGo" placeholder="0" oninput="saveBudgetSettings()" style="width:90px;text-align:right">
+            </div>
+          </div>
+          <div class="daily-box">
+            <small>dailyAllowance</small>
+            <div class="daily-amount">₱<span id="dailyLimitBudget">0.00</span></div>
+          </div>
+          <div class="budget-inline-stats">
+            <div class="budget-inline-box"><small>spentToday</small><b id="spentToday">₱0.00</b></div>
+            <div class="budget-inline-box"><small>cycleUsed</small><b id="budgetCycleUsed">₱0.00</b></div>
+          </div>
+          <div class="budget-progress-wrap">
+            <div class="budget-progress-top"><span style="color:var(--text-dim)">// usage</span><span id="budgetUsagePercent" style="color:var(--green2)">0%</span></div>
+            <div class="budget-progress-track"><div id="budgetUsageBar" class="budget-progress-fill"></div></div>
+            <div class="budget-progress-bottom"><span style="color:var(--text-dim)">remaining</span><span id="budgetRemaining" style="color:var(--cyan)">₱0.00</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;width:100%">
+            <div id="budgetStatus">// ✓ status: safe</div>
+            <div class="live-limit-box"><small>liveLimit</small><b>₱<span id="liveLimitDisplay">0.00</span></b></div>
+            <button class="btn-primary" onclick="openBudgetSpend()" style="margin-top:4px">→ recordExpense()</button>
+            <button class="btn-secondary" onclick="confirmTransferToExtra()">transferToExtra()</button>
+            <button class="btn-secondary" onclick="resetBudgetCycle()">newCycle()</button>
+          </div>
         </div>
       </div>
-      <div style="background: var(--bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border)">
-        <small>DAILY ALLOWANCE</small>
-        <div style="font-size: 1.8rem; font-weight: 800; color: var(--success);">₱<span id="dailyLimitBudget">0.00</span></div>
+
+      <div class="input-box">
+        <h4>quickSpend</h4>
+        <div class="budget-inline-stats" style="margin-bottom:8px">
+          <div class="budget-inline-box"><small>todaySpent</small><b id="quickSpentToday">₱0.00</b></div>
+          <div class="budget-inline-box"><small>remaining</small><b id="quickRemainingToday">₱1,000.00</b></div>
+        </div>
+        <input type="text"   id="gDesc" placeholder='"description..."'>
+        <input type="number" id="gAmt"  placeholder="0.00  // amount">
+        <select id="gWalletSelect"></select>
+        <button class="btn-primary" onclick="addDailyExpense()">→ addExpense()</button>
       </div>
-      <div style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 8px; width:100%;">
-  <div class="budget-inline-stats">
-    <div class="budget-inline-box">
-      <small>Spent Today</small>
-      <b id="spentToday">₱0.00</b>
-    </div>
-    <div class="budget-inline-box">
-      <small>Used This Cycle</small>
-      <b id="budgetCycleUsed">₱0.00</b>
-    </div>
-  </div>
 
-  <div class="budget-progress-wrap">
-    <div class="budget-progress-top">
-      <span>Budget Usage</span>
-      <span id="budgetUsagePercent">0%</span>
-    </div>
-    <div class="budget-progress-track">
-      <div id="budgetUsageBar" class="budget-progress-fill"></div>
-    </div>
-    <div class="budget-progress-bottom">
-      <span>Remaining</span>
-      <span id="budgetRemaining">₱0.00</span>
-    </div>
-  </div>
-
-  <span id="budgetStatus" style="font-weight: 800; font-size: 0.95rem;">✅ Status: Safe</span>
-        <div style="background: var(--bg); width: 100%; padding: 10px; border-radius: 12px; margin-top: 5px; text-align: center; border: 1px solid var(--border)">
-    <small style="font-weight: 800; color: #9ca3af;">LIVE 2-WEEK BALANCE</small>
-    <div style="font-weight: 800; color: #ffffff;">₱<span id="liveLimitDisplay">0.00</span></div>
-</div>
-        <div style="margin-top: 15px;">
-  <button class="pay-btn success-btn" onclick="openBudgetSpend()" style="width:100%; font-weight:800; padding:15px; border-radius:15px; box-shadow:0 14px 26px rgba(22,163,74,0.18);">
-    💸 RECORD BUDGET EXPENSE
-  </button>
-</div>
-        <button class="btn-secondary transfer-btn" style="margin-top:10px" onclick="confirmTransferToExtra()">
-    Transfer to Extra Budget
-</button>
-<button class="btn-secondary" style="margin-top:10px" onclick="resetBudgetCycle()">
-  🔄 Start New Cycle
-</button>
+      <div class="section-header">
+        <h5>expenseHistory</h5>
+        <button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">clear()</button>
       </div>
+      <input type="text" id="searchExp" class="search-bar" placeholder="// search history..." oninput="refresh()">
+      <div id="expHistoryList"></div>
+      <div id="expHistoryPager" class="pagination-controls"></div>
     </div>
-    <div class="input-box input-expense">
-  <h4>Quick Spend</h4>
-<div class="budget-inline-stats" style="margin-bottom:10px;">
-    <div class="budget-inline-box">
-      <small>Quick Spend Today</small>
-      <b id="quickSpentToday">₱0.00</b>
-    </div>
-    <div class="budget-inline-box">
-      <small>Quick Spend Left</small>
-      <b id="quickRemainingToday">₱1000.00</b>
-    </div>
-  </div>
-
-  <input type="text" id="gDesc" placeholder="Description">
-  <input type="number" id="gAmt" placeholder="Amount ₱">
-  <select id="gWalletSelect"></select>
-  <button class="btn-primary" onclick="addDailyExpense()">Add Expense</button>
-</div>
-    <div class="section-header">
-      <h5>Expense History</h5>
-      <button class="btn-text-action danger" onclick="confirmClearAll('expHistory')">Clear All</button>
-    </div>
-    <input type="text" id="searchExp" class="search-bar" placeholder="🔍 Search history..." oninput="refresh()">
-    <div id="expHistoryList"></div>
-    <div id="expHistoryPager" class="pagination-controls"></div>
   </section>
 
+  <!-- ── BILLS ──────────────────── -->
   <section id="bills">
-    <div class="stat-row">
-      <div class="stat-card"><small>Available After Bills</small><b style="color:var(--accent)">₱<span id="billForecast">0.00</span></b></div>
-      <div class="stat-card"><small>Bills Total</small><b style="color:var(--danger)">₱<span id="totalBillsOnly">0.00</span></b></div>
+    <div class="gutter">
+      <span class="gutter-path">~/finance</span>
+      <span class="gutter-sep">/</span>
+      <span class="gutter-file">bills.js</span>
     </div>
-    <div class="input-box input-bill">
-      <h4>Add Bill</h4>
-      <input type="text" id="bName" placeholder="Bill Name">
-      <input type="number" id="bAmt" placeholder="Amount ₱">
-      <button class="btn-primary" onclick="addBill()">Add Bill</button>
+    <div style="padding:14px 14px 0">
+      <div class="stat-row">
+        <div class="stat-card"><small>availableAfterBills</small><b style="color:var(--green)">₱<span id="billForecast">0.00</span></b></div>
+        <div class="stat-card"><small>totalBills</small><b style="color:var(--red)">₱<span id="totalBillsOnly">0.00</span></b></div>
+      </div>
+      <div class="input-box">
+        <h4>addBill</h4>
+        <input type="text"   id="bName" placeholder='"bill name..."'>
+        <input type="number" id="bAmt"  placeholder="0.00  // amount">
+        <button class="btn-primary" onclick="addBill()">→ addBill()</button>
+      </div>
+      <div class="section-header">
+        <h5>activeBills</h5>
+        <div class="header-actions-inline">
+          <button class="btn-text-action success" onclick="openPayAll('bills')">payAll()</button>
+          <span class="header-separator">·</span>
+          <button class="btn-text-action danger" onclick="confirmClearAll('bills')">clear()</button>
+        </div>
+      </div>
+      <div id="billList"></div>
+      <div id="billPager" class="pagination-controls"></div>
+      <div class="section-header">
+        <h5>paymentHistory</h5>
+        <button class="btn-text-action danger" onclick="confirmClearAll('billHistory')">clear()</button>
+      </div>
+      <input type="text" id="searchBill" class="search-bar" placeholder="// search bill history..." oninput="refresh()">
+      <div id="billHistoryList"></div>
+      <div id="billHistoryPager" class="pagination-controls"></div>
     </div>
-    <div class="section-header">
-  <h5>Active Bills</h5>
-  <div class="header-actions-inline">
-    <button class="btn-text-action success" onclick="openPayAll('bills')">Pay All</button>
-    <span class="header-separator">|</span>
-    <button class="btn-text-action danger" onclick="confirmClearAll('bills')">Clear</button>
-  </div>
-</div>
-    <div id="billList"></div><div id="billPager" class="pagination-controls"></div>
-    <div class="section-header"><h5>Payment History (Bills)</h5><button class="btn-text-action danger" onclick="confirmClearAll('billHistory')">Clear All</button></div>
-    <input type="text" id="searchBill" class="search-bar" placeholder="🔍 Search bill history..." oninput="refresh()">
-    <div id="billHistoryList"></div><div id="billHistoryPager" class="pagination-controls"></div>
   </section>
 
+  <!-- ── DEBTS ──────────────────── -->
   <section id="debts">
-    <div class="stat-row">
-      <div class="stat-card"><small>Available After Debts</small><b style="color:var(--accent)">₱<span id="debtForecast">0.00</span></b></div>
-      <div class="stat-card"><small>Total Debts</small><b style="color:var(--purple)">₱<span id="totalDebtsOnly">0.00</span></b></div>
+    <div class="gutter">
+      <span class="gutter-path">~/finance</span>
+      <span class="gutter-sep">/</span>
+      <span class="gutter-file">debts.js</span>
     </div>
-    <div class="input-box input-debt">
-      <h4>Add Debt</h4>
-      <input type="text" id="dName" placeholder="Lender / Name">
-      <input type="number" id="dAmt" placeholder="Amount ₱">
-      <button class="btn-primary" style="background:var(--purple)" onclick="addDebt()">Add Debt</button>
+    <div style="padding:14px 14px 0">
+      <div class="stat-row">
+        <div class="stat-card"><small>availableAfterDebts</small><b style="color:var(--green)">₱<span id="debtForecast">0.00</span></b></div>
+        <div class="stat-card"><small>totalDebts</small><b style="color:var(--purple)">₱<span id="totalDebtsOnly">0.00</span></b></div>
+      </div>
+      <div class="input-box">
+        <h4>addDebt</h4>
+        <input type="text"   id="dName" placeholder='"lender name..."'>
+        <input type="number" id="dAmt"  placeholder="0.00  // amount">
+        <button class="btn-primary" onclick="addDebt()">→ addDebt()</button>
+      </div>
+      <div class="section-header">
+        <h5>debtList</h5>
+        <div class="header-actions-inline">
+          <button class="btn-text-action success" onclick="openPayAll('debts')">payAll()</button>
+          <span class="header-separator">·</span>
+          <button class="btn-text-action danger" onclick="confirmClearAll('debts')">clear()</button>
+        </div>
+      </div>
+      <div id="debtList"></div>
+      <div id="debtPager" class="pagination-controls"></div>
+      <div class="section-header">
+        <h5>paymentHistory</h5>
+        <button class="btn-text-action danger" onclick="confirmClearAll('debtHistory')">clear()</button>
+      </div>
+      <input type="text" id="searchDebt" class="search-bar" placeholder="// search debt history..." oninput="refresh()">
+      <div id="debtHistoryList"></div>
+      <div id="debtHistoryPager" class="pagination-controls"></div>
     </div>
-    <div class="section-header">
-  <h5>Debt List</h5>
-  <div class="header-actions-inline">
-    <button class="btn-text-action success" onclick="openPayAll('debts')">Pay All</button>
-    <span class="header-separator">|</span>
-    <button class="btn-text-action danger" onclick="confirmClearAll('debts')">Clear</button>
-  </div>
-</div>
-<div id="debtList"></div>
-<div id="debtPager" class="pagination-controls"></div>
-
-<div class="section-header">
-  <h5>Payment History (Debts)</h5>
-  <button class="btn-text-action danger" onclick="confirmClearAll('debtHistory')">Clear All</button>
-</div>
-<input type="text" id="searchDebt" class="search-bar" placeholder="🔍 Search debt history..." oninput="refresh()">
-<div id="debtHistoryList"></div>
-<div id="debtHistoryPager" class="pagination-controls"></div>
   </section>
+
+  <!-- ── SALARY ─────────────────── -->
   <section id="salarycalc">
-  <div class="card-main">
-    <small>Salary Calculation</small>
-    <b>₱<span id="salaryFinalCutoff">0.00</span></b>
-  </div>
-
-  <div class="input-box">
-    <h4>Salary Calculation</h4>
-
-    <input type="number" id="salaryBasic" placeholder="Basic Salary Per Month ₱" oninput="saveSalaryCalc()">
-    <input type="number" id="salaryDeduction" placeholder="Deduction Per Cutoff ₱" oninput="saveSalaryCalc()">
-    <input type="number" id="salaryAbsentDays" placeholder="Absent Days" oninput="saveSalaryCalc()">
-
-    <select id="salaryAbsentType" oninput="saveSalaryCalc()">
-      <option value="whole">Whole Day</option>
-      <option value="half">Half Day</option>
-    </select>
-
-    <select id="salaryWorkSchedule" oninput="saveSalaryCalc()">
-      <option value="monfri">Monday to Friday</option>
-      <option value="monsat">Monday to Saturday</option>
-    </select>
-
-    <div class="budget-inline-stats" style="margin-top:10px;">
-      <div class="budget-inline-box">
-        <small>Salary Per Cutoff</small>
-        <b id="salaryPerCutoffDisplay">₱0.00</b>
+    <div class="gutter">
+      <span class="gutter-path">~/finance</span>
+      <span class="gutter-sep">/</span>
+      <span class="gutter-file">salary.js</span>
+    </div>
+    <div style="padding:14px 14px 0">
+      <div class="card-main">
+        <small>finalSalaryPerCutoff</small>
+        <b>₱<span id="salaryFinalCutoff">0.00</span></b>
       </div>
-      <div class="budget-inline-box">
-        <small>Daily Rate</small>
-        <b id="salaryDailyRateDisplay">₱0.00</b>
+      <div class="input-box">
+        <h4>calcSalary</h4>
+        <input type="number" id="salaryBasic" placeholder="0.00 // basicSalaryPerMonth" oninput="saveSalaryCalc()">
+        <input type="number" id="salaryDeduction" placeholder="0.00 // deductionPerCutoff" oninput="saveSalaryCalc()">
+        
+        <input type="number" id="salaryWholeAbsents" placeholder="0 // wholeDayAbsents" oninput="saveSalaryCalc()">
+<input type="number" id="salaryHalfAbsents" placeholder="0 // halfDayAbsents" oninput="saveSalaryCalc()">
+        
+        <select id="salaryWorkSchedule" oninput="saveSalaryCalc()">
+          <option value="monfri">schedule: 'mon-fri' // 22 days</option>
+          <option value="monsat">schedule: 'mon-sat' // 26 days</option>
+        </select>
+
+        <div class="budget-inline-stats" style="margin-top:10px">
+          <div class="budget-inline-box"><small>perCutoff</small><b id="salaryPerCutoffDisplay">₱0.00</b></div>
+          <div class="budget-inline-box"><small>dailyRate</small><b id="salaryDailyRateDisplay">₱0.00</b></div>
+        </div>
+        <div class="budget-inline-stats" style="margin-top:6px">
+          <div class="budget-inline-box"><small>absentDeduction</small><b id="salaryAbsentDeductionDisplay" style="color:var(--red)">₱0.00</b></div>
+          <div class="budget-inline-box"><small>takeHome</small><b id="salaryTakeHomeDisplay" style="color:var(--green)">₱0.00</b></div>
+        </div>
       </div>
     </div>
-
-    <div class="budget-inline-stats" style="margin-top:10px;">
-      <div class="budget-inline-box">
-        <small>Absent Deduction</small>
-        <b id="salaryAbsentDeductionDisplay">₱0.00</b>
-      </div>
-      <div class="budget-inline-box">
-        <small>Final Salary Per Cutoff</small>
-        <b id="salaryTakeHomeDisplay">₱0.00</b>
-      </div>
-    </div>
-  </div>
 </section>
+
 </div>
 
 <script>
-  let wallets = JSON.parse(localStorage.getItem('WF_W')) || [];
-  let bills = JSON.parse(localStorage.getItem('WF_B')) || [];
-  let debts = JSON.parse(localStorage.getItem('WF_D')) || [];
-  let expHistory = JSON.parse(localStorage.getItem('WF_EH')) || [];
-  let billHistory = JSON.parse(localStorage.getItem('WF_BH')) || [];
-  let debtHistory = JSON.parse(localStorage.getItem('WF_DH')) || [];
-  let unallocatedSalary = parseFloat(localStorage.getItem('WF_US')) || 0;
-  let extraBudget = parseFloat(localStorage.getItem('WF_EB')) || 0;
-  let salaryBasic = parseFloat(localStorage.getItem('WF_SALARY_BASIC')) || 0;
-let salaryDeduction = parseFloat(localStorage.getItem('WF_SALARY_DEDUCTION')) || 0;
-let salaryAbsentDays = parseFloat(localStorage.getItem('WF_SALARY_ABSENT_DAYS')) || 0;
-let salaryAbsentType = localStorage.getItem('WF_SALARY_ABSENT_TYPE') || "whole";
-let salaryWorkSchedule = localStorage.getItem('WF_SALARY_WORK_SCHEDULE') || "monfri";
-  
-  // LIVE SYNC LOGIC: Check if live limit already exists, otherwise use config
-  let liveLimit = parseFloat(localStorage.getItem('WF_LIVE_LIMIT'));
-  if (isNaN(liveLimit)) {
-      liveLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 6000;
-  }
-  
-  let lastSyncDate = localStorage.getItem('WF_LSD') || new Date().toLocaleDateString();
+// ── STATE ─────────────────────────────────────────────────────────────────────
+
+let wallets         = JSON.parse(localStorage.getItem('WF_W'))  || [];
+let bills           = JSON.parse(localStorage.getItem('WF_B'))  || [];
+let debts           = JSON.parse(localStorage.getItem('WF_D'))  || [];
+let expHistory      = JSON.parse(localStorage.getItem('WF_EH')) || [];
+let billHistory     = JSON.parse(localStorage.getItem('WF_BH')) || [];
+let debtHistory     = JSON.parse(localStorage.getItem('WF_DH')) || [];
+
+let unallocatedSalary  = parseFloat(localStorage.getItem('WF_US')) || 0;
+let extraBudget        = parseFloat(localStorage.getItem('WF_EB')) || 0;
+
+let salaryBasic        = parseFloat(localStorage.getItem('WF_SALARY_BASIC'))         || 0;
+let salaryDeduction    = parseFloat(localStorage.getItem('WF_SALARY_DEDUCTION'))     || 0;
+let salaryWholeAbsents = parseFloat(localStorage.getItem('WF_SALARY_WHOLE_ABSENTS')) || 0;
+let salaryHalfAbsents  = parseFloat(localStorage.getItem('WF_SALARY_HALF_ABSENTS'))  || 0;
+let salaryWorkSchedule = localStorage.getItem('WF_SALARY_WORK_SCHEDULE') || 'monfri';
+
+let liveLimit = parseFloat(localStorage.getItem('WF_LIVE_LIMIT'));
+if (isNaN(liveLimit)) liveLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 6000;
+
+let lastSyncDate   = localStorage.getItem('WF_LSD')         || new Date().toLocaleDateString();
 let cycleStartDate = localStorage.getItem('WF_CYCLE_START') || null;
 let currentCycleId = parseInt(localStorage.getItem('WF_CYCLE_ID')) || 1;
+
 let pages = { bills: 0, debts: 0, expH: 0, billH: 0, debtH: 0 };
 const step = 5;
 
-  function format(v){ return v.toLocaleString('en-PH',{minimumFractionDigits:2}); }
-  
-  function save(){
-    localStorage.setItem('WF_W', JSON.stringify(wallets)); 
-    localStorage.setItem('WF_B', JSON.stringify(bills));
-    localStorage.setItem('WF_D', JSON.stringify(debts));
-    localStorage.setItem('WF_EH', JSON.stringify(expHistory));
-    localStorage.setItem('WF_BH', JSON.stringify(billHistory)); 
-    localStorage.setItem('WF_DH', JSON.stringify(debtHistory));
-    localStorage.setItem('WF_US', unallocatedSalary.toString()); 
-    localStorage.setItem('WF_EB', extraBudget.toString());
-    localStorage.setItem('WF_LIVE_LIMIT', liveLimit.toString()); 
-    localStorage.setItem('WF_LSD', lastSyncDate);
-    localStorage.setItem('WF_CYCLE_START', cycleStartDate || "");
-    localStorage.setItem('WF_CYCLE_ID', currentCycleId.toString());
-    localStorage.setItem('WF_SALARY_BASIC', salaryBasic.toString());
-localStorage.setItem('WF_SALARY_DEDUCTION', salaryDeduction.toString());
-localStorage.setItem('WF_SALARY_ABSENT_DAYS', salaryAbsentDays.toString());
-localStorage.setItem('WF_SALARY_ABSENT_TYPE', salaryAbsentType);
-localStorage.setItem('WF_SALARY_WORK_SCHEDULE', salaryWorkSchedule);
-    refresh();
-  }
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+
+function format(v) {
+  return v.toLocaleString('en-PH', { minimumFractionDigits: 2 });
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────────────
+
+function save() {
+  localStorage.setItem('WF_W',  JSON.stringify(wallets));
+  localStorage.setItem('WF_B',  JSON.stringify(bills));
+  localStorage.setItem('WF_D',  JSON.stringify(debts));
+  localStorage.setItem('WF_EH', JSON.stringify(expHistory));
+  localStorage.setItem('WF_BH', JSON.stringify(billHistory));
+  localStorage.setItem('WF_DH', JSON.stringify(debtHistory));
+  localStorage.setItem('WF_US',                    unallocatedSalary.toString());
+  localStorage.setItem('WF_EB',                    extraBudget.toString());
+  localStorage.setItem('WF_LIVE_LIMIT',             liveLimit.toString());
+  localStorage.setItem('WF_LSD',                    lastSyncDate);
+  localStorage.setItem('WF_CYCLE_START',            cycleStartDate || '');
+  localStorage.setItem('WF_CYCLE_ID',               currentCycleId.toString());
+  localStorage.setItem('WF_SALARY_BASIC',           salaryBasic.toString());
+  localStorage.setItem('WF_SALARY_DEDUCTION',       salaryDeduction.toString());
+  localStorage.setItem('WF_SALARY_WHOLE_ABSENTS',   salaryWholeAbsents.toString());
+  localStorage.setItem('WF_SALARY_HALF_ABSENTS',    salaryHalfAbsents.toString());
+  localStorage.setItem('WF_SALARY_WORK_SCHEDULE',   salaryWorkSchedule);
+  refresh();
+}
+
+// ── DATE TRANSITION ───────────────────────────────────────────────────────────
 
 function checkDateTransition() {
+  const today       = new Date();
+  const todayString = today.toLocaleDateString();
+  let savedLimit    = localStorage.getItem('WF_LIMIT_CFG');
+  let savedDays     = localStorage.getItem('WF_DAYS_CFG');
 
-    const today = new Date();
+  if (lastSyncDate !== todayString) {
+    const diffInDays = Math.floor((today - new Date(lastSyncDate)) / 86400000);
 
-    const todayString = today.toLocaleDateString();
-
-    
-
-    // Kunin ang mga huling naka-save na settings para hindi mag-empty
-
-    let savedLimit = localStorage.getItem('WF_LIMIT_CFG');
-
-    let savedDays = localStorage.getItem('WF_DAYS_CFG');
-
-
-
-    if (lastSyncDate !== todayString) {
-
-        // I-calculate ang gap ng mga araw
-
-        const lastDateObj = new Date(lastSyncDate);
-        const diffInTime = today.getTime() - lastDateObj.getTime();
-        const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
-
-        
-        if (diffInDays > 0) {
-            let currentDays = parseInt(savedDays) || 0;
-            let newDays = Math.max(0, currentDays - diffInDays);
-
-            // I-update ang storage at ang input field
-            localStorage.setItem('WF_DAYS_CFG', newDays.toString());
-            document.getElementById('daysToGo').value = newDays;
-
-        }
-
-        // Update ang reference date para sa susunod na check
-        lastSyncDate = todayString;
-        localStorage.setItem('WF_LSD', lastSyncDate);
-
-        // Siguraduhin na hindi mawawala ang limit settings
-        if (savedLimit) {
-            localStorage.setItem('WF_LIMIT_CFG', savedLimit);
-        }
-
-        save(); // I-save lahat ng changes
+    if (diffInDays > 0) {
+      let newDays = Math.max(0, (parseInt(savedDays) || 0) - diffInDays);
+      localStorage.setItem('WF_DAYS_CFG', newDays.toString());
+      document.getElementById('daysToGo').value = newDays;
     }
 
-  }
-  function saveBudgetSettings() {
-  const configLimit = document.getElementById('spendLimit').value;
-  const configDays = document.getElementById('daysToGo').value;
-  
-  localStorage.setItem('WF_LIMIT_CFG', configLimit);
-  localStorage.setItem('WF_DAYS_CFG', configDays);
-  
-  liveLimit = parseFloat(configLimit) || 0;
-  daysToGo = parseInt(configDays) || 0;
-
-  save(); 
-
-}
-  function showTab(id){
-    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-  }
-
-  function closeModal(){ document.getElementById('customModal').style.display='none'; }
-  
-  function showMsg(title, desc, isErr=false) {
-    document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalDesc').innerText = desc;
-    document.getElementById('modalInputs').innerHTML = "";
-    document.getElementById('modalCancelBtn').style.display = "none";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Okay"; btn.style.background = isErr ? 'var(--danger)' : 'var(--success)';
-    btn.onclick = closeModal;
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function exportData() {
-    const data = { WF_W: wallets, WF_B: bills, WF_D: debts, WF_EH: expHistory, WF_BH: billHistory, WF_DH: debtHistory, WF_US: unallocatedSalary, WF_EB: extraBudget, WF_LIVE_LIMIT: liveLimit };
-    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `MoneyTracker_Backup_${new Date().toLocaleDateString()}.json`;
-    a.click();
-  }
-
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        if(confirm("Importing will overwrite current data. Continue?")) {
-            wallets = data.WF_W || []; 
-            bills = data.WF_B || []; 
-            debts = data.WF_D || [];
-            expHistory = data.WF_EH || []; 
-            billHistory = data.WF_BH || []; 
-            debtHistory = data.WF_DH || [];
-            unallocatedSalary = data.WF_US || 0; 
-            extraBudget = data.WF_EB || 0; 
-            liveLimit = data.WF_LIVE_LIMIT || 0; 
-            save(); 
-            showMsg("Success", "Data Restored!");
-        }
-      } catch (err) { showMsg("Error", "Invalid Backup File", true); }
-    };
-    reader.readAsText(file);
-  }
-
-  function addWallet(){
-    const n=document.getElementById('wName'), b=document.getElementById('wBal');
-    if(n.value){ wallets.push({name:n.value, balance:parseFloat(b.value)||0}); n.value=''; b.value=''; save(); }
-  }
-
-function openPayIndividual(type, idx){
-    const list = type==='bills'?bills:debts;
-    const item = list[idx];
-    document.getElementById('modalTitle').innerText = "Select Payment Source";
-    document.getElementById('modalDesc').innerText = `Payment for: ${item.name}\nAmount Due: ₱${format(item.amount)}`;
-    
-    // Nagdagdag ng input para sa Transaction Fee
-    document.getElementById('modalInputs').innerHTML = `
-      <select id="ps" style="margin-bottom:10px">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>
-      <input type="number" id="txFee" placeholder="Transaction Fee (Optional) ₱" step="0.01">
-    `;
-    
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Confirm Payment"; btn.style.background = 'var(--success)';
-    
-    btn.onclick = () => {
-      const walletIdx = document.getElementById('ps').value;
-      const wallet = wallets[walletIdx];
-      const fee = parseFloat(document.getElementById('txFee').value) || 0;
-      const totalToDeduct = item.amount + fee;
-
-      if (wallet.balance < totalToDeduct) { 
-        showMsg("Insufficient Funds", "Wallet balance cannot cover the amount + fee.", true); 
-        return;
-      }
-
-      const originalName = item.name;
-      wallet.balance -= totalToDeduct; // Dito ibabawas pati ang fee
-      
-      const logName = fee > 0
-  ? `Paid ${originalName} via ${wallet.name} (+₱${fee} Fee)`
-  : `Paid ${originalName} via ${wallet.name}`;
-      const log = { name: logName, amount: item.amount + fee, date: new Date().toLocaleDateString() };
-      
-      if(type==='bills') billHistory.push(log); else debtHistory.push(log);
-      list.splice(idx,1);
-      
-      save(); 
-      showMsg("Success", `Paid ₱${format(item.amount)} plus ₱${format(fee)} fee.`);
-    };
-    document.getElementById('customModal').style.display='flex';
-}
-
-  function openPayAll(type) {
-    const list = type==='bills'?bills:debts;
-    if(list.length === 0) return;
-    document.getElementById('modalTitle').innerText = "Bulk Payment";
-    document.getElementById('modalDesc').innerText = "Fee will be applied to each fully paid item:";
-    document.getElementById('modalInputs').innerHTML = `
-      <select id="ps" style="margin-bottom:10px">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>
-      <input type="number" id="bulkFee" placeholder="Fee per transaction ₱" step="0.01">
-    `;
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Execute Bulk Pay"; btn.style.background = 'var(--success)';
-
-    btn.onclick = () => {
-      const walletIdx = document.getElementById('ps').value;
-      let wallet = wallets[walletIdx];
-      const perItemFee = parseFloat(document.getElementById('bulkFee').value) || 0;
-      let i = 0, summaryLines = [];
-
-      while (i < list.length) {
-        let item = list[i];
-        let totalNeeded = item.amount + perItemFee;
-
-        if (wallet.balance >= totalNeeded) {
-          wallet.balance -= totalNeeded;
-          summaryLines.push(`Paid: ${item.name} (+₱${perItemFee} fee)`);
-          const log = { 
-            name: `Paid ${item.name} via ${wallet.name} (Bulk +₱${perItemFee} Fee)`,
-            amount: totalNeeded, 
-            date: new Date().toLocaleDateString() 
-          };
-          if(type==='bills') billHistory.push(log); else debtHistory.push(log);
-          list.splice(i, 1); 
-        } else {
-          // Kapag hindi na kaya pati fee, ihihinto na ang bulk pay para iwas error
-          summaryLines.push(`Stopped at: ${item.name} (Insufficient funds for item + fee)`);
-          break;
-        }
-      }
-      save(); 
-      showMsg("Result", summaryLines.join('\n') || "No funds.");
-    };
-    document.getElementById('customModal').style.display='flex';
-}
-
-function openExtraDistributor() {
-    if(wallets.length === 0) { 
-        showMsg("No Wallets", "Please add a wallet in the Wallets Tab first.", true); 
-        return; 
-    }
-    
-    document.getElementById('modalTitle').innerText = "Extra Budget Manager";
-    
-    // Ipinapakita dito ang 'extraBudget' variable balance
-    document.getElementById('modalInputs').innerHTML = `
-      <div style="background:var(--surface); padding:12px; border-radius:16px; margin-bottom:15px; border:1px solid var(--border); text-align:left">
-        <small style="font-weight:800">AVAILABLE EXTRA BUDGET</small>
-        <div style="font-size:1.4rem; font-weight:800; color:var(--warning)">₱${format(extraBudget)}</div>
-      </div>
-
-      <div style="margin-bottom:15px; text-align:left;">
-        <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">TRANSFER FEE PER ALLOCATION (DEDUCT FROM EXTRA):</label>
-        <input type="number" id="extraFeeAmt" placeholder="0.00 ₱" step="0.01" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin-top:5px;">
-      </div>
-
-      <div style="text-align:left;">
-        <small style="font-weight:800; color:var(--success)">📤 ALLOCATE TO WALLETS (ADD TO BALANCE)</small>
-        ${wallets.map((w,i)=>`
-          <div style="margin-top:8px; font-size:0.8rem"><b>To ${w.name}</b></div>
-          <div class="input-row">
-            <input type="number" class="extra-input" data-idx="${i}" placeholder="0.00">
-            <button class="btn-all" onclick="setAllValue('extra-input', ${i})">ALL</button>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Execute Distribution"; 
-    btn.style.background = 'var(--accent)';
-
-    btn.onclick = () => {
-      const inputs = document.querySelectorAll('.extra-input');
-      const perItemFee = parseFloat(document.getElementById('extraFeeAmt').value) || 0;
-      let totalNeededFromExtra = 0;
-
-      // 1. Calculate total (Amount to ADD + Fees)
-      inputs.forEach(input => { 
-        const val = (parseFloat(input.value) || 0);
-        if (val > 0) {
-          totalNeededFromExtra += (val + perItemFee);
-        }
-      });
-      
-      // 2. Check kung sapat ang extraBudget pool
-      if (totalNeededFromExtra > extraBudget + 0.01) { 
-        showMsg("Over Budget", `Kulang ang extra funds. Need ₱${format(totalNeededFromExtra)} kasama ang fees.`, true); 
-        return; 
-      }
-
-      // 3. EXECUTE: Add to Wallet, Deduct from Extra Pool
-      inputs.forEach(input => { 
-        const idx = input.getAttribute('data-idx'); 
-        const amountToAdd = (parseFloat(input.value) || 0);
-
-        if (amountToAdd > 0) {
-          // ADDITION: Dagdag sa wallet balance
-          wallets[idx].balance += amountToAdd;
-
-          // Record history para sa transparency
-          expHistory.push({
-            name: `Allocated to ${wallets[idx].name}`,
-            amount: amountToAdd,
-            date: new Date().toLocaleDateString()
-          });
-
-          // Record Fee kung meron
-          if (perItemFee > 0) {
-            expHistory.push({
-              name: `Fee: Extra➔${wallets[idx].name}`,
-              amount: perItemFee,
-              date: new Date().toLocaleDateString()
-            });
-          }
-        }
-      });
-
-      // Ibawas ang kabuuan sa extraBudget pool variable
-      extraBudget = Math.max(0, extraBudget - totalNeededFromExtra); 
-      
-      save(); 
-      closeModal();
-      showMsg("Success", `Funds allocated! Total ₱${format(totalNeededFromExtra)} deducted from Extra Budget pool.`);
-    };
-
-    document.getElementById('customModal').style.display='flex';
-}
-
-// 2. Helper function para sa deduction logic
-function executeManualDeduct() {
-    const srcIdx = document.getElementById('deductSrcIdx').value;
-    const amt = parseFloat(document.getElementById('deductAmt').value) || 0;
-    const wallet = wallets[srcIdx];
-
-    if (amt <= 0) return;
-    if (wallet.balance < amt) {
-        showMsg("Insufficient Funds", `₱${format(wallet.balance)} lang ang laman ng ${wallet.name}.`, true);
-        return;
-    }
-
-    // Deduction logic
-    wallet.balance -= amt;
-    extraBudget += amt;
-
-    // Log to history
-    expHistory.push({
-        name: `Deducted from ${wallet.name} (to Extra Budget)`,
-        amount: amt,
-        date: new Date().toLocaleDateString()
-    });
-
-    save();
-    openExtraDistributor(); // Refresh modal para makita ang updated balance
-    showMsg("Success", `₱${format(amt)} deducted from ${wallet.name}!`);
-}
-  function confirmClearExtra() {
-    document.getElementById('modalTitle').innerText = "Clear Extra Budget";
-    document.getElementById('modalDesc').innerText = "Are you sure you want to clear your Extra Budget?";
-    document.getElementById('modalInputs').innerHTML = ""; document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Clear All"; btn.style.background = 'var(--danger)';
-    btn.onclick = () => { extraBudget = 0; save(); closeModal(); };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function openSalaryDistributor() {
-    if(wallets.length === 0) { showMsg("No Wallets", "Add a wallet first.", true); return; }
-    document.getElementById('modalTitle').innerText = "Salary Distributor";
-    document.getElementById('modalInputs').innerHTML = `
-      <div style="background:var(--surface); padding:12px; border-radius:16px; margin-bottom:15px; border:1px solid var(--border); text-align:left">
-        <small style="font-weight:800">UNALLOCATED SALARY</small>
-        <div style="font-size:1.4rem; font-weight:800; color:var(--accent)">₱<span id="unallocatedDisplay">${format(unallocatedSalary)}</span></div>
-      </div>
-      <input type="number" id="incomeInput" placeholder="New Income ₱" oninput="calcRemainingSal()">
-      <div id="salRemaining" style="margin-bottom:15px; font-weight:800; color:var(--success); background:#ecfdf5; padding:10px; border-radius:10px;">Available: ₱${format(unallocatedSalary)}</div>
-      ${wallets.map((w,i)=>`<div style="text-align:left; font-size:0.8rem"><b>To ${w.name}</b></div><div class="input-row"><input type="number" class="sal-input" data-idx="${i}" placeholder="0.00" oninput="calcRemainingSal()"><button class="btn-all" onclick="setAllValue('sal-input', ${i})">ALL</button></div>`).join('')}
-    `;
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Confirm Distribution"; btn.style.background = 'var(--accent)';
-    btn.onclick = () => {
-      const income = parseFloat(document.getElementById('incomeInput').value) || 0;
-      const inputs = document.querySelectorAll('.sal-input');
-      let totalAvailable = unallocatedSalary + income, allocated = 0;
-      inputs.forEach(input => { allocated += (parseFloat(input.value) || 0); });
-      if (allocated > totalAvailable + 0.01) { showMsg("Over Budget", "Total exceeds available funds!", true); return; }
-      inputs.forEach(input => { const idx = input.getAttribute('data-idx'); wallets[idx].balance += (parseFloat(input.value) || 0); });
-      unallocatedSalary = Math.max(0, totalAvailable - allocated); save(); closeModal();
-    };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-function openWalletRedistributor() {
-    if(wallets.length < 2) { 
-        showMsg("Restricted", "You need at least 2 wallets to transfer funds.", true); 
-        return; 
-    }
-    
-    document.getElementById('modalTitle').innerText = "Internal Transfer";
-    document.getElementById('modalInputs').innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <div>
-          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">FROM (SOURCE):</label>
-          <select id="srcIdx" onchange="updateDestDrop()" style="width:100%">${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}</select>
-        </div>
-        
-        <div>
-          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">TO (DESTINATION):</label>
-          <select id="destIdx" style="width:100%"></select>
-        </div>
-
-        <div>
-          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">AMOUNT & FEE:</label>
-          <div class="input-row">
-            <input type="number" id="trAmt" placeholder="Amount ₱" oninput="calcRedistRemaining()">
-            <button class="btn-all" onclick="setTrAll()">ALL</button>
-          </div>
-          <input type="number" id="trFee" placeholder="Transfer Fee ₱ (Optional)" oninput="calcRedistRemaining()" style="margin-top:8px">
-        </div>
-        
-        <div id="redistStatus" style="padding:10px; border-radius:8px; font-weight:800; font-size:0.85rem; text-align:center; background:var(--accent-light)">
-          Source Rem: ₱0.00
-        </div>
-      </div>
-    `;
-    
-    updateDestDrop(); 
-    calcRedistRemaining();
-    
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Execute Transfer"; 
-    btn.style.background = 'var(--accent)';
-
-    btn.onclick = () => {
-        const s = parseInt(document.getElementById('srcIdx').value);
-        const d = parseInt(document.getElementById('destIdx').value);
-        const amt = parseFloat(document.getElementById('trAmt').value) || 0;
-        const fee = parseFloat(document.getElementById('trFee').value) || 0;
-        const total = amt + fee;
-
-        if (amt <= 0) {
-            showMsg("Error", "Please enter a valid amount.", true);
-            return;
-        }
-        if (total > wallets[s].balance + 0.01) {
-            showMsg("Insufficient Funds", "Wallet cannot cover amount + fee.", true);
-            return;
-        }
-
-        // Processing
-        wallets[s].balance -= total;
-        wallets[d].balance += amt;
-
-        if(fee > 0) {
-            expHistory.push({
-                name: `Fee: ${wallets[s].name}➔${wallets[d].name}`,
-                amount: fee,
-                date: new Date().toLocaleDateString()
-            });
-        }
-
-        save();
-        closeModal(); // Siguraduhin na tinatawag nito ang pag-close ng modal
-        showMsg("Success", `Transferred ₱${format(amt)} (Fee: ₱${format(fee)})`);
-    };
-    
-    document.getElementById('customModal').style.display = 'flex';
-}
-
-function updateDestDrop() { 
-    const s = parseInt(document.getElementById('srcIdx').value);
-    const destSelect = document.getElementById('destIdx');
-    if(!destSelect) return;
-    destSelect.innerHTML = wallets.map((w,i) => i === s ? '' : `<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('');
-}
-
-function setTrAll() { 
-    const s = parseInt(document.getElementById('srcIdx').value); 
-    const fee = parseFloat(document.getElementById('trFee').value) || 0;
-    const maxAmt = Math.max(0, wallets[s].balance - fee);
-    document.getElementById('trAmt').value = maxAmt.toFixed(2); 
-    calcRedistRemaining(); 
-}
-
-function calcRedistRemaining() {
-    const s = parseInt(document.getElementById('srcIdx').value);
-    const amt = parseFloat(document.getElementById('trAmt').value) || 0;
-    const fee = parseFloat(document.getElementById('trFee').value) || 0;
-    const rem = wallets[s].balance - (amt + fee);
-    const el = document.getElementById('redistStatus'); 
-    if(!el) return;
-    
-    el.innerText = `Source Rem: ₱${format(rem)}`;
-    el.style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
-}
-  function calcRemainingSal() {
-    const income = parseFloat(document.getElementById('incomeInput').value) || 0;
-    let allocated = 0; document.querySelectorAll('.sal-input').forEach(i => allocated += (parseFloat(i.value) || 0));
-    const rem = (unallocatedSalary + income) - allocated;
-    const el = document.getElementById('salRemaining'); el.innerText = `Remaining: ₱${format(rem)}`; el.style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
-  }
-  function setAllValue(className, targetIdx) {
-    const inputs = document.querySelectorAll('.' + className); let currentAllocated = 0;
-    inputs.forEach(input => { if(parseInt(input.getAttribute('data-idx')) !== targetIdx) currentAllocated += (parseFloat(input.value) || 0); });
-    let available = (unallocatedSalary + (parseFloat(document.getElementById('incomeInput').value) || 0)) - currentAllocated;
-    inputs.forEach(input => { if(parseInt(input.getAttribute('data-idx')) === targetIdx) input.value = Math.max(0, available).toFixed(2); });
-    calcRemainingSal();
-  }
-
-  function addBill(){ const n=document.getElementById('bName'), a=document.getElementById('bAmt'); if(n.value && a.value){ bills.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
-  function addDebt(){ const n=document.getElementById('dName'), a=document.getElementById('dAmt'); if(n.value && a.value){ debts.push({name:n.value, amount:parseFloat(a.value)}); n.value=''; a.value=''; save(); } }
-  
-function addDailyExpense() {
-    const a = document.getElementById('gAmt'),
-          d = document.getElementById('gDesc'),
-          wIdx = document.getElementById('gWalletSelect').value;
-
-    if (a.value && wIdx !== "") {
-        const amt = parseFloat(a.value);
-        const todayStr = new Date().toLocaleDateString();
-
-        const quickSpentToday = expHistory
-            .filter(h => h.date === todayStr && h.name.includes("(QS)"))
-            .reduce((s, h) => s + h.amount, 0);
-
-        const quickDailyLimit = 1000;
-
-        if ((quickSpentToday + amt) > quickDailyLimit) {
-            showMsg(
-                "Quick Spend Limit Reached",
-                `Your Quick Spend is limited to ₱${format(quickDailyLimit)} per day.\nToday's total is already ₱${format(quickSpentToday)}.`,
-                true
-            );
-            return;
-        }
-
-        if (wallets[wIdx].balance >= amt) {
-            wallets[wIdx].balance -= amt;
-
-            expHistory.push({
-                name: `${d.value || "Quick Spend"} (Wallet: ${wallets[wIdx].name}) (QS)`,
-                amount: amt,
-                date: todayStr
-            });
-
-            a.value = '';
-            d.value = '';
-            save();
-            showMsg("Success", "Quick Spend recorded!");
-        } else {
-            showMsg("Insufficient Balance", "Kulang ang balance sa wallet.", true);
-        }
-    }
-}
-
-  function openEdit(type, idx){
-    let list = type==='wallets'?wallets:type==='bills'?bills:type==='debts'?debts:type==='expH'?expHistory:type==='billH'?billHistory:debtHistory;
-    const item = list[idx];
-    document.getElementById('modalTitle').innerText = "Edit Entry";
-    document.getElementById('modalInputs').innerHTML = `<input type="text" id="en" value="${item.name}"><input type="number" id="ea" value="${item.balance!==undefined?item.balance:item.amount}">`;
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Update"; btn.style.background = 'var(--success)';
-    btn.onclick = () => { item.name = document.getElementById('en').value; const a = parseFloat(document.getElementById('ea').value); if(item.balance!==undefined) item.balance=a; else item.amount=a; save(); closeModal(); };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function confirmDelete(type, idx){
-    document.getElementById('modalTitle').innerText = "Delete Record";
-    document.getElementById('modalDesc').innerText = "Are you sure you want to delete this?";
-    document.getElementById('modalInputs').innerHTML = ""; document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Delete"; btn.style.background = 'var(--danger)';
-    btn.onclick = () => { if(type==='wallets') wallets.splice(idx,1); else if(type==='bills') bills.splice(idx,1); else if(type==='debts') debts.splice(idx,1); else if(type==='expH') expHistory.splice(idx,1); else if(type==='billH') billHistory.splice(idx,1); else if(type==='debtH') debtHistory.splice(idx,1); save(); closeModal(); };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function confirmClearAll(type){
-    document.getElementById('modalTitle').innerText = "Clear All";
-    document.getElementById('modalDesc').innerText = "Warning: This will clear all data in this section.";
-    document.getElementById('modalInputs').innerHTML = ""; document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn'); btn.innerText = "Wipe Section"; btn.style.background = 'var(--danger)';
-    btn.onclick = () => { if(type==='wallets') wallets=[]; else if(type==='bills') bills=[]; else if(type==='debts') debts=[]; else if(type==='expHistory') expHistory=[]; else if(type==='billHistory') billHistory=[]; else if(type==='debtHistory') debtHistory=[]; save(); closeModal(); };
-    document.getElementById('customModal').style.display='flex';
-  }
-
-  function renderPager(id, type, total){
-    const max = Math.ceil(total/step); if(max <= 1) { document.getElementById(id).innerHTML=""; return; }
-    document.getElementById(id).innerHTML = `<button onclick="pages['${type}']--; refresh()" ${pages[type]===0?'disabled':''}>←</button> <span>${pages[type]+1}/${max}</span> <button onclick="pages['${type}']++; refresh()" ${pages[type]>=max-1?'disabled':''}>→</button>`;
-  }
-
-function refresh() {
-    checkDateTransition();
-
-    // 1. Siguraduhin na ang liveLimit ay updated mula sa localStorage/variable
-    // (Dito kumukuha ang display para hindi mag-zero)
-    const storedLive = localStorage.getItem('WF_LIVE_LIMIT');
-    if (storedLive !== null) {
-        liveLimit = parseFloat(storedLive);
-    }
-
-    const tCash = wallets.reduce((s, w) => s + w.balance, 0),
-          tBills = bills.reduce((s, b) => s + b.amount, 0),
-          tDebts = debts.reduce((s, d) => s + d.amount, 0),
-          tExps = expHistory.reduce((s, h) => s + h.amount, 0);
-
-    const safeUnallocated = Math.max(0, unallocatedSalary),
-          totalCap = tCash + safeUnallocated + tBills + tDebts + tExps;
-
-    // Dashboard Updates
-    document.getElementById('mainTotal').innerText = format(tCash + safeUnallocated + extraBudget);
-    document.getElementById('billForecast').innerText = format((tCash + safeUnallocated) - tBills);
-    document.getElementById('totalBillsOnly').innerText = format(tBills);
-    document.getElementById('debtForecast').innerText = format((tCash + safeUnallocated) - tDebts);
-    document.getElementById('totalDebtsOnly').innerText = format(tDebts);
-
-    // Progress Bars / Charts
-    if (totalCap > 0) {
-        const pS = ((tCash + safeUnallocated) / totalCap) * 100,
-              pB = (tBills / totalCap) * 100,
-              pD = (tDebts / totalCap) * 100,
-              pE = (tExps / totalCap) * 100;
-
-        document.getElementById('barSavings').style.width = pS + "%";
-        document.getElementById('barBills').style.width = pB + "%";
-        document.getElementById('barDebts').style.width = pD + "%";
-        document.getElementById('barExps').style.width = pE + "%";
-
-        document.getElementById('percSavings').innerText = Math.round(pS) + "%";
-        document.getElementById('percBills').innerText = Math.round(pB) + "%";
-        document.getElementById('percDebts').innerText = Math.round(pD) + "%";
-        document.getElementById('percExps').innerText = Math.round(pE) + "%";
-
-        document.getElementById('amtSavings').innerText = "₱" + format(tCash + safeUnallocated);
-        document.getElementById('amtBills').innerText = "₱" + format(tBills);
-        document.getElementById('amtDebts').innerText = "₱" + format(tDebts);
-        document.getElementById('amtExps').innerText = "₱" + format(tExps);
-        document.getElementById('chartTotalValue').innerText = "₱" + format(totalCap);
-    } else {
-        document.getElementById('barSavings').style.width = "0%";
-        document.getElementById('barBills').style.width = "0%";
-        document.getElementById('barDebts').style.width = "0%";
-        document.getElementById('barExps').style.width = "0%";
-
-        document.getElementById('percSavings').innerText = "0%";
-        document.getElementById('percBills').innerText = "0%";
-        document.getElementById('percDebts').innerText = "0%";
-        document.getElementById('percExps').innerText = "0%";
-
-        document.getElementById('amtSavings').innerText = "₱0.00";
-        document.getElementById('amtBills').innerText = "₱0.00";
-        document.getElementById('amtDebts').innerText = "₱0.00";
-        document.getElementById('amtExps').innerText = "₱0.00";
-        document.getElementById('chartTotalValue').innerText = "₱0.00";
-    }
-
-    // Wallets and Select Options
-    document.getElementById('gWalletSelect').innerHTML = wallets.map((w, i) => `<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('');
-
-    let walletsHTML = wallets.map((w, i) => `
-      <div class="wallet-card">
-        <small class="wallet-label">Wallet</small>
-        <b class="wallet-name">${w.name}</b>
-        <div class="wallet-amount">₱${format(w.balance)}</div>
-        <div class="action-btns">
-          <button class="edit-btn" onclick="openEdit('wallets',${i})">Edit</button>
-          <button class="del-btn" onclick="confirmDelete('wallets',${i})">🗑</button>
-        </div>
-      </div>
-    `).join('');
-
-    walletsHTML += `<div style="background:#fffbeb; padding:15px; border-radius:18px; border:1px solid #fde68a; color:#92400e"><b>Extra Budget</b><br>₱${format(extraBudget)}<br><div class="action-btns"><button class="del-btn" onclick="confirmClearExtra()">Clear</button></div></div>`;
-    document.getElementById('walletGrid').innerHTML = walletsHTML;
-
-    // Budget Configuration Load
-    const savedLimit = localStorage.getItem('WF_LIMIT_CFG') || "";
-    const savedDays = localStorage.getItem('WF_DAYS_CFG') || "";
-    document.getElementById('spendLimit').value = savedLimit;
-    document.getElementById('daysToGo').value = savedDays;
-
-    // LIVE SYNC DISPLAY
-    document.getElementById('liveLimitDisplay').innerText = format(liveLimit);
-
-    const bDays = parseInt(savedDays) || 1;
-    const currentLimit = parseFloat(savedLimit) || 0;
-    const daily = currentLimit / bDays;
-    document.getElementById('dailyLimitBudget').innerText = format(daily);
-
-    const todayStr = new Date().toLocaleDateString();
-
-    // Spent Today Logic
-    const spentT = expHistory
-        .filter(h => h.date === todayStr && !h.name.includes("(QS)"))
-        .reduce((s, h) => s + h.amount, 0);
-
-    document.getElementById('spentToday').innerText = "₱" + format(spentT);
-    const quickSpentToday = expHistory
-    .filter(h => h.date === todayStr && h.name.includes("(QS)"))
-    .reduce((s, h) => s + h.amount, 0);
-
-const quickDailyLimit = 1000;
-const quickRemainingToday = Math.max(0, quickDailyLimit - quickSpentToday);
-
-document.getElementById('quickSpentToday').innerText = "₱" + format(quickSpentToday);
-document.getElementById('quickRemainingToday').innerText = "₱" + format(quickRemainingToday);
-
-    // Budget Progress Logic
-    const totalCycleSpent = expHistory
-    .filter(h => !h.name.includes("(QS)") && h.cycleId === currentCycleId)
-    .reduce((s, h) => s + h.amount, 0);
-
-    const remainingBudget = Math.max(0, liveLimit);
-    const usagePercent = currentLimit > 0
-        ? Math.min((totalCycleSpent / currentLimit) * 100, 100)
-        : 0;
-
-    document.getElementById('budgetCycleUsed').innerText = "₱" + format(totalCycleSpent);
-    document.getElementById('budgetRemaining').innerText = "₱" + format(remainingBudget);
-    document.getElementById('budgetUsagePercent').innerText = Math.round(usagePercent) + "%";
-    document.getElementById('budgetUsageBar').style.width = usagePercent + "%";
-
-    const usageBar = document.getElementById('budgetUsageBar');
-    if (usagePercent >= 100) {
-        usageBar.style.background = "var(--danger)";
-    } else if (usagePercent >= 75) {
-        usageBar.style.background = "var(--warning)";
-    } else {
-        usageBar.style.background = "var(--success)";
-    }
-
-    // Budget Status
-    const status = document.getElementById('budgetStatus');
-    if (spentT > daily && daily > 0) {
-        status.innerText = `⚠️ Overspent Today by ₱${format(spentT - daily)}`;
-        status.style.color = "var(--danger)";
-    } else if (usagePercent >= 75) {
-        status.innerText = "⚠️ Warning: Budget usage is getting high";
-        status.style.color = "var(--warning)";
-    } else {
-        status.innerText = "✅ Status: Safe";
-        status.style.color = "var(--success)";
-    }
-
-    // Render Lists
-    const drawList = (list, el, pag, type, isP = false) => {
-    const s = (pages[type] || 0) * step;
-    const sliced = list.slice(s, s + step);
-
-    if (sliced.length === 0) {
-        document.getElementById(el).innerHTML = `<div class="empty-state">No records yet.</div>`;
-    } else {
-        document.getElementById(el).innerHTML = sliced.map((item, i) => `
-          <div class="list-item line-${type.includes('bill') ? 'bill' : type.includes('debt') ? 'debt' : 'expense'}">
-            <div>
-              <b>${item.name}</b><br>
-              <small>₱${format(item.balance !== undefined ? item.balance : item.amount)}</small>
-              <div class="action-btns">
-                <button class="edit-btn" onclick="openEdit('${type}',${s + i})">Edit</button>
-                <button class="del-btn" onclick="confirmDelete('${type}',${s + i})">🗑</button>
-              </div>
-            </div>
-            ${isP ? `<button class="pay-btn" onclick="openPayIndividual('${type}',${s + i})">Pay</button>` : ''}
-          </div>
-        `).join('');
-    }
-
-        renderPager(pag, type, list.length);
-    };
-
-    drawList(bills, 'billList', 'billPager', 'bills', true);
-    drawList(debts, 'debtList', 'debtPager', 'debts', true);
-
-    const renderHistory = (key, el, pag, type, sId) => {
-        const list = key === 'expHistory' ? expHistory : key === 'billHistory' ? billHistory : debtHistory;
-        const q = document.getElementById(sId).value.toLowerCase();
-        const fil = list.filter(h => h.name.toLowerCase().includes(q)).reverse();
-        const s = (pages[type] || 0) * step;
-        const slicedHistory = fil.slice(s, s + step);
-
-        if (slicedHistory.length === 0) {
-            document.getElementById(el).innerHTML = `<div class="empty-state">No history found.</div>`;
-        } else {
-            document.getElementById(el).innerHTML = slicedHistory.map(h => `
-                <div class="list-item">
-                  <div><b>${h.name}</b><br><small>${h.date}</small></div>
-                  <b>-₱${format(h.amount)}</b>
-                </div>
-            `).join('');
-        }
-
-        renderPager(pag, type, fil.length);
-    };
-
-    renderHistory('expHistory', 'expHistoryList', 'expHistoryPager', 'expH', 'searchExp');
-    renderHistory('billHistory', 'billHistoryList', 'billHistoryPager', 'billH', 'searchBill');
-    renderHistory('debtHistory', 'debtHistoryList', 'debtHistoryPager', 'debtH', 'searchDebt');
-
-    // Salary Calculation
-const salaryBasicInput = document.getElementById('salaryBasic');
-const salaryDeductionInput = document.getElementById('salaryDeduction');
-const salaryAbsentDaysInput = document.getElementById('salaryAbsentDays');
-const salaryAbsentTypeInput = document.getElementById('salaryAbsentType');
-const salaryWorkScheduleInput = document.getElementById('salaryWorkSchedule');
-
-if (salaryBasicInput) salaryBasicInput.value = salaryBasic || "";
-if (salaryDeductionInput) salaryDeductionInput.value = salaryDeduction || "";
-if (salaryAbsentDaysInput) salaryAbsentDaysInput.value = salaryAbsentDays || "";
-if (salaryAbsentTypeInput) salaryAbsentTypeInput.value = salaryAbsentType || "whole";
-if (salaryWorkScheduleInput) salaryWorkScheduleInput.value = salaryWorkSchedule || "monfri";
-
-const workingDaysDivisor = salaryWorkSchedule === "monsat" ? 26 : 22;
-const salaryPerCutoff = salaryBasic / 2;
-const salaryDailyRate = salaryBasic / workingDaysDivisor;
-
-let absentDeduction = 0;
-if (salaryAbsentType === "half") {
-  absentDeduction = (salaryDailyRate / 2) * salaryAbsentDays;
-} else {
-  absentDeduction = salaryDailyRate * salaryAbsentDays;
-}
-
-const finalSalaryPerCutoff = Math.max(0, salaryPerCutoff - salaryDeduction - absentDeduction);
-
-const salaryPerCutoffDisplay = document.getElementById('salaryPerCutoffDisplay');
-const salaryDailyRateDisplay = document.getElementById('salaryDailyRateDisplay');
-const salaryAbsentDeductionDisplay = document.getElementById('salaryAbsentDeductionDisplay');
-const salaryTakeHomeDisplay = document.getElementById('salaryTakeHomeDisplay');
-const salaryFinalCutoff = document.getElementById('salaryFinalCutoff');
-
-if (salaryPerCutoffDisplay) salaryPerCutoffDisplay.innerText = "₱" + format(salaryPerCutoff);
-if (salaryDailyRateDisplay) salaryDailyRateDisplay.innerText = "₱" + format(salaryDailyRate);
-if (salaryAbsentDeductionDisplay) salaryAbsentDeductionDisplay.innerText = "₱" + format(absentDeduction);
-if (salaryTakeHomeDisplay) salaryTakeHomeDisplay.innerText = "₱" + format(finalSalaryPerCutoff);
-if (salaryFinalCutoff) salaryFinalCutoff.innerText = format(finalSalaryPerCutoff);
-
-}
-// ILAGAY ITO SA PINAKA-BABA NG SCRIPT PARA GUMANA PAGKA-REFRESH
-window.onload = function() {
-    refresh();
-    console.log("App Refreshed and Data Restored");
-};
-
-function copyTextSummary() {
-    let report = "📊 MONEY TRACKER PRO SUMMARY\n";
-    report += "Date: " + new Date().toLocaleString() + "\n";
-    report += "----------------------------------\n\n";
-    const totalCash = wallets.reduce((s, w) => s + w.balance, 0);
-    const eb = typeof extraBudget !== 'undefined' ? extraBudget : 0;
-    report += "💰 TOTAL SAVINGS: PHP " + format(totalCash + eb) + "\n\n";
-    report += "--- WALLET BREAKDOWN ---\n";
-    wallets.forEach(w => { report += `${w.name}: PHP ${format(w.balance)}\n`; });
-    if (eb > 0) report += `Extra Budget: PHP ${format(eb)}\n`;
-    report += "\n--- LATEST EXPENSES ---\n";
-    if (expHistory.length > 0) {
-      expHistory.slice(-10).reverse().forEach(h => { report += `• ${h.date} | ${h.name} (-PHP ${format(h.amount)})\n`; });
-    }
-    report += "\n--- UNPAID BILLS ---\n";
-    if (bills.length > 0) { bills.forEach(b => { report += `[ ] ${b.name}: PHP ${format(b.amount)}\n`; }); }
-    report += "\n--- UNPAID DEBTS ---\n";
-    if (debts.length > 0) { debts.forEach(d => { report += `[ ] ${d.name}: PHP ${format(d.amount)}\n`; }); }
-    report += "\n----------------------------------\nGenerated via Money Tracker Pro";
-    navigator.clipboard.writeText(report).then(() => {
-      showMsg("Success", "Summary copied to clipboard!.");
-    }).catch(err => {
-      showMsg("Error", "Failed to copy text.", true);
-    });
-}
-
-function openBudgetSpend() {
-    if(wallets.length === 0) { 
-        showMsg("No Wallets", "Please add a wallet in the Wallets Tab first.", true); 
-        return; 
-    }
-    
-    document.getElementById('modalTitle').innerText = "💸 Record Budget Expense";
-    document.getElementById('modalDesc').innerText = "This will deduct from your selected Wallet AND your 2-Week Budget.";
-    
-    document.getElementById('modalInputs').innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
-        <div>
-          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">ITEM DESCRIPTION:</label>
-          <input type="text" id="bsDesc" placeholder="e.g., Groceries, Food" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
-        </div>
-        <div>
-          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">SELECT WALLET:</label>
-          <select id="bsWalletIdx" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
-            ${wallets.map((w,i)=>`<option value="${i}">${w.name} (₱${format(w.balance)})</option>`).join('')}
-          </select>
-        </div>
-        <div>
-          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted)">AMOUNT:</label>
-          <input type="number" id="bsAmt" placeholder="0.00" step="0.01" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
-        </div>
-      </div>
-    `;
-    
-    document.getElementById('modalCancelBtn').style.display = "block";
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Confirm Expense";
-    btn.style.background = 'var(--success)';
-
-    btn.onclick = () => {
-        const desc = document.getElementById('bsDesc').value || "Budget Expense";
-        const wIdx = parseInt(document.getElementById('bsWalletIdx').value);
-        const amt = parseFloat(document.getElementById('bsAmt').value) || 0;
-        const wallet = wallets[wIdx];
-
-        if (amt <= 0) { showMsg("Error", "Please enter a valid amount.", true); return; }
-        if (wallet.balance < amt) { showMsg("Insufficient", `Not enough balance in ${wallet.name}`, true); return; }
-        if (liveLimit < amt) { showMsg("Limit Exceeded", "Amount is over your remaining budget.", true); return; }
-
-        wallet.balance -= amt; 
-        liveLimit -= amt;      
-
-        expHistory.push({
-    name: `${desc} (Wallet: ${wallet.name}) (Budget)`,
-    amount: amt,
-    date: new Date().toLocaleDateString(),
-    cycleId: currentCycleId
-});
-
-        save();
-        closeModal();
-        showMsg("Success", "Wallet and Budget updated!");
-    };
-    
-    document.getElementById('customModal').style.display = 'flex';
-}
-
-function confirmTransferToExtra() {
-    document.getElementById('modalTitle').innerText = "Transfer to Extra Budget";
-    document.getElementById('modalDesc').innerText = "Choose a transfer method to move your funds to the Extra Budget Pool.";
-    
-    const getWalletOptions = () => wallets.map((w, index) => `<option value="${index}">${w.name} (₱${format(w.balance)})</option>`).join('');
-    
-    document.getElementById('modalInputs').innerHTML = `
-        <div style="background: var(--accent-light); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent);">
-            <p style="font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Option 1: Quick Transfer</p>
-            <p style="font-size: 13px; color: var(--text-main); margin-bottom: 12px;">Move entire balance (<b>₱${format(liveLimit)}</b>) without wallet deduction.</p>
-            <button type="button" id="transferAllBtn" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:12px; box-shadow:0 12px 24px rgba(37,99,235,0.18); cursor:pointer; font-weight:700; font-size:12px; transition: 0.3s;">
-                TRANSFER ALL NOW
-            </button>
-        </div>
-
-        <div style="text-align: center; margin-bottom: 15px; position: relative;">
-            <hr style="border: 0; border-top: 1px solid #eee;">
-            <span style="font-size: 10px; color: var(--text-muted); font-weight: 800; background: var(--card); padding: 0 10px; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); text-transform: uppercase;">OR MANUAL DEDUCTION</span>
-        </div>
-
-        <div id="deductionRows">
-            <div class="deduc-group" style="margin-bottom:15px; padding:12px; border:1px solid #eee; border-radius:15px; background: var(--surface);">
-                <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Source Wallet</label>
-                <select class="dWallet" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px; font-family:inherit; font-size:13px; margin-top:4px;">
-                    ${getWalletOptions()}
-                </select>
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1;">
-                        <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Deduct Amount</label>
-                        <input type="number" class="dAmt" placeholder="0.00" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
-                    </div>
-                    <div style="width:100px;">
-                        <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Transfer Fee</label>
-                        <input type="number" class="dFee" value="0" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <button type="button" id="addRowBtn" style="width:100%; padding:10px; background:none; color:var(--accent); border:1.5px dashed var(--accent); border-radius:10px; cursor:pointer; font-size:11px; font-weight:700; margin-bottom:15px; text-transform: uppercase;">
-            + Add Another Wallet
-        </button>
-    `;
-
-    // --- BUTTON ACTIONS ---
-
-    // Quick Transfer (No Deduction)
-    document.getElementById('transferAllBtn').onclick = () => {
-        if (liveLimit <= 0) return showMsg("Error", "No funds available to transfer.");
-        extraBudget += liveLimit;
-        liveLimit = 0;
-        save(); closeModal();
-        showMsg("Success", "All funds moved to Extra Budget!");
-    };
-
-    // Add Row
-    document.getElementById('addRowBtn').onclick = () => {
-        if (document.querySelectorAll('.deduc-group').length >= 3) return showMsg("Limit", "Max 3 wallets reached.");
-        const newRow = document.createElement('div');
-        newRow.className = 'deduc-group';
-        newRow.style = "margin-bottom:15px; padding:12px; border:1px solid #eee; border-radius:15px; background: var(--surface);";
-        newRow.innerHTML = `
-            <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Source Wallet</label>
-            <select class="dWallet" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px; font-family:inherit; font-size:13px; margin-top:4px;">
-                ${getWalletOptions()}
-            </select>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1;">
-                    <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Deduct Amount</label>
-                    <input type="number" class="dAmt" placeholder="0.00" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
-                </div>
-                <div style="width:100px;">
-                    <label style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Transfer Fee</label>
-                    <input type="number" class="dFee" value="0" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; margin-top:4px;">
-                </div>
-            </div>
-        `;
-        document.getElementById('deductionRows').appendChild(newRow);
-    };
-
-    // Manual Deduction Confirm
-    const btn = document.getElementById('modalConfirmBtn');
-    btn.innerText = "Confirm Manual Deduction";
-    btn.onclick = () => {
-        const rows = document.querySelectorAll('.deduc-group');
-        let totalToExtra = 0;
-
-        for (let row of rows) {
-            const wIdx = parseInt(row.querySelector('.dWallet').value);
-            const amt = parseFloat(row.querySelector('.dAmt').value) || 0;
-            const fee = parseFloat(row.querySelector('.dFee').value) || 0;
-            if (amt > 0) {
-                if (wallets[wIdx].balance < (amt + fee)) return showMsg("Error", `Insufficient funds in ${wallets[wIdx].name}`);
-                totalToExtra += amt;
-            }
-        }
-
-        if (totalToExtra <= 0) return showMsg("Error", "Please enter a deduction amount.");
-        if (totalToExtra > liveLimit) return showMsg("Error", "Amount exceeds your Live Limit.");
-
-        // Execute
-        rows.forEach(row => {
-            const wIdx = parseInt(row.querySelector('.dWallet').value);
-            const amt = parseFloat(row.querySelector('.dAmt').value) || 0;
-            const fee = parseFloat(row.querySelector('.dFee').value) || 0;
-            if (amt > 0) wallets[wIdx].balance -= (amt + fee);
-        });
-
-        extraBudget += totalToExtra;
-        liveLimit -= totalToExtra;
-        save(); closeModal();
-        showMsg("Success", "Deduction and Transfer successful!");
-    };
-
-    document.getElementById('modalCancelBtn').style.display = "block";
-    document.getElementById('customModal').style.display = 'flex';
-}
-function resetBudgetCycle() {
-  document.getElementById('modalTitle').innerText = "Start New Cycle";
-  document.getElementById('modalDesc').innerText = "This will reset your current budget cycle. Used This Cycle will go back to zero.";
-  document.getElementById('modalInputs').innerHTML = "";
-  document.getElementById('modalCancelBtn').style.display = "block";
-
-  const btn = document.getElementById('modalConfirmBtn');
-  btn.innerText = "Start New Cycle";
-  btn.style.background = 'var(--danger)';
-
-  btn.onclick = () => {
-    const configLimit = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 0;
-    const configDays = parseInt(localStorage.getItem('WF_DAYS_CFG')) || 0;
-    const todayStr = new Date().toLocaleDateString();
-
-    currentCycleId += 1;
-    cycleStartDate = todayStr;
-
-    localStorage.setItem('WF_CYCLE_ID', currentCycleId.toString());
-    localStorage.setItem('WF_CYCLE_START', cycleStartDate);
-
-    liveLimit = configLimit;
-    lastSyncDate = todayStr;
-
-    localStorage.setItem('WF_LIVE_LIMIT', liveLimit.toString());
+    lastSyncDate = todayString;
     localStorage.setItem('WF_LSD', lastSyncDate);
-
-    document.getElementById('spendLimit').value = configLimit || "";
-    document.getElementById('daysToGo').value = configDays || "";
-
-    closeModal();
+    if (savedLimit) localStorage.setItem('WF_LIMIT_CFG', savedLimit);
     save();
-    showMsg("Cycle Reset", "A new budget cycle has started.");
+  }
+}
+
+// ── BUDGET SETTINGS ───────────────────────────────────────────────────────────
+
+function saveBudgetSettings() {
+  const cl = document.getElementById('spendLimit').value;
+  const cd = document.getElementById('daysToGo').value;
+  localStorage.setItem('WF_LIMIT_CFG', cl);
+  localStorage.setItem('WF_DAYS_CFG',  cd);
+  liveLimit = parseFloat(cl) || 0;
+  save();
+}
+
+// ── SALARY CALC ───────────────────────────────────────────────────────────────
+
+function saveSalaryCalc() {
+  salaryBasic        = parseFloat(document.getElementById('salaryBasic').value)        || 0;
+  salaryDeduction    = parseFloat(document.getElementById('salaryDeduction').value)    || 0;
+  salaryWholeAbsents = parseFloat(document.getElementById('salaryWholeAbsents').value) || 0;
+  salaryHalfAbsents  = parseFloat(document.getElementById('salaryHalfAbsents').value)  || 0;
+  salaryWorkSchedule = document.getElementById('salaryWorkSchedule').value || 'monfri';
+  save();
+}
+
+function renderSalary() {
+  const sBI  = document.getElementById('salaryBasic');
+  const sDI  = document.getElementById('salaryDeduction');
+  const sWAI = document.getElementById('salaryWholeAbsents');
+  const sHAI = document.getElementById('salaryHalfAbsents');
+  const sWSI = document.getElementById('salaryWorkSchedule');
+
+  if (sBI)  sBI.value  = salaryBasic        || '';
+  if (sDI)  sDI.value  = salaryDeduction    || '';
+  if (sWAI) sWAI.value = salaryWholeAbsents || '';
+  if (sHAI) sHAI.value = salaryHalfAbsents  || '';
+  if (sWSI) sWSI.value = salaryWorkSchedule || 'monfri';
+
+  const daysInMonth     = salaryWorkSchedule === 'monsat' ? 26 : 22;
+  const dailyRate       = salaryBasic / daysInMonth;
+  const totalAbsentDays = salaryWholeAbsents + (salaryHalfAbsents * 0.5);
+  const absentDeduction = totalAbsentDays * dailyRate;
+  const cutoffSalary    = salaryBasic / 2;
+  const finalTakeHome   = Math.max(0, cutoffSalary - salaryDeduction - absentDeduction);
+
+  const e = (id) => document.getElementById(id);
+  if (e('salaryPerCutoffDisplay'))       e('salaryPerCutoffDisplay').innerText       = '₱' + format(cutoffSalary);
+  if (e('salaryDailyRateDisplay'))       e('salaryDailyRateDisplay').innerText       = '₱' + format(dailyRate);
+  if (e('salaryAbsentDeductionDisplay')) e('salaryAbsentDeductionDisplay').innerText = '₱' + format(absentDeduction);
+  if (e('salaryTakeHomeDisplay'))        e('salaryTakeHomeDisplay').innerText        = '₱' + format(finalTakeHome);
+  if (e('salaryFinalCutoff'))            e('salaryFinalCutoff').innerText            = format(finalTakeHome);
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
+
+function showTab(id) {
+  document.querySelectorAll('section').forEach((s) => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('customModal').style.display = 'none';
+}
+
+function showMsg(title, desc, isErr = false) {
+  document.getElementById('modalTitle').innerText         = title;
+  document.getElementById('modalDesc').innerText          = desc;
+  document.getElementById('modalInputs').innerHTML        = '';
+  document.getElementById('modalCancelBtn').style.display = 'none';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ ok';
+  btn.style.color   = isErr ? 'var(--red)'  : 'var(--green)';
+  btn.style.borderColor = isErr ? 'var(--red)' : 'var(--green)';
+  btn.onclick       = closeModal;
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+// ── DATA EXPORT / IMPORT ──────────────────────────────────────────────────────
+
+function exportData() {
+  const data = {
+    WF_W:          wallets,
+    WF_B:          bills,
+    WF_D:          debts,
+    WF_EH:         expHistory,
+    WF_BH:         billHistory,
+    WF_DH:         debtHistory,
+    WF_US:         unallocatedSalary,
+    WF_EB:         extraBudget,
+    WF_LIVE_LIMIT: liveLimit
+  };
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `money-tracker-backup-${Date.now()}.json`;
+  a.click();
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (confirm('// overwrite current data?')) {
+        wallets           = data.WF_W  || [];
+        bills             = data.WF_B  || [];
+        debts             = data.WF_D  || [];
+        expHistory        = data.WF_EH || [];
+        billHistory       = data.WF_BH || [];
+        debtHistory       = data.WF_DH || [];
+        unallocatedSalary = data.WF_US || 0;
+        extraBudget       = data.WF_EB || 0;
+        liveLimit         = data.WF_LIVE_LIMIT || 0;
+        save();
+        showMsg('success', '// data restored');
+      }
+    } catch (err) {
+      showMsg('error', '// invalid file', true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── WALLET ────────────────────────────────────────────────────────────────────
+
+function addWallet() {
+  const n = document.getElementById('wName');
+  const b = document.getElementById('wBal');
+  if (n.value) {
+    wallets.push({ name: n.value, balance: parseFloat(b.value) || 0 });
+    n.value = '';
+    b.value = '';
+    save();
+  }
+}
+
+// ── PAY INDIVIDUAL / PAY ALL ──────────────────────────────────────────────────
+
+function openPayIndividual(type, idx) {
+  const list = type === 'bills' ? bills : debts;
+  const item = list[idx];
+
+  document.getElementById('modalTitle').innerText = 'payBill';
+  document.getElementById('modalDesc').innerText  = `name: "${item.name}"\namount: ₱${format(item.amount)}`;
+  document.getElementById('modalInputs').innerHTML =
+    `<select id="ps" style="margin-bottom:8px">
+       ${wallets.map((w, i) => `<option value="${i}">${w.name}  //  ₱${format(w.balance)}</option>`).join('')}
+     </select>
+     <input type="number" id="txFee" placeholder="0.00  // txFee (optional)">`;
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ pay()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const walletIdx = document.getElementById('ps').value;
+    const wallet    = wallets[walletIdx];
+    const fee       = parseFloat(document.getElementById('txFee').value) || 0;
+    const total     = item.amount + fee;
+
+    if (wallet.balance < total) {
+      showMsg('error', `// insufficient balance\n// need: ₱${format(total)}\n// have: ₱${format(wallet.balance)}`, true);
+      return;
+    }
+
+    wallet.balance -= total;
+    const log = {
+      name:   `${item.name} via ${wallet.name}${fee > 0 ? ` +₱${fee} fee` : ''}`,
+      amount: total,
+      date:   new Date().toLocaleDateString()
+    };
+    if (type === 'bills') billHistory.push(log);
+    else debtHistory.push(log);
+    list.splice(idx, 1);
+    save();
+    showMsg('success', `// paid ₱${format(item.amount)}`);
   };
 
   document.getElementById('customModal').style.display = 'flex';
 }
 
-function saveSalaryCalc() {
-  salaryBasic = parseFloat(document.getElementById('salaryBasic').value) || 0;
-  salaryDeduction = parseFloat(document.getElementById('salaryDeduction').value) || 0;
-  salaryAbsentDays = parseFloat(document.getElementById('salaryAbsentDays').value) || 0;
-  salaryAbsentType = document.getElementById('salaryAbsentType').value || "whole";
-  salaryWorkSchedule = document.getElementById('salaryWorkSchedule').value || "monfri";
+function openPayAll(type) {
+  const list = type === 'bills' ? bills : debts;
+  if (list.length === 0) return;
 
-  save();
+  document.getElementById('modalTitle').innerText = 'payAll';
+  document.getElementById('modalDesc').innerText  = `// batch payment\nitems: ${list.length}`;
+  document.getElementById('modalInputs').innerHTML =
+    `<select id="ps" style="margin-bottom:8px">
+       ${wallets.map((w, i) => `<option value="${i}">${w.name}  //  ₱${format(w.balance)}</option>`).join('')}
+     </select>
+     <input type="number" id="bulkFee" placeholder="0.00  // feePerItem">`;
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ executeAll()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const walletIdx = document.getElementById('ps').value;
+    const wallet    = wallets[walletIdx];
+    const fee       = parseFloat(document.getElementById('bulkFee').value) || 0;
+    let i   = 0;
+    let log = [];
+
+    while (i < list.length) {
+      const item  = list[i];
+      const total = item.amount + fee;
+
+      if (wallet.balance >= total) {
+        wallet.balance -= total;
+        log.push(`✓ ${item.name}`);
+        const h = {
+          name:   `${item.name} via ${wallet.name}`,
+          amount: total,
+          date:   new Date().toLocaleDateString()
+        };
+        if (type === 'bills') billHistory.push(h);
+        else debtHistory.push(h);
+        list.splice(i, 1);
+      } else {
+        log.push(`✗ stopped: ${item.name}`);
+        break;
+      }
+    }
+
+    save();
+    showMsg('result', log.join('\n'));
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
 }
 
+// ── EXTRA BUDGET ──────────────────────────────────────────────────────────────
+
+function openExtraDistributor() {
+  if (wallets.length === 0) {
+    showMsg('error', '// no wallets found', true);
+    return;
+  }
+
+  document.getElementById('modalTitle').innerText = 'extraBudget';
+  document.getElementById('modalDesc').innerText  = `available: ₱${format(extraBudget)}`;
+  document.getElementById('modalInputs').innerHTML =
+    `<input type="number" id="extraFeeAmt" placeholder="0.00  // feePerAllocation">
+     ${wallets.map((w, i) =>
+       `<div style="color:var(--cyan);font-size:11px;margin-bottom:3px">to.${w.name}:</div>
+        <div class="input-row">
+          <input type="number" class="extra-input" data-idx="${i}" placeholder="0.00">
+          <button class="btn-all" onclick="setAllValue('extra-input',${i})">ALL</button>
+        </div>`
+     ).join('')}`;
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ distribute()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const inputs = document.querySelectorAll('.extra-input');
+    const fee    = parseFloat(document.getElementById('extraFeeAmt').value) || 0;
+    let total    = 0;
+
+    inputs.forEach((i) => {
+      const v = parseFloat(i.value) || 0;
+      if (v > 0) total += (v + fee);
+    });
+
+    if (total > extraBudget + 0.01) {
+      showMsg('error', `// insufficient\n// need: ₱${format(total)}\n// have: ₱${format(extraBudget)}`, true);
+      return;
+    }
+
+    inputs.forEach((i) => {
+      const idx = i.getAttribute('data-idx');
+      const amt = parseFloat(i.value) || 0;
+      if (amt > 0) {
+        wallets[idx].balance += amt;
+        expHistory.push({
+          name:   `allocated → ${wallets[idx].name}`,
+          amount: amt,
+          date:   new Date().toLocaleDateString()
+        });
+      }
+    });
+
+    extraBudget = Math.max(0, extraBudget - total);
+    save();
+    closeModal();
+    showMsg('success', `// distributed ₱${format(total)}`);
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function confirmClearExtra() {
+  document.getElementById('modalTitle').innerText         = 'clearExtra';
+  document.getElementById('modalDesc').innerText          = '// reset extraBudget to 0?';
+  document.getElementById('modalInputs').innerHTML        = '';
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ clear()';
+  btn.style.color   = 'var(--red)';
+  btn.style.borderColor = 'var(--red)';
+  btn.onclick = () => {
+    extraBudget = 0;
+    save();
+    closeModal();
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+// ── SALARY DISTRIBUTOR ────────────────────────────────────────────────────────
+
+function openSalaryDistributor() {
+  if (wallets.length === 0) {
+    showMsg('error', '// no wallets found', true);
+    return;
+  }
+
+  document.getElementById('modalTitle').innerText = 'distributeSalary';
+  document.getElementById('modalDesc').innerText  = `unallocated: ₱${format(unallocatedSalary)}`;
+  document.getElementById('modalInputs').innerHTML =
+    `<input type="number" id="incomeInput" placeholder="0.00  // newIncome" oninput="calcRemainingSal()">
+     <div id="salRemaining"
+          style="margin-bottom:8px;font-size:11px;padding:6px 10px;border-radius:4px;border:1px solid var(--border);color:var(--green2)">
+       // remaining: ₱${format(unallocatedSalary)}
+     </div>
+     ${wallets.map((w, i) =>
+       `<div style="color:var(--cyan);font-size:11px;margin-bottom:3px">to.${w.name}:</div>
+        <div class="input-row">
+          <input type="number" class="sal-input" data-idx="${i}" placeholder="0.00" oninput="calcRemainingSal()">
+          <button class="btn-all" onclick="setAllValue('sal-input',${i})">ALL</button>
+        </div>`
+     ).join('')}`;
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ distribute()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const income = parseFloat(document.getElementById('incomeInput').value) || 0;
+    const inputs = document.querySelectorAll('.sal-input');
+    let total    = unallocatedSalary + income;
+    let alloc    = 0;
+
+    inputs.forEach((i) => alloc += (parseFloat(i.value) || 0));
+
+    if (alloc > total + 0.01) {
+      showMsg('error', '// exceeds available', true);
+      return;
+    }
+
+    inputs.forEach((i) => {
+      const idx = i.getAttribute('data-idx');
+      wallets[idx].balance += (parseFloat(i.value) || 0);
+    });
+
+    unallocatedSalary = Math.max(0, total - alloc);
+    save();
+    closeModal();
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+// ── WALLET TRANSFER ───────────────────────────────────────────────────────────
+
+function openWalletRedistributor() {
+  if (wallets.length < 2) {
+    showMsg('error', '// need 2+ wallets', true);
+    return;
+  }
+
+  document.getElementById('modalTitle').innerText = 'transfer';
+  document.getElementById('modalDesc').innerText  = '// internal wallet transfer';
+  document.getElementById('modalInputs').innerHTML =
+    `<div style="display:flex;flex-direction:column;gap:8px">
+       <div>
+         <div style="color:var(--cyan);font-size:11px;margin-bottom:3px">from:</div>
+         <select id="srcIdx" onchange="updateDestDrop()">
+           ${wallets.map((w, i) => `<option value="${i}">${w.name}  //  ₱${format(w.balance)}</option>`).join('')}
+         </select>
+       </div>
+       <div>
+         <div style="color:var(--cyan);font-size:11px;margin-bottom:3px">to:</div>
+         <select id="destIdx"></select>
+       </div>
+       <div>
+         <div style="color:var(--cyan);font-size:11px;margin-bottom:3px">amount + fee:</div>
+         <div class="input-row">
+           <input type="number" id="trAmt" placeholder="0.00" oninput="calcRedistRemaining()">
+           <button class="btn-all" onclick="setTrAll()">MAX</button>
+         </div>
+         <input type="number" id="trFee" placeholder="0.00  // fee" oninput="calcRedistRemaining()">
+       </div>
+       <div id="redistStatus"
+            style="padding:6px 10px;border-radius:4px;font-size:11px;text-align:center;background:var(--bg3);border:1px solid var(--border);color:var(--green2)">
+         // rem: ₱0.00
+       </div>
+     </div>`;
+
+  updateDestDrop();
+  calcRedistRemaining();
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ transfer()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const s     = parseInt(document.getElementById('srcIdx').value);
+    const d     = parseInt(document.getElementById('destIdx').value);
+    const amt   = parseFloat(document.getElementById('trAmt').value) || 0;
+    const fee   = parseFloat(document.getElementById('trFee').value) || 0;
+    const total = amt + fee;
+
+    if (amt <= 0) {
+      showMsg('error', '// amount required', true);
+      return;
+    }
+    if (total > wallets[s].balance + 0.01) {
+      showMsg('error', '// insufficient balance', true);
+      return;
+    }
+
+    wallets[s].balance -= total;
+    wallets[d].balance += amt;
+
+    if (fee > 0) {
+      expHistory.push({
+        name:   `fee: ${wallets[s].name}→${wallets[d].name}`,
+        amount: fee,
+        date:   new Date().toLocaleDateString()
+      });
+    }
+
+    save();
+    closeModal();
+    showMsg('success', `// transferred ₱${format(amt)}`);
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function updateDestDrop() {
+  const s  = parseInt(document.getElementById('srcIdx').value);
+  const el = document.getElementById('destIdx');
+  if (!el) return;
+  el.innerHTML = wallets
+    .map((w, i) => i === s ? '' : `<option value="${i}">${w.name}  //  ₱${format(w.balance)}</option>`)
+    .join('');
+}
+
+function setTrAll() {
+  const s   = parseInt(document.getElementById('srcIdx').value);
+  const fee = parseFloat(document.getElementById('trFee').value) || 0;
+  document.getElementById('trAmt').value = Math.max(0, wallets[s].balance - fee).toFixed(2);
+  calcRedistRemaining();
+}
+
+function calcRedistRemaining() {
+  const s   = parseInt(document.getElementById('srcIdx').value);
+  const amt = parseFloat(document.getElementById('trAmt').value) || 0;
+  const fee = parseFloat(document.getElementById('trFee').value) || 0;
+  const rem = wallets[s].balance - (amt + fee);
+  const el  = document.getElementById('redistStatus');
+  if (!el) return;
+  el.innerText   = `// rem: ₱${format(rem)}`;
+  el.style.color = rem < 0 ? 'var(--red)' : 'var(--green2)';
+}
+
+function calcRemainingSal() {
+  const income = parseFloat(document.getElementById('incomeInput').value) || 0;
+  let alloc    = 0;
+  document.querySelectorAll('.sal-input').forEach((i) => alloc += (parseFloat(i.value) || 0));
+  const rem = (unallocatedSalary + income) - alloc;
+  const el  = document.getElementById('salRemaining');
+  el.innerText   = `// remaining: ₱${format(rem)}`;
+  el.style.color = rem < 0 ? 'var(--red)' : 'var(--green2)';
+}
+
+function setAllValue(className, targetIdx) {
+  const inputs = document.querySelectorAll('.' + className);
+  let ca       = 0;
+  inputs.forEach((i) => {
+    if (parseInt(i.getAttribute('data-idx')) !== targetIdx) ca += (parseFloat(i.value) || 0);
+  });
+  const av = (unallocatedSalary + (parseFloat(document.getElementById('incomeInput').value) || 0)) - ca;
+  inputs.forEach((i) => {
+    if (parseInt(i.getAttribute('data-idx')) === targetIdx) i.value = Math.max(0, av).toFixed(2);
+  });
+  calcRemainingSal();
+}
+
+// ── ADD RECORDS ───────────────────────────────────────────────────────────────
+
+function addBill() {
+  const n = document.getElementById('bName');
+  const a = document.getElementById('bAmt');
+  if (n.value && a.value) {
+    bills.push({ name: n.value, amount: parseFloat(a.value) });
+    n.value = '';
+    a.value = '';
+    save();
+  }
+}
+
+function addDebt() {
+  const n = document.getElementById('dName');
+  const a = document.getElementById('dAmt');
+  if (n.value && a.value) {
+    debts.push({ name: n.value, amount: parseFloat(a.value) });
+    n.value = '';
+    a.value = '';
+    save();
+  }
+}
+
+function addDailyExpense() {
+  const a    = document.getElementById('gAmt');
+  const d    = document.getElementById('gDesc');
+  const wIdx = document.getElementById('gWalletSelect').value;
+
+  if (a.value && wIdx !== '') {
+    const amt      = parseFloat(a.value);
+    const todayStr = new Date().toLocaleDateString();
+    const qs       = expHistory
+      .filter((h) => h.date === todayStr && h.name.includes('(QS)'))
+      .reduce((s, h) => s + h.amount, 0);
+
+    if ((qs + amt) > 1000) {
+      showMsg('error', `// quickSpend limit: ₱1,000/day\n// used: ₱${format(qs)}`, true);
+      return;
+    }
+
+    if (wallets[wIdx].balance >= amt) {
+      wallets[wIdx].balance -= amt;
+      expHistory.push({
+        name:   `${d.value || 'quickSpend'} [${wallets[wIdx].name}] (QS)`,
+        amount: amt,
+        date:   todayStr
+      });
+      a.value = '';
+      d.value = '';
+      save();
+      showMsg('success', '// expense recorded');
+    } else {
+      showMsg('error', '// insufficient balance', true);
+    }
+  }
+}
+
+// ── EDIT / DELETE / CLEAR ─────────────────────────────────────────────────────
+
+function openEdit(type, idx) {
+  const list = type === 'wallets'  ? wallets
+             : type === 'bills'    ? bills
+             : type === 'debts'    ? debts
+             : type === 'expH'     ? expHistory
+             : type === 'billH'    ? billHistory
+             : debtHistory;
+  const item = list[idx];
+
+  document.getElementById('modalTitle').innerText = 'edit';
+  document.getElementById('modalDesc').innerText  = `// editing: ${item.name}`;
+  document.getElementById('modalInputs').innerHTML =
+    `<input type="text"   id="en" value="${item.name}">
+     <input type="number" id="ea" value="${item.balance !== undefined ? item.balance : item.amount}">`;
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ save()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    item.name = document.getElementById('en').value;
+    const a   = parseFloat(document.getElementById('ea').value);
+    if (item.balance !== undefined) item.balance = a;
+    else item.amount = a;
+    save();
+    closeModal();
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function confirmDelete(type, idx) {
+  document.getElementById('modalTitle').innerText         = 'delete';
+  document.getElementById('modalDesc').innerText          = '// this action is irreversible';
+  document.getElementById('modalInputs').innerHTML        = '';
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ delete()';
+  btn.style.color   = 'var(--red)';
+  btn.style.borderColor = 'var(--red)';
+  btn.onclick = () => {
+    if      (type === 'wallets') wallets.splice(idx, 1);
+    else if (type === 'bills')   bills.splice(idx, 1);
+    else if (type === 'debts')   debts.splice(idx, 1);
+    else if (type === 'expH')    expHistory.splice(idx, 1);
+    else if (type === 'billH')   billHistory.splice(idx, 1);
+    else if (type === 'debtH')   debtHistory.splice(idx, 1);
+    save();
+    closeModal();
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function confirmClearAll(type) {
+  document.getElementById('modalTitle').innerText         = 'clearAll';
+  document.getElementById('modalDesc').innerText          = '// WARNING: irreversible';
+  document.getElementById('modalInputs').innerHTML        = '';
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ wipe()';
+  btn.style.color   = 'var(--red)';
+  btn.style.borderColor = 'var(--red)';
+  btn.onclick = () => {
+    if      (type === 'wallets')     wallets     = [];
+    else if (type === 'bills')       bills       = [];
+    else if (type === 'debts')       debts       = [];
+    else if (type === 'expHistory')  expHistory  = [];
+    else if (type === 'billHistory') billHistory = [];
+    else if (type === 'debtHistory') debtHistory = [];
+    save();
+    closeModal();
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+// ── PAGER ─────────────────────────────────────────────────────────────────────
+
+function renderPager(id, type, total) {
+  const max = Math.ceil(total / step);
+  if (max <= 1) {
+    document.getElementById(id).innerHTML = '';
+    return;
+  }
+  document.getElementById(id).innerHTML =
+    `<button onclick="pages['${type}']--;refresh()" ${pages[type] === 0 ? 'disabled' : ''}>← prev</button>
+     <span style="color:var(--text-dim)">${pages[type] + 1}/${max}</span>
+     <button onclick="pages['${type}']++;refresh()" ${pages[type] >= max - 1 ? 'disabled' : ''}>next →</button>`;
+}
+
+// ── MAIN REFRESH ──────────────────────────────────────────────────────────────
+
+function refresh() {
+  checkDateTransition();
+
+  const sl = localStorage.getItem('WF_LIVE_LIMIT');
+  if (sl !== null) liveLimit = parseFloat(sl);
+
+  const tC   = wallets.reduce((s, w)    => s + w.balance, 0);
+  const tB   = bills.reduce((s, b)      => s + b.amount,  0);
+  const tD   = debts.reduce((s, d)      => s + d.amount,  0);
+  const tE   = expHistory.reduce((s, h) => s + h.amount,  0);
+  const sU   = Math.max(0, unallocatedSalary);
+  const tCap = tC + sU + tB + tD + tE;
+
+  document.getElementById('mainTotal').innerText      = format(tC + sU + extraBudget);
+  document.getElementById('billForecast').innerText   = format((tC + sU) - tB);
+  document.getElementById('totalBillsOnly').innerText = format(tB);
+  document.getElementById('debtForecast').innerText   = format((tC + sU) - tD);
+  document.getElementById('totalDebtsOnly').innerText = format(tD);
+
+  if (tCap > 0) {
+    const pS = ((tC + sU) / tCap) * 100;
+    const pB = (tB / tCap) * 100;
+    const pD = (tD / tCap) * 100;
+    const pE = (tE / tCap) * 100;
+
+    ['barSavings', 'barBills', 'barDebts', 'barExps']
+      .forEach((id, i) => document.getElementById(id).style.width = [pS, pB, pD, pE][i] + '%');
+
+    ['percSavings', 'percBills', 'percDebts', 'percExps']
+      .forEach((id, i) => document.getElementById(id).innerText = Math.round([pS, pB, pD, pE][i]) + '%');
+
+    document.getElementById('amtSavings').innerText      = '₱' + format(tC + sU);
+    document.getElementById('amtBills').innerText        = '₱' + format(tB);
+    document.getElementById('amtDebts').innerText        = '₱' + format(tD);
+    document.getElementById('amtExps').innerText         = '₱' + format(tE);
+    document.getElementById('chartTotalValue').innerText = '₱' + format(tCap);
+  } else {
+    ['barSavings', 'barBills', 'barDebts', 'barExps']
+      .forEach((id) => document.getElementById(id).style.width = '0%');
+
+    ['percSavings', 'percBills', 'percDebts', 'percExps', 'amtSavings', 'amtBills', 'amtDebts', 'amtExps']
+      .forEach((id) => document.getElementById(id).innerText = id.startsWith('perc') ? '0%' : '₱0.00');
+
+    document.getElementById('chartTotalValue').innerText = '₱0.00';
+  }
+
+  // Wallet select dropdown
+  document.getElementById('gWalletSelect').innerHTML = wallets
+    .map((w, i) => `<option value="${i}">${w.name}  //  ₱${format(w.balance)}</option>`)
+    .join('');
+
+  // Wallet grid
+  let wHTML = wallets.map((w, i) =>
+    `<div class="wallet-card">
+       <span class="wallet-label">wallet</span>
+       <span class="wallet-name">${w.name}</span>
+       <span class="wallet-amount">₱${format(w.balance)}</span>
+       <div class="action-btns">
+         <button class="edit-btn" onclick="openEdit('wallets',${i})">edit</button>
+         <button class="del-btn"  onclick="confirmDelete('wallets',${i})">del</button>
+       </div>
+     </div>`
+  ).join('');
+
+  wHTML +=
+    `<div class="wallet-card extra-card">
+       <span class="wallet-label">pool</span>
+       <span class="wallet-name">extraBudget</span>
+       <span class="wallet-amount">₱${format(extraBudget)}</span>
+       <div class="action-btns">
+         <button class="del-btn" onclick="confirmClearExtra()">clear</button>
+       </div>
+     </div>`;
+
+  document.getElementById('walletGrid').innerHTML = wHTML;
+
+  // Budget settings
+  const sL = localStorage.getItem('WF_LIMIT_CFG') || '';
+  const sD = localStorage.getItem('WF_DAYS_CFG')  || '';
+  document.getElementById('spendLimit').value           = sL;
+  document.getElementById('daysToGo').value             = sD;
+  document.getElementById('liveLimitDisplay').innerText = format(liveLimit);
+
+  const bD    = parseInt(sD) || 1;
+  const cL    = parseFloat(sL) || 0;
+  const daily = cL / bD;
+  document.getElementById('dailyLimitBudget').innerText = format(daily);
+
+  const todayStr = new Date().toLocaleDateString();
+
+  const spT = expHistory
+    .filter((h) => h.date === todayStr && !h.name.includes('(QS)'))
+    .reduce((s, h) => s + h.amount, 0);
+  document.getElementById('spentToday').innerText = '₱' + format(spT);
+
+  const qsT = expHistory
+    .filter((h) => h.date === todayStr && h.name.includes('(QS)'))
+    .reduce((s, h) => s + h.amount, 0);
+  document.getElementById('quickSpentToday').innerText     = '₱' + format(qsT);
+  document.getElementById('quickRemainingToday').innerText = '₱' + format(Math.max(0, 1000 - qsT));
+
+  const tCS = expHistory
+    .filter((h) => !h.name.includes('(QS)') && h.cycleId === currentCycleId)
+    .reduce((s, h) => s + h.amount, 0);
+  const uP = cL > 0 ? Math.min((tCS / cL) * 100, 100) : 0;
+
+  document.getElementById('budgetCycleUsed').innerText    = '₱' + format(tCS);
+  document.getElementById('budgetRemaining').innerText    = '₱' + format(Math.max(0, liveLimit));
+  document.getElementById('budgetUsagePercent').innerText = Math.round(uP) + '%';
+  document.getElementById('budgetUsageBar').style.width   = uP + '%';
+
+  const uBar = document.getElementById('budgetUsageBar');
+  uBar.style.background = uP >= 100 ? 'var(--red)' : uP >= 75 ? 'var(--yellow2)' : 'var(--green)';
+
+  const st = document.getElementById('budgetStatus');
+  if (spT > daily && daily > 0) {
+    st.innerText   = `// ⚠ overspent: +₱${format(spT - daily)}`;
+    st.style.color = 'var(--red)';
+  } else if (uP >= 75) {
+    st.innerText   = '// ⚠ warning: high usage';
+    st.style.color = 'var(--yellow2)';
+  } else {
+    st.innerText   = '// ✓ status: safe';
+    st.style.color = 'var(--green)';
+  }
+
+  // List renderer
+  const dL = (list, el, pag, type, isP = false) => {
+    const s  = (pages[type] || 0) * step;
+    const sl = list.slice(s, s + step);
+
+    if (sl.length === 0) {
+      document.getElementById(el).innerHTML = `<div class="empty-state">empty array []</div>`;
+    } else {
+      document.getElementById(el).innerHTML = sl.map((item, i) =>
+        `<div class="list-item line-${type.includes('bill') ? 'bill' : type.includes('debt') ? 'debt' : 'expense'}">
+           <div class="list-item-left">
+             <b>${item.name}</b>
+             <small>₱${format(item.balance !== undefined ? item.balance : item.amount)}</small>
+             <div class="action-btns" style="margin-top:6px">
+               <button class="edit-btn" onclick="openEdit('${type}',${s + i})">edit</button>
+               <button class="del-btn"  onclick="confirmDelete('${type}',${s + i})">del</button>
+             </div>
+           </div>
+           ${isP ? `<button class="pay-btn" onclick="openPayIndividual('${type}',${s + i})">→pay</button>` : ''}
+         </div>`
+      ).join('');
+    }
+    renderPager(pag, type, list.length);
+  };
+
+  dL(bills, 'billList', 'billPager', 'bills', true);
+  dL(debts, 'debtList', 'debtPager', 'debts', true);
+
+  // History renderer
+  const rH = (key, el, pag, type, sId) => {
+    const list = key === 'expHistory'  ? expHistory
+               : key === 'billHistory' ? billHistory
+               : debtHistory;
+    const q   = document.getElementById(sId).value.toLowerCase();
+    const fil = list.filter((h) => h.name.toLowerCase().includes(q)).reverse();
+    const s   = (pages[type] || 0) * step;
+    const sl  = fil.slice(s, s + step);
+
+    if (sl.length === 0) {
+      document.getElementById(el).innerHTML = `<div class="empty-state">// no results</div>`;
+    } else {
+      document.getElementById(el).innerHTML = sl.map((h) =>
+        `<div class="list-item">
+           <div class="list-item-left">
+             <b>${h.name}</b>
+             <small>${h.date}</small>
+           </div>
+           <span style="color:var(--red);font-size:12px;font-weight:500;flex-shrink:0">-₱${format(h.amount)}</span>
+         </div>`
+      ).join('');
+    }
+    renderPager(pag, type, fil.length);
+  };
+
+  rH('expHistory',  'expHistoryList',  'expHistoryPager',  'expH',  'searchExp');
+  rH('billHistory', 'billHistoryList', 'billHistoryPager', 'billH', 'searchBill');
+  rH('debtHistory', 'debtHistoryList', 'debtHistoryPager', 'debtH', 'searchDebt');
+
+  // Salary section
+  renderSalary();
+}
+
+// ── BUDGET SPEND ──────────────────────────────────────────────────────────────
+
+function openBudgetSpend() {
+  if (wallets.length === 0) {
+    showMsg('error', '// no wallets', true);
+    return;
+  }
+
+  document.getElementById('modalTitle').innerText = 'recordExpense';
+  document.getElementById('modalDesc').innerText  = '// deducts from wallet + budget';
+  document.getElementById('modalInputs').innerHTML =
+    `<input type="text"   id="bsDesc"      placeholder='"description..."'>
+     <select id="bsWalletIdx">
+       ${wallets.map((w, i) => `<option value="${i}">${w.name}  //  ₱${format(w.balance)}</option>`).join('')}
+     </select>
+     <input type="number" id="bsAmt" placeholder="0.00  // amount">`;
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ record()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const desc   = document.getElementById('bsDesc').value || 'expense';
+    const wIdx   = parseInt(document.getElementById('bsWalletIdx').value);
+    const amt    = parseFloat(document.getElementById('bsAmt').value) || 0;
+    const wallet = wallets[wIdx];
+
+    if (amt <= 0)             { showMsg('error', '// invalid amount',       true); return; }
+    if (wallet.balance < amt) { showMsg('error', '// insufficient balance', true); return; }
+    if (liveLimit < amt)      { showMsg('error', '// exceeds budget limit', true); return; }
+
+    wallet.balance -= amt;
+    liveLimit      -= amt;
+    expHistory.push({
+      name:    `${desc} [${wallet.name}] (Budget)`,
+      amount:  amt,
+      date:    new Date().toLocaleDateString(),
+      cycleId: currentCycleId
+    });
+    save();
+    closeModal();
+    showMsg('success', '// expense recorded');
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+// ── TRANSFER TO EXTRA ─────────────────────────────────────────────────────────
+
+function confirmTransferToExtra() {
+  document.getElementById('modalTitle').innerText = 'transferToExtra';
+  document.getElementById('modalDesc').innerText  = `liveLimit: ₱${format(liveLimit)}`;
+
+  const gWO = () => wallets
+    .map((w, idx) => `<option value="${idx}">${w.name}  //  ₱${format(w.balance)}</option>`)
+    .join('');
+
+  document.getElementById('modalInputs').innerHTML =
+    `<div style="background:rgba(78,201,176,0.06);padding:10px;border-radius:4px;margin-bottom:10px;border:1px solid rgba(78,201,176,0.2)">
+       <div style="font-size:11px;color:var(--text-mid);margin-bottom:8px">
+         // quick: move all (₱${format(liveLimit)}) to extra
+       </div>
+       <button type="button" id="transferAllBtn"
+               style="width:100%;padding:8px;background:transparent;color:var(--green);border:1px solid var(--green);border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px">
+         → transferAll()
+       </button>
+     </div>
+     <div id="deductionRows">
+       <div class="deduc-group"
+            style="margin-bottom:8px;padding:10px;border:1px solid var(--border);border-radius:4px">
+         <select class="dWallet" style="width:100%;margin-bottom:6px">${gWO()}</select>
+         <div style="display:flex;gap:6px">
+           <input type="number" class="dAmt" placeholder="0.00  // amount" style="flex:1">
+           <input type="number" class="dFee" value="0" placeholder="fee" style="width:80px">
+         </div>
+       </div>
+     </div>
+     <button type="button" id="addRowBtn"
+             style="width:100%;padding:6px;background:transparent;color:var(--text-mid);border:1px dashed var(--border2);border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;margin-bottom:8px">
+       + addWallet()
+     </button>`;
+
+  document.getElementById('transferAllBtn').onclick = () => {
+    if (liveLimit <= 0) return showMsg('error', '// no funds', true);
+    extraBudget += liveLimit;
+    liveLimit    = 0;
+    save();
+    closeModal();
+    showMsg('success', '// transferred');
+  };
+
+  document.getElementById('addRowBtn').onclick = () => {
+    if (document.querySelectorAll('.deduc-group').length >= 3) {
+      return showMsg('error', '// max 3 wallets', true);
+    }
+    const r         = document.createElement('div');
+    r.className     = 'deduc-group';
+    r.style.cssText = 'margin-bottom:8px;padding:10px;border:1px solid var(--border);border-radius:4px';
+    r.innerHTML     =
+      `<select class="dWallet" style="width:100%;margin-bottom:6px">${gWO()}</select>
+       <div style="display:flex;gap:6px">
+         <input type="number" class="dAmt" placeholder="0.00" style="flex:1">
+         <input type="number" class="dFee" value="0" placeholder="fee" style="width:80px">
+       </div>`;
+    document.getElementById('deductionRows').appendChild(r);
+  };
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ deduct()';
+  btn.style.color   = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  btn.onclick = () => {
+    const rows = document.querySelectorAll('.deduc-group');
+    let total  = 0;
+
+    for (const row of rows) {
+      const wI  = parseInt(row.querySelector('.dWallet').value);
+      const amt = parseFloat(row.querySelector('.dAmt').value) || 0;
+      const fee = parseFloat(row.querySelector('.dFee').value) || 0;
+      if (amt > 0) {
+        if (wallets[wI].balance < (amt + fee)) {
+          return showMsg('error', `// insufficient: ${wallets[wI].name}`, true);
+        }
+        total += amt;
+      }
+    }
+
+    if (total <= 0)        return showMsg('error', '// enter amount',      true);
+    if (total > liveLimit) return showMsg('error', '// exceeds liveLimit', true);
+
+    rows.forEach((row) => {
+      const wI  = parseInt(row.querySelector('.dWallet').value);
+      const amt = parseFloat(row.querySelector('.dAmt').value) || 0;
+      const fee = parseFloat(row.querySelector('.dFee').value) || 0;
+      if (amt > 0) wallets[wI].balance -= (amt + fee);
+    });
+
+    extraBudget += total;
+    liveLimit   -= total;
+    save();
+    closeModal();
+    showMsg('success', '// transfer complete');
+  };
+
+  document.getElementById('modalCancelBtn').style.display = 'block';
+  document.getElementById('customModal').style.display    = 'flex';
+}
+
+// ── RESET BUDGET CYCLE ────────────────────────────────────────────────────────
+
+function resetBudgetCycle() {
+  document.getElementById('modalTitle').innerText         = 'newCycle';
+  document.getElementById('modalDesc').innerText          = '// reset cycleUsed to 0';
+  document.getElementById('modalInputs').innerHTML        = '';
+  document.getElementById('modalCancelBtn').style.display = 'block';
+
+  const btn         = document.getElementById('modalConfirmBtn');
+  btn.innerText     = '→ reset()';
+  btn.style.color   = 'var(--red)';
+  btn.style.borderColor = 'var(--red)';
+  btn.onclick = () => {
+    const cL = parseFloat(localStorage.getItem('WF_LIMIT_CFG')) || 0;
+    const cD = parseInt(localStorage.getItem('WF_DAYS_CFG'))    || 0;
+    const ts = new Date().toLocaleDateString();
+
+    currentCycleId += 1;
+    cycleStartDate  = ts;
+    localStorage.setItem('WF_CYCLE_ID',    currentCycleId.toString());
+    localStorage.setItem('WF_CYCLE_START', cycleStartDate);
+
+    liveLimit    = cL;
+    lastSyncDate = ts;
+    localStorage.setItem('WF_LIVE_LIMIT', liveLimit.toString());
+    localStorage.setItem('WF_LSD',        lastSyncDate);
+
+    document.getElementById('spendLimit').value = cL || '';
+    document.getElementById('daysToGo').value   = cD || '';
+
+    closeModal();
+    save();
+    showMsg('success', '// new cycle started');
+  };
+
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+// ── COPY SUMMARY ──────────────────────────────────────────────────────────────
+
+function copyTextSummary() {
+  const tC = wallets.reduce((s, w) => s + w.balance, 0);
+  const eb = typeof extraBudget !== 'undefined' ? extraBudget : 0;
+
+  let r = '// MONEY TRACKER REPORT\n// ' + new Date().toLocaleString() + '\n\nconst summary = {\n';
+  r += `  totalSavings: ${format(tC + eb)},\n  wallets: [\n`;
+  wallets.forEach((w) => { r += `    { name: "${w.name}", balance: ${format(w.balance)} },\n`; });
+  r += `  ],\n  extraBudget: ${format(eb)},\n  unpaidBills: [\n`;
+  bills.forEach((b)   => { r += `    { name: "${b.name}", amount: ${format(b.amount)} },\n`; });
+  r += `  ],\n  unpaidDebts: [\n`;
+  debts.forEach((d)   => { r += `    { name: "${d.name}", amount: ${format(d.amount)} },\n`; });
+  r += `  ]\n};\n\n// generated by money-tracker.js`;
+
+  navigator.clipboard.writeText(r)
+    .then(()  => showMsg('success', '// copied to clipboard'))
+    .catch(() => showMsg('error',   '// clipboard access denied', true));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+window.onload = function () { refresh(); };
+
+</script>
 </script>
 </body>
 </html>
